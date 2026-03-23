@@ -1,0 +1,9 @@
+{
+  "appId": "com.monochrome.chat",
+  "appName": "monochrome-chat",
+  "webDir": "public",
+  "server": {
+    "cleartext": true,
+    "androidScheme": "http"
+  }
+}
