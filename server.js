@@ -17,7 +17,7 @@ const io = new Server(server, {
     }
 }); 
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 const SALT_ROUNDS = 10;
 
 // --- Безопасность: Ограничение частоты запросов ---
