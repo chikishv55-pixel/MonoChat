@@ -1,0 +1,723 @@
+function loadRecentChats() {
+            socket.emit('get recent chats', (users) => renderChatsList(users, 'У вас пока нет переписок.'));
+        }
+
+        function handleSearch(e) {
+            // Поиск только по нажатию Enter или если поле пустое (сброс)
+            if (e && e.type === 'keydown' && e.key !== 'Enter') return;
+            const query = document.getElementById('search-input').value.trim();
+            if (query.length === 0) {
+                document.querySelector('.chats-column').classList.remove('is-searching');
+                return loadRecentChats();
+            }
+            document.querySelector('.chats-column').classList.add('is-searching');
+            socket.emit('search users', query, (users) => renderChatsList(users.filter(u => u.username !== currentUser.username), 'Пользователь не найден'));
+        }
+
+        function renderChatsList(users, emptyText) {
+            const chatsList = document.getElementById('chats-list');
+            chatsList.innerHTML = '';
+            if (users.length === 0) return chatsList.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-muted);">${emptyText}</div>`;
+            users.forEach(user => {
+                const isActive = currentChatUser && currentChatUser.username === user.username;
+                const chatItem = document.createElement('div');
+                chatItem.className = `chat-item ${isActive ? 'active' : ''}`;
+                chatItem.setAttribute('data-username', user.username);
+                chatItem.onclick = () => selectChat(user);
+                
+                const displayName = escapeHTML(myContacts[user.username] || user.display_name);
+                let avatarHTML = user.avatar ? `<img class="chat-avatar" src="${escapeHTML(getFullUrl(user.avatar))}">` : `<div class="chat-avatar">${displayName.substring(0,2).toUpperCase()}</div>`;
+                const statusDotHTML = user.isGroup ? '' : `<div class="status-dot ${user.isOnline ? 'online' : 'offline'}"></div>`;
+                
+                const snippetText = createMessageSnippet(user.lastMessage);
+                const lastMessageHTML = `<span class="chat-last-message" id="lm-${user.username}">${escapeHTML(snippetText)}</span>`;
+
+                chatItem.innerHTML = `<div class="avatar-wrapper">${avatarHTML}${statusDotHTML}</div>
+                    <div class="chat-info">
+                        <span class="chat-name">${displayName}</span>
+                        ${lastMessageHTML}
+                    </div>`;
+                chatsList.appendChild(chatItem);
+            });
+        }
+
+        function selectChat(user) {
+            currentChatUser = user;
+            const displayName = myContacts[user.username] || user.display_name;
+            const safeDisplayName = escapeHTML(displayName);
+            const safeUsername = escapeHTML(user.username);
+            setAvatarUI('current-chat-avatar-img', 'current-chat-avatar-text', user.avatar, safeDisplayName);
+            document.getElementById('current-chat-name').innerHTML = `${safeDisplayName} <span class="username-tag" style="color:inherit">@${safeUsername}</span>`;
+            const dot = document.getElementById('current-chat-status-dot');
+            const statusText = document.getElementById('current-chat-status-text');
+            const addContactBtn = document.getElementById('add-contact-btn');
+            const audioCallBtn = document.getElementById('audio-call-btn');
+            const videoCallBtn = document.getElementById('video-call-btn');
+
+            if (user.isGroup) {
+                dot.style.display = 'none';
+                let typeStr = user.type === 'channel' ? 'Канал' : 'Группа';
+                let membersStr = user.member_count ? `${user.member_count} ${user.type === 'channel' ? 'подписчиков' : 'участников'}` : typeStr;
+                statusText.textContent = membersStr;
+                addContactBtn.style.display = 'none';
+                audioCallBtn.style.display = 'none';
+                videoCallBtn.style.display = 'none';
+                
+                // Скрываем поле ввода, если это канал и пользователь не админ
+                if (user.type === 'channel' && user.my_role !== 'admin') {
+                    document.getElementById('message-input-area').style.display = 'none';
+                } else {
+                    document.getElementById('message-input-area').style.display = 'flex';
+                }
+            } else {
+                dot.style.display = 'block';
+                dot.className = `status-dot ${user.isOnline ? 'online' : 'offline'}`;
+                statusText.textContent = user.isOnline ? 'в сети' : 'офлайн';
+                addContactBtn.style.display = myContacts[user.username] ? 'none' : 'block';
+                audioCallBtn.style.display = 'block';
+                videoCallBtn.style.display = 'block';
+                document.getElementById('message-input-area').style.display = 'flex';
+            }
+            
+            // Адаптация для мобилок: добавляем класс активности чата
+            document.querySelector('.chat-container').classList.add('chat-active');
+            
+            socket.emit('get history', user.username, renderMessages);
+
+            // Обновляем активный чат в списке
+            document.querySelectorAll('.chat-item').forEach(el => {
+                el.classList.remove('active');
+                if (el.getAttribute('data-username') === user.username) {
+                    el.classList.add('active');
+                }
+            });
+
+            // After setting the default status, check for typers
+            updateTypingIndicator(user.username);
+        }
+
+        // Кнопка назад для мобилок
+        function closeChatMobile() {
+            document.querySelector('.chat-container').classList.remove('chat-active');
+            currentChatUser = null;
+        }
+
+        function addCurrentToContacts() {
+            const alias = prompt("Имя для контакта:", currentChatUser.display_name);
+            if (alias) {
+                socket.emit('add contact', { username: currentChatUser.username, alias }, () => {
+                    myContacts[currentChatUser.username] = alias;
+                    selectChat(currentChatUser);
+                    loadRecentChats();
+                });
+            }
+        }
+
+        socket.on('user status changed', (data) => {
+            const chatEl = document.querySelector(`.chat-item[data-username="${data.username}"] .status-dot`);
+            if (chatEl) chatEl.className = `status-dot ${data.online ? 'online' : 'offline'}`;
+            if (currentChatUser && currentChatUser.username === data.username) {
+                currentChatUser.isOnline = data.online;
+                document.getElementById('current-chat-status-dot').className = `status-dot ${data.online ? 'online' : 'offline'}`;
+                document.getElementById('current-chat-status-text').textContent = data.online ? 'в сети' : 'офлайн';
+            }
+        });
+
+        socket.on('user data changed', (data) => {
+            if (data.username === currentChatUser?.username) {
+                if (data.display_name) currentChatUser.display_name = data.display_name;
+                if (data.avatar) currentChatUser.avatar = data.avatar;
+                selectChat(currentChatUser); // Re-render header
+            }
+            loadRecentChats(); // To update name in chat list
+        });
+
+        function openCurrentChatInfo() {
+             if (!currentChatUser) return;
+             if (currentChatUser.isGroup) {
+                 openGroupInfoModal();
+             } else {
+                 openProfileModal();
+             }
+         }
+
+         function openProfileModal() {
+             const displayName = myContacts[currentChatUser.username] || currentChatUser.display_name; 
+             const safeDisplayName = escapeHTML(displayName);
+             setAvatarUI('pm-avatar-img', 'pm-avatar-text', currentChatUser.avatar, safeDisplayName);
+             document.getElementById('pm-name').textContent = safeDisplayName;
+             document.getElementById('pm-username').textContent = '@' + currentChatUser.username;
+
+             const bioEl = document.getElementById('pm-bio');
+             const bdateEl = document.getElementById('pm-bdate');
+             
+             bioEl.textContent = currentChatUser.bio || '';
+             bioEl.style.display = currentChatUser.bio ? 'block' : 'none';
+
+             if (currentChatUser.birth_date) {
+                 bdateEl.textContent = `Дата рождения: ${new Date(currentChatUser.birth_date).toLocaleDateString()}`;
+                 bdateEl.style.display = 'block';
+             } else {
+                 bdateEl.style.display = 'none';
+             }
+
+             const pmMusicWidget = document.getElementById('pm-music-widget');
+             if (currentChatUser.music_status) {
+                 pmMusicWidget.style.display = 'flex';
+                 pmMusicWidget.classList.add('playing');
+                 document.getElementById('pm-music-text').textContent = currentChatUser.music_status;
+             } else {
+                 pmMusicWidget.style.display = 'none';
+             }
+
+             document.getElementById('main-overlay').classList.add('active');
+             document.getElementById('profile-modal').classList.add('active');
+         }
+
+        function openFullAvatar() {
+            if (currentChatUser && currentChatUser.avatar) {
+                document.getElementById('full-avatar-img').src = getFullUrl(currentChatUser.avatar);
+                document.getElementById('avatar-viewer').classList.add('active');
+            }
+        }
+        
+        function closeFullAvatar() { document.getElementById('avatar-viewer').classList.remove('active'); }
+
+        function sendTextMessage() {
+            const input = document.getElementById('message-text');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Stop typing indicator
+            clearTimeout(typingTimer);
+            if (isCurrentlyTyping) {
+                socket.emit('stop typing', { chatId: currentChatUser.username });
+                isCurrentlyTyping = false;
+            }
+
+            emitMessage(text, 'text'); 
+            input.value = '';
+            input.dispatchEvent(new Event('input')); // Обновляем видимость кнопок
+        }
+
+        function sendImage(input) {
+            const files = input.files;
+            if (!files || files.length === 0) return;
+
+            if (files.length === 1) {
+                // Если выбрано одно фото - открываем окно предпросмотра с кнопкой "Отправить"
+                const reader = new FileReader();
+                reader.onload = e => openMessageCropModal(e.target.result);
+                reader.readAsDataURL(files[0]);
+            } else {
+                const readAsDataURL = (file) => new Promise((res, rej) => {
+                    const reader = new FileReader();
+                    reader.onload = e => res(e.target.result);
+                    reader.onerror = e => rej(e);
+                    reader.readAsDataURL(file);
+                });
+                Promise.all(Array.from(files).map(readAsDataURL))
+                    .then(images => {
+                        images.forEach((img, index) => setTimeout(() => emitMessage(img, 'image'), index * 300));
+                    })
+                    .catch(err => alert("Не удалось загрузить изображения."));
+            }
+            input.value = '';
+        }
+        async function startVoice() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                voiceStartTime = Date.now();
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.start(); 
+                document.getElementById('record-btn').classList.add('recording');
+            } catch (err) { alert('Нет доступа к микрофону!'); }
+        }
+
+        function stopVoice() {
+            if (!mediaRecorder) return; 
+            mediaRecorder.stop(); 
+            const duration = (Date.now() - voiceStartTime) / 1000;
+            mediaRecorder.onstop = () => {
+                document.getElementById('record-btn').classList.remove('recording');
+                if (duration < 1.0) {
+                    audioChunks = [];
+                    return;
+                }
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const reader = new FileReader(); 
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = () => emitMessage(reader.result, 'audio', duration);
+                audioChunks = [];
+            };
+        }
+
+        let circleMediaRecorder;
+        let circleChunks = [];
+        let circleStream;
+        let circleStartTime = 0;
+
+        async function startCircleVideo() {
+            try {
+                circleStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", aspectRatio: 1 }, audio: true });
+                
+                const previewOverlay = document.getElementById('circle-preview-overlay');
+                const previewVideo = document.getElementById('circle-preview-video');
+                previewVideo.srcObject = circleStream;
+                previewOverlay.style.display = 'flex';
+                setTimeout(() => previewOverlay.classList.add('visible'), 10);
+
+                circleMediaRecorder = new MediaRecorder(circleStream, { mimeType: 'video/webm' });
+                circleStartTime = Date.now();
+                circleChunks = [];
+                circleMediaRecorder.ondataavailable = e => circleChunks.push(e.data);
+                circleMediaRecorder.start();
+                document.getElementById('record-btn').classList.add('recording');
+            } catch (err) { 
+                alert('Нет доступа к камере или микрофону!'); 
+                if (circleStream) {
+                    circleStream.getTracks().forEach(t => t.stop());
+                    circleStream = null;
+                }
+                hideCirclePreview();
+            }
+        }
+
+        function stopCircleVideo() {
+            hideCirclePreview();
+
+            if (!circleMediaRecorder) {
+                if (circleStream) {
+                    circleStream.getTracks().forEach(t => t.stop());
+                    circleStream = null;
+                }
+                return;
+            }
+
+            if (circleMediaRecorder.state === 'recording') {
+                circleMediaRecorder.stop();
+            }
+
+            const duration = (Date.now() - circleStartTime) / 1000;
+            circleMediaRecorder.onstop = () => {
+                document.getElementById('record-btn').classList.remove('recording');
+                if (circleStream) {
+                    circleStream.getTracks().forEach(t => t.stop());
+                    circleStream = null;
+                }
+                if (duration < 1.0) {
+                    circleChunks = [];
+                    return;
+                }
+                const videoBlob = new Blob(circleChunks, { type: 'video/webm' });
+                const reader = new FileReader();
+                reader.readAsDataURL(videoBlob);
+                reader.onloadend = () => emitMessage(reader.result, 'circle_video', duration);
+                circleChunks = [];
+            };
+        }
+
+        // --- Логика переключения режима записи ---
+        let recordMode = 'voice'; // 'voice' | 'video'
+        let isRecordingMedia = false;
+        let recordHoldTimer = null;
+        let isPressing = false;
+        let isTouchDevice = false;
+
+        function handleRecordStart(e) {
+            if (e.type === 'touchstart') isTouchDevice = true;
+            if (e.type === 'mousedown' && isTouchDevice) return; 
+            
+            isPressing = true;
+            isRecordingMedia = false;
+            clearTimeout(recordHoldTimer);
+            
+            recordHoldTimer = setTimeout(() => {
+                if (!isPressing) return;
+                isRecordingMedia = true;
+                if (recordMode === 'voice') startVoice();
+                else startCircleVideo();
+            }, 300); // 300мс удержания для старта записи
+        }
+
+        function handleRecordStop(e) {
+            if (e && e.type === 'mouseup' && isTouchDevice) return;
+            
+            if (!isPressing) return;
+            isPressing = false;
+            clearTimeout(recordHoldTimer);
+
+            if (isRecordingMedia) {
+                if (recordMode === 'voice') stopVoice();
+                else stopCircleVideo();
+                isRecordingMedia = false;
+            } else {
+                if (e && !['mouseleave', 'touchcancel', 'pointerleave', 'pointercancel'].includes(e.type)) {
+                    toggleRecordMode();
+                }
+            }
+        }
+
+        function handleRecordLeave(e) { 
+            if (e.type === 'mouseleave' && isTouchDevice) return;
+            if (isPressing) handleRecordStop(e); 
+        }
+
+        function toggleRecordMode() {
+            recordMode = recordMode === 'voice' ? 'video' : 'voice';
+            document.getElementById('record-icon-voice').style.display = recordMode === 'voice' ? 'block' : 'none';
+            document.getElementById('record-icon-video').style.display = recordMode === 'video' ? 'block' : 'none';
+        }
+
+        function hideCirclePreview() {
+            const previewOverlay = document.getElementById('circle-preview-overlay');
+            if (!previewOverlay) return;
+            const previewVideo = document.getElementById('circle-preview-video');
+            
+            previewOverlay.classList.remove('visible');
+            setTimeout(() => {
+                previewOverlay.style.display = 'none';
+                if (previewVideo) previewVideo.srcObject = null;
+            }, 200); // Match CSS transition
+        }
+
+        async function emitMessage(content, type, duration = 0) {
+            if (!currentChatUser) return;
+            const now = new Date(); const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            let finalContent = content;
+            
+            if (content && typeof content === 'string' && content.startsWith('data:')) {
+                try {
+                    const res = await fetch('/api/upload/chat-media', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + localStorage.getItem('monochrome_token')
+                        },
+                        body: JSON.stringify({ media: content })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        finalContent = data.path;
+                    } else {
+                        return alert('Ошибка загрузки медиа');
+                    }
+                } catch(e) { return alert('Network error during upload'); }
+            }
+
+            const payload = { 
+                to: currentChatUser.username, 
+                text: finalContent, 
+                type, 
+                time, 
+                duration 
+            };
+            if (replyContext) {
+                payload.replyTo = replyContext;
+            }
+            socket.emit('private message', payload);
+            cancelReply();
+            setTimeout(loadRecentChats, 500);
+        }
+
+        socket.on('private message', (msg) => {
+            // При получении любого сообщения, перезагружаем список чатов,
+            // чтобы он отсортировался по-новому и обновилось последнее сообщение.
+            loadRecentChats();
+
+            // Далее, если чат открыт, добавляем сообщение в окно.
+            if (!currentChatUser) return;
+            
+            const isGroupMsg = msg.receiver.startsWith('g');
+            let chatIsActive = false;
+            if (isGroupMsg) {
+                chatIsActive = currentChatUser.username === msg.receiver;
+            } else {
+                const otherUser = (msg.sender === currentUser.username) ? msg.receiver : msg.sender;
+                chatIsActive = currentChatUser.username === otherUser;
+            }
+            if (chatIsActive) {
+                appendMessageUI(msg);
+            } else {
+                // Чат не активен, но мы уже перезагрузили список выше.
+            }
+        });
+
+        socket.on('user is typing', ({ displayName, chatId }) => {
+            if (!typingUsers.has(chatId)) {
+                typingUsers.set(chatId, new Set());
+            }
+            typingUsers.get(chatId).add(displayName);
+
+            const lastMessageSpan = document.getElementById(`lm-${chatId}`);
+            if (lastMessageSpan) {
+                lastMessageSpan.innerHTML = `<em class="typing">печатает...</em>`;
+            }
+
+            updateTypingIndicator(chatId);
+        });
+
+        socket.on('user stopped typing', ({ displayName, chatId }) => {
+            const typers = typingUsers.get(chatId);
+            if (typingUsers.has(chatId)) {
+                typingUsers.get(chatId).delete(displayName);
+                if (typingUsers.get(chatId).size === 0) typingUsers.delete(chatId);
+            }
+            
+            // Если в этом чате больше никто не печатает, нужно восстановить последнее сообщение
+            if (!typers || typers.size === 0) {
+                const lastMessageSpan = document.getElementById(`lm-${chatId}`);
+                // Обновляем список, только если мы действительно показывали "печатает..."
+                if (lastMessageSpan && lastMessageSpan.querySelector('.typing')) {
+                    loadRecentChats(); // Самый надежный способ получить актуальное последнее сообщение
+                }
+            }
+            updateTypingIndicator(chatId); // Обновляем заголовок в любом случае
+        });
+        
+        socket.on('new_comment', (comment) => {
+            const countSpan = document.getElementById(`comment-count-${comment.message_id}`);
+            if (countSpan) countSpan.textContent = parseInt(countSpan.textContent || 0) + 1;
+            
+            if (currentCommentMessageId === comment.message_id) {
+                appendCommentUI(comment);
+            }
+        });
+
+        socket.on('user_music_changed', (data) => {
+            if (currentChatUser && currentChatUser.username === data.username) {
+                currentChatUser.music_status = data.music_status;
+                if (document.getElementById('profile-modal').classList.contains('active')) {
+                    const pmMusicWidget = document.getElementById('pm-music-widget');
+                    if (data.music_status) {
+                        pmMusicWidget.style.display = 'flex';
+                        pmMusicWidget.classList.add('playing');
+                        document.getElementById('pm-music-text').textContent = data.music_status;
+                    } else {
+                        pmMusicWidget.style.display = 'none';
+                    }
+                }
+            }
+        });
+
+        socket.on('message failed', ({ time, error }) => {
+            alert(`Не удалось отправить сообщение: ${error}`);
+        });
+
+        socket.on('new story', loadStories);
+
+        socket.on('group_member_removed', ({ groupId, removedUsername, removerUsername }) => {
+            const groupUsername = `g${groupId}`;
+            if (removedUsername === currentUser.username) {
+                alert(`Вы были удалены из группы.`);
+                // Если текущий чат - эта группа, закрываем его
+                if (currentChatUser && currentChatUser.username === groupUsername) {
+                    closeChatMobile();
+                    document.getElementById('message-input-area').style.display = 'none';
+                    document.getElementById('messages-area').innerHTML = '';
+                    document.getElementById('current-chat-name').textContent = 'Выберите чат';
+                }
+                // Удаляем чат из списка
+                const chatItem = document.querySelector(`.chat-item[data-username="${groupUsername}"]`);
+                if (chatItem) chatItem.remove();
+            } else {
+                // Если открыт этот чат, обновляем инфо
+                if (currentChatUser && currentChatUser.username === groupUsername) {
+                    openGroupInfoModal(); // Re-fetch details
+                }
+            }
+        });
+
+        socket.on('group_settings_updated', ({ groupId, newSettings }) => {
+            if (currentChatUser && currentChatUser.username === `g${groupId}`) {
+                currentChatUser.display_name = newSettings.name;
+                currentChatUser.public_id = newSettings.public_id;
+                selectChat(currentChatUser); // Re-render header
+                if (document.getElementById('group-info-modal').classList.contains('active')) {
+                    openGroupInfoModal(); // Refresh modal if open
+                }
+            }
+            loadRecentChats(); // Refresh chat list
+        });
+
+        function renderMessages(messages) {
+            const area = document.getElementById('messages-area'); area.innerHTML = '';
+            messages.forEach(appendMessageUI); area.scrollTop = area.scrollHeight;
+        }
+
+        function appendMessageUI(msg) {
+            try {
+            const area = document.getElementById('messages-area');
+            const isMine = msg.sender === currentUser.username;
+            const div = document.createElement('div');
+            div.className = `message ${isMine ? 'mine' : 'other'}`;
+            div.id = `msg-${msg.id}`;
+            div.dataset.reactions = JSON.stringify(msg.reactions || []);
+            let content = '';
+            let bubbleClass = 'bubble';
+
+            let replyHTML = '';
+            if (msg.reply_to_message_id && msg.reply_snippet) {
+                const [sender, ...snippetParts] = msg.reply_snippet.split(': ');
+                const snippet = snippetParts.join(': ');
+                replyHTML = `
+                    <div class="reply-block" id="reply-block-${msg.id}">
+                        <b>${escapeHTML(sender)}</b>
+                        <p>${escapeHTML(snippet)}</p>
+                    </div>
+                `;
+            }
+
+            let forwardedHTML = '';
+            if (msg.forwarded_from_username) {
+                forwardedHTML = `
+                    <div class="forwarded-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15l5-5-5-5"/></svg>
+                        Переслано от @${escapeHTML(msg.forwarded_from_username)}
+                    </div>
+                `;
+            }
+
+            let images = [];
+            if (msg.type === 'image') {
+                bubbleClass += ' image-bubble';
+                content = `<img src="${escapeHTML(getFullUrl(msg.text))}" class="message-img" id="img-${msg.id}" onload="this.style.background='none'" loading="lazy">`;
+            } else if (msg.type === 'gallery') {
+                try {
+                    images = JSON.parse(msg.text).map(getFullUrl); // Сервер присылает JSON-строку с путями
+                    bubbleClass += ' gallery-bubble';
+                    content = `<div class="gallery-grid">${images.map((src, index) => `<img src="${escapeHTML(src)}" class="message-img" id="gallery-${msg.id}-${index}" onload="this.style.background='none'" loading="lazy">`).join('')}</div>`;
+                } catch(e) {
+                    content = "<i>Ошибка загрузки галереи</i>";
+                }
+            } else if (msg.type === 'audio') {
+                let barWidth = Math.min(100 + ((msg.duration || 0) * 15), 280);
+                content = `
+                <div class="voice-player" style="width: ${barWidth}px;">
+                    <button class="play-btn" id="play-voice-${msg.id}">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <div class="voice-wave voice-dynamic-wave">
+                        <div class="voice-progress"></div>
+                    </div>
+                    <audio class="hidden-audio" src="${escapeHTML(getFullUrl(msg.text))}"></audio>
+                </div>`;
+            } else if (msg.type === 'circle_video') {
+                bubbleClass += ' circle-bubble';
+                content = `<video class="circle-video" src="${escapeHTML(getFullUrl(msg.text))}" autoplay loop muted playsinline onclick="this.muted = !this.muted"></video>`;
+            } else if (msg.type === 'sticker') {
+                bubbleClass += ' sticker-bubble';
+                content = `<img src="${escapeHTML(getFullUrl(msg.text))}" class="sticker-img" loading="lazy">`;
+            } else {
+                content = escapeHTML((msg.text || '').toString());
+            }
+            
+            let commentsHTML = '';
+            if (currentChatUser && currentChatUser.type === 'channel') {
+                commentsHTML = `
+                    <div class="message-comments-btn" onclick="openComments(${msg.id})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right:6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        Комментарии (<span id="comment-count-${msg.id}">${msg.comment_count || 0}</span>)
+                    </div>`;
+            }
+            
+            div.innerHTML = `
+                <div class="message-actions">
+                    <button class="msg-action-btn" title="Реакция"><svg viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5"></path><path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke-width="1.5" stroke-linecap="round"></path><path d="M9 9H9.01" stroke-width="1.5" stroke-linecap="round"></path><path d="M15 9H15.01" stroke-width="1.5" stroke-linecap="round"></path></svg></button>
+                    <button class="msg-action-btn" title="Ответить"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
+                    <button class="msg-action-btn" title="Переслать"><svg viewBox="0 0 24 24" transform="scale(1, -1) rotate(90)"><path d="M18 9.5l-6-6-6 6"></path><path d="M12 3v13.5"></path><path d="M5 15h14"></path></svg></button>
+                    <button class="msg-action-btn" title="Удалить"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                </div>
+                <div class="${bubbleClass}">
+                    ${forwardedHTML}
+                    ${replyHTML}
+                    ${content}
+                </div>
+                <div class="message-footer">
+                    ${commentsHTML}
+                    <div class="message-reactions" id="reactions-${msg.id}"></div>
+                    <div class="message-meta">
+                        <span class="message-time">${msg.time}</span>
+                    </div>
+                </div>`;
+            
+            // Программно добавляем обработчики, чтобы избежать проблем с кавычками в тексте сообщения
+            const btnReaction = div.querySelector('button[title="Реакция"]');
+            if (btnReaction) btnReaction.onclick = (e) => openReactionPicker(e.currentTarget, msg.id);
+            
+            const btnReply = div.querySelector('button[title="Ответить"]');
+            if (btnReply) btnReply.onclick = () => showReplyUI(msg.id, msg.sender, msg.text, msg.type);
+            
+            const btnForward = div.querySelector('button[title="Переслать"]');
+            if (btnForward) btnForward.onclick = () => openForwardModal(msg.id);
+            
+            const btnDelete = div.querySelector('button[title="Удалить"]');
+            if (btnDelete) btnDelete.onclick = () => openDeleteModal(msg.id, isMine);
+
+            if (msg.reply_to_message_id && msg.reply_snippet) {
+                const replyBlock = div.querySelector(`#reply-block-${msg.id}`);
+                if (replyBlock) replyBlock.onclick = () => scrollToMessage(msg.reply_to_message_id);
+            }
+
+            if (msg.type === 'image') {
+                const imgEl = div.querySelector(`#img-${msg.id}`);
+                if (imgEl) imgEl.onclick = () => openImageViewer([getFullUrl(msg.text)], 0);
+            } else if (msg.type === 'gallery' && images.length > 0) {
+                images.forEach((src, index) => {
+                    const imgEl = div.querySelector(`#gallery-${msg.id}-${index}`);
+                    if (imgEl) imgEl.onclick = () => openImageViewer(images, index);
+                });
+            } else if (msg.type === 'audio') {
+                const playBtn = div.querySelector(`#play-voice-${msg.id}`);
+                if (playBtn) playBtn.onclick = () => playVoice(playBtn, msg.text);
+            }
+
+            // Add hover delay logic
+            div.onmouseenter = () => showMessageActionsWithDelay(div);
+            div.onmouseleave = () => hideMessageActionsWithDelay(div);
+            const actionsEl = div.querySelector('.message-actions');
+            if (actionsEl) {
+                actionsEl.onmouseenter = () => cancelHideMessageActions(div);
+                actionsEl.onmouseleave = () => hideMessageActionsWithDelay(div);
+            }
+
+            area.appendChild(div); 
+            area.scrollTop = area.scrollHeight;
+            renderReactions(msg.id, msg.reactions);
+            } catch (error) {
+                console.error("Ошибка при отрисовке сообщения:", msg, error);
+            }
+        }
+
+        function playVoice(btn, src) {
+            const audio = btn.parentElement.querySelector('.hidden-audio');
+            const icon = btn.querySelector('svg');
+            const progress = btn.parentElement.querySelector('.voice-progress');
+            
+            if (audio.paused) { 
+                document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
+                audio.play(); 
+                icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; 
+            } else { 
+                audio.pause(); 
+                icon.innerHTML = '<path d="M8 5v14l11-7z"/>'; 
+            }
+            
+            audio.ontimeupdate = () => { if(progress) progress.style.width = (audio.currentTime / audio.duration * 100) + '%'; };
+            audio.onended = () => { icon.innerHTML = '<path d="M8 5v14l11-7z"/>'; if(progress) progress.style.width = '0%'; };
+        }
+
+        function openDeleteModal(id, mine) {
+            messageToDeleteId = id;
+            document.getElementById('btn-delete-everyone').style.display = mine ? 'block' : 'none';
+            document.getElementById('main-overlay').classList.add('active');
+            document.getElementById('delete-modal').classList.add('active');
+        }
+
+        function executeDelete(type) {
+            socket.emit('delete message', { msgId: messageToDeleteId, deleteType: type });
+            closeAllModals();
+        }
+
+        socket.on('message deleted', (data) => { const el = document.getElementById(`msg-${data.msgId}`); if (el) el.remove(); });

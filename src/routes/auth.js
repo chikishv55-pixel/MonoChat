@@ -1,0 +1,148 @@
+const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcrypt');
+const jwt = require('../utils/jwt');
+const { dbRun, dbGet } = require('../db/database');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'monochrome-super-secret-key-123';
+const SALT_ROUNDS = 10;
+
+// Ограничение попыток входа/регистрации
+const loginAttempts = new Map();
+const registerAttempts = new Map();
+const AUTH_ATTEMPTS_LIMIT = 5;
+const AUTH_ATTEMPTS_WINDOW = 5 * 60 * 1000;
+
+router.post('/register', async (req, res) => {
+    try {
+        const ip = req.ip || req.connection.remoteAddress;
+        const now = Date.now();
+        const attempts = registerAttempts.get(ip) || { count: 0, firstAttempt: now };
+        
+        if (now - attempts.firstAttempt > AUTH_ATTEMPTS_WINDOW) {
+            registerAttempts.set(ip, { count: 1, firstAttempt: now });
+        } else {
+            if (attempts.count >= AUTH_ATTEMPTS_LIMIT) {
+                return res.status(429).json({ success: false, message: 'Слишком много попыток. Попробуйте позже.' });
+            }
+            attempts.count++;
+            registerAttempts.set(ip, attempts);
+        }
+
+        const { username, displayName, password, fcmToken } = req.body;
+        
+        if (!username || !displayName || !password) {
+            return res.status(400).json({ success: false, message: 'Все поля обязательны.' });
+        }
+        if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+            return res.status(400).json({ success: false, message: 'Юзернейм: от 3 до 20 символов (буквы, цифры, _).' });
+        }
+        if (password.length < 6) {
+            return res.status(400).json({ success: false, message: 'Пароль должен быть не менее 6 символов.' });
+        }
+
+        const lowerUser = username.toLowerCase();
+        const hash = await bcrypt.hash(password, SALT_ROUNDS);
+
+        try {
+            await dbRun(`INSERT INTO users (username, display_name, password, fcm_token) VALUES (?, ?, ?, ?)`, 
+                [lowerUser, displayName, hash, fcmToken || null]);
+            
+            registerAttempts.delete(ip);
+            
+            const user = { 
+                username: lowerUser, 
+                display_name: displayName, 
+                fcm_token: fcmToken,
+                avatar: null,
+                bio: null,
+                birth_date: null,
+                music_status: null
+            };
+            const token = jwt.sign({ username: lowerUser }, JWT_SECRET, { expiresIn: '7d' });
+            
+            res.json({ success: true, user, token });
+        } catch (err) {
+            if (err.code === 'SQLITE_CONSTRAINT') {
+                return res.status(409).json({ success: false, message: 'Этот юзернейм уже занят!' });
+            } else {
+                throw err;
+            }
+        }
+    } catch (e) {
+        console.error('Registration error:', e);
+        res.status(500).json({ success: false, message: 'Ошибка сервера при регистрации.' });
+    }
+});
+
+router.post('/login', async (req, res) => {
+    try {
+        const ip = req.ip || req.connection.remoteAddress;
+        const now = Date.now();
+        const attempts = loginAttempts.get(ip) || { count: 0, firstAttempt: now };
+
+        if (now - attempts.firstAttempt > AUTH_ATTEMPTS_WINDOW) {
+            loginAttempts.set(ip, { count: 1, firstAttempt: now });
+        } else {
+            if (attempts.count >= AUTH_ATTEMPTS_LIMIT) {
+                return res.status(429).json({ success: false, message: 'Слишком много попыток входа. Попробуйте позже.' });
+            }
+            attempts.count++;
+            loginAttempts.set(ip, attempts);
+        }
+
+        const { username, password, fcmToken } = req.body;
+        if (!username || !password) {
+            return res.status(400).json({ success: false, message: 'Введите логин и пароль.' });
+        }
+
+        const lowerUser = username.toLowerCase();
+        const row = await dbGet(`SELECT username, display_name, password, avatar, bio, birth_date, music_status, fcm_token FROM users WHERE username = ?`, [lowerUser]);
+        
+        if (!row) {
+            return res.status(401).json({ success: false, message: 'Пользователь не найден!' });
+        }
+
+        const match = await bcrypt.compare(password, row.password);
+        if (match) {
+            loginAttempts.delete(ip);
+
+            if (fcmToken && fcmToken !== row.fcm_token) {
+                await dbRun(`UPDATE users SET fcm_token = ? WHERE username = ?`, [fcmToken, row.username]);
+                row.fcm_token = fcmToken;
+            }
+
+            const userResponse = { ...row };
+            delete userResponse.password;
+            
+            const token = jwt.sign({ username: row.username }, JWT_SECRET, { expiresIn: '7d' });
+
+            res.json({ success: true, user: userResponse, token });
+        } else {
+            res.status(401).json({ success: false, message: 'Неверный пароль!' });
+        }
+    } catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ success: false, message: 'Ошибка на стороне сервера.' });
+    }
+});
+
+router.get('/me', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, message: 'Нет токена доступа' });
+        }
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+        
+        const row = await dbGet(`SELECT username, display_name, avatar, bio, birth_date, music_status, fcm_token FROM users WHERE username = ?`, [decoded.username]);
+        if (!row) return res.status(404).json({ success: false, message: 'Пользователь не найден' });
+        
+        res.json({ success: true, user: row });
+    } catch(e) {
+        res.status(401).json({ success: false, message: 'Токен недействителен' });
+    }
+});
+
+module.exports = { router, JWT_SECRET };
