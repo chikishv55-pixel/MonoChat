@@ -1,6 +1,5 @@
-// --- НАСТРОЙКА ПОДКЛЮЧЕНИЯ К СЕРВЕРУ ---
 const SERVER_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || !window.location.hostname)
-    ? 'https://5.35.95.248' // <- ЗАМЕНИТЕ НА ВАШ ДОМЕН BEGET
+    ? 'http://5.35.95.248:3000' // Сменили https на http и добавили порт :3000
     : window.location.origin;
 
 const socket = io(SERVER_URL);
@@ -104,6 +103,9 @@ window.addEventListener('load', () => {
         document.getElementById('auth-screen').classList.add('active');
         hideSplash();
     }
+
+    // ГАРАНТИЯ: Если через 5 секунд заставка все еще висит — убираем её в любом случае
+    setTimeout(hideSplash, 5000);
 
     const messageInput = document.getElementById('message-text');
     messageInput.addEventListener('keypress', (e) => {
