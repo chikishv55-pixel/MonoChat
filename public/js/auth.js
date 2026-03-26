@@ -50,7 +50,7 @@ function showLogin() { document.getElementById('login-card').classList.remove('h
             const password = document.getElementById('password-input').value;
             if(!username || !password) return alert('Введите данные');
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch(SERVER_URL + '/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password, fcmToken: localStorage.getItem('fcm_token') || fcmToken })
@@ -73,7 +73,7 @@ function showLogin() { document.getElementById('login-card').classList.remove('h
             if (password !== passwordCheck) return alert('Пароли не совпадают');
             if(!username || !displayName || !password) return alert('Заполните все поля');
             try {
-                const response = await fetch('/api/auth/register', {
+                const response = await fetch(SERVER_URL + '/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, displayName, password, fcmToken: localStorage.getItem('fcm_token') || fcmToken })

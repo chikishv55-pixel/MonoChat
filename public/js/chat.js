@@ -389,7 +389,7 @@ function loadRecentChats() {
             
             if (content && typeof content === 'string' && content.startsWith('data:')) {
                 try {
-                    const res = await fetch('/api/upload/chat-media', {
+                    const res = await fetch(SERVER_URL + '/api/upload/chat-media', {
                         method: 'POST',
                         headers: { 
                             'Content-Type': 'application/json',

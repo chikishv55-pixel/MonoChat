@@ -88,7 +88,7 @@ window.addEventListener('load', () => {
 
     const token = localStorage.getItem('monochrome_token');
     if (token) {
-        fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
+        fetch(SERVER_URL + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
             .then(res => {
                 if (res.success) authSuccess(res.user);

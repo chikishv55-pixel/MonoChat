@@ -72,7 +72,7 @@ function postStory(input) {
             const oldAvatar = currentUser.avatar;
             updateAllMyAvatars(dataUrl, currentUser.display_name); // Оптимистичное обновление
             
-            fetch('/api/upload/avatar', {
+            fetch(SERVER_URL + '/api/upload/avatar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('monochrome_token') },
             body: JSON.stringify({ avatar: dataUrl })
