@@ -3,6 +3,119 @@ let localStream;
         let callPeerUsername = null;
         let isCurrentCallVideo = true;
 
+        // =====================================================================
+        // RINGTONE via Web Audio API
+        // Позволяет играть поверх любого другого аудио и при заблокированном экране.
+        // =====================================================================
+        let ringtoneAudioCtx = null;
+        let ringtoneNodes = [];
+        let ringtoneInterval = null;
+
+        function initRingtoneAudio() {
+            if (ringtoneAudioCtx) return; // Уже инициализирован
+            try {
+                ringtoneAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch(e) {
+                console.warn('Web Audio API не поддерживается:', e);
+            }
+        }
+
+        function playRingtoneBeep() {
+            if (!ringtoneAudioCtx) return;
+            try {
+                // Два тона — как традиционный телефонный рингтон
+                const beeps = [
+                    { freq: 480, start: 0,    dur: 0.2 },
+                    { freq: 620, start: 0.05, dur: 0.2 },
+                ];
+                beeps.forEach(b => {
+                    const osc = ringtoneAudioCtx.createOscillator();
+                    const gain = ringtoneAudioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ringtoneAudioCtx.destination);
+                    osc.frequency.value = b.freq;
+                    osc.type = 'sine';
+                    const t = ringtoneAudioCtx.currentTime + b.start;
+                    gain.gain.setValueAtTime(0, t);
+                    gain.gain.linearRampToValueAtTime(0.35, t + 0.02);
+                    gain.gain.setValueAtTime(0.35, t + b.dur - 0.05);
+                    gain.gain.linearRampToValueAtTime(0, t + b.dur);
+                    osc.start(t);
+                    osc.stop(t + b.dur + 0.1);
+                    ringtoneNodes.push(osc);
+                });
+            } catch(e) { console.warn('Ringtone error:', e); }
+        }
+
+        function startRingtone(callerName) {
+            stopRingtone(); // На случай если уже играет
+            if (!ringtoneAudioCtx) initRingtoneAudio();
+            if (ringtoneAudioCtx && ringtoneAudioCtx.state === 'suspended') {
+                ringtoneAudioCtx.resume().catch(()=>{});
+            }
+            // Играем сразу и потом каждые 1.5 секунды
+            playRingtoneBeep();
+            ringtoneInterval = setInterval(playRingtoneBeep, 1500);
+
+            // MediaSession API — показывает метаданные в системном媒体-плеере устройства
+            // (экран блокировки Android, пульт AirPods, CarPlay и т.д.)
+            if ('mediaSession' in navigator) {
+                try {
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                        title: 'Входящий звонок',
+                        artist: callerName || 'Monochrome',
+                        album: 'MONOCHROME CHAT',
+                    });
+                    navigator.mediaSession.playbackState = 'playing';
+                    navigator.mediaSession.setActionHandler('stop', () => rejectCall());
+                    navigator.mediaSession.setActionHandler('pause', () => rejectCall());
+                } catch(e) { console.warn('MediaSession error:', e); }
+            }
+
+            // Notification API — системное уведомление (нужно разрешение)
+            if ('Notification' in window) {
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted') {
+                        try {
+                            const notif = new Notification('📞 Входящий звонок', {
+                                body: `${callerName || 'Кто-то'} звонит вам`,
+                                icon: '/icon.png',
+                                badge: '/icon.png',
+                                tag: 'incoming-call',
+                                renotify: true,
+                                requireInteraction: true, // Не скрывать автоматически
+                                silent: true, // Звук мы делаем через Web Audio
+                                vibrate: [200, 100, 200, 100, 200],
+                            });
+                            notif.onclick = () => { window.focus(); notif.close(); };
+                            // Сохраняем для закрытия
+                            window._callNotification = notif;
+                        } catch(e) { console.warn('Notification error:', e); }
+                    }
+                });
+            }
+        }
+
+        function stopRingtone() {
+            clearInterval(ringtoneInterval);
+            ringtoneInterval = null;
+            ringtoneNodes.forEach(n => { try { n.stop(); } catch(e){} });
+            ringtoneNodes = [];
+            // Закрываем системное уведомление
+            if (window._callNotification) {
+                window._callNotification.close();
+                window._callNotification = null;
+            }
+            // Сбрасываем MediaSession
+            if ('mediaSession' in navigator) {
+                try {
+                    navigator.mediaSession.playbackState = 'none';
+                    navigator.mediaSession.setActionHandler('stop', null);
+                    navigator.mediaSession.setActionHandler('pause', null);
+                } catch(e) {}
+            }
+        }
+
         // Бесплатные STUN сервера от Google для пробития NAT
         const rtcConfig = { iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }] };
 
@@ -44,14 +157,13 @@ let localStream;
             document.getElementById('ic-call-type').textContent = data.isVideo ? 'Входящий видеозвонок' : 'Входящий аудиозвонок';
             document.getElementById('incoming-call-overlay').classList.add('active');
 
-            const ringtone = document.getElementById('ringtone');
-            ringtone.play().catch(e => console.warn("Не удалось воспроизвести рингтон:", e));
+            // Запускаем рингтон через Web Audio API
+            startRingtone(data.callerName);
         });
 
+
         async function acceptCall() {
-            const ringtone = document.getElementById('ringtone');
-            ringtone.pause();
-            ringtone.currentTime = 0;
+            stopRingtone();
             document.getElementById('incoming-call-overlay').classList.remove('active');
             
             // Настройка UI перед показом
@@ -78,9 +190,7 @@ let localStream;
         }
 
         function rejectCall() {
-            const ringtone = document.getElementById('ringtone');
-            ringtone.pause();
-            ringtone.currentTime = 0;
+            stopRingtone();
             document.getElementById('incoming-call-overlay').classList.remove('active');
             if (callPeerUsername) socket.emit('reject_call', { to: callPeerUsername });
             callPeerUsername = null;

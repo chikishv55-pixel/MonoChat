@@ -1,6 +1,5 @@
 // --- НАСТРОЙКА ПОДКЛЮЧЕНИЯ К СЕРВЕРУ ---
-        // Для Android-приложения здесь должен быть IP-адрес вашего компьютера в локальной сети.
-        const SERVER_URL = "http://192.168.1.34:3000";
+        const SERVER_URL = "http://5.35.95.248";
         const socket = io(SERVER_URL);
 
         socket.on('connect_error', (error) => {
@@ -175,7 +174,42 @@
                     isCurrentlyTyping = false;
                 }, typingTimeout);
             });
+
+            // =====================================================================
+            // FIX: Клавиатура на мобильных не прокручивает чат вниз
+            // visualViewport API отслеживает реальный видимый viewport (без клавиатуры).
+            // При его изменении — принудительно оставляем скролл у последнего сообщения.
+            // =====================================================================
+            if (window.visualViewport) {
+                let lastScrollHeight = 0;
+                window.visualViewport.addEventListener('resize', () => {
+                    const messagesArea = document.getElementById('messages-area');
+                    if (!messagesArea) return;
+                    // Если высота viewport уменьшилась (открылась клавиатура)
+                    // — держим скролл у последнего сообщения
+                    if (messagesArea.scrollHeight !== lastScrollHeight || messagesArea.scrollTop < messagesArea.scrollHeight - messagesArea.clientHeight - 10) {
+                        requestAnimationFrame(() => {
+                            messagesArea.scrollTop = messagesArea.scrollHeight;
+                        });
+                    }
+                    lastScrollHeight = messagesArea.scrollHeight;
+                });
+            }
+
+            // =====================================================================
+            // FIX: Инициализируем AudioContext при первом касании/клике пользователя.
+            // Без этого браузер блокирует воспроизведение аудио (autoplay policy).
+            // initRingtoneAudio() определена в webrtc.js
+            // =====================================================================
+            const unlockAudio = () => {
+                if (typeof initRingtoneAudio === 'function') initRingtoneAudio();
+                document.removeEventListener('touchstart', unlockAudio, true);
+                document.removeEventListener('click', unlockAudio, true);
+            };
+            document.addEventListener('touchstart', unlockAudio, true);
+            document.addEventListener('click', unlockAudio, true);
         });
+
 
         document.addEventListener('keydown', (e) => {
             const viewer = document.getElementById('image-viewer');
