@@ -381,10 +381,40 @@ body.dark-theme .message.mine .reply-block b { color: #fff; }
 .remove-member-btn { background: transparent; border: none; color: #e74c3c; font-size: 20px; cursor: pointer; padding: 5px; opacity: 0.7; transition: 0.2s; }
 .remove-member-btn:hover { opacity: 1; background: rgba(231,76,60,0.1); border-radius: 50%; }
 
-#my-profile-modal .profile-modal-name { margin-top: 16px; font-size: 22px; font-weight: 500;}
-#my-profile-modal .profile-modal-user { margin-bottom: 16px; font-size: 15px; color: var(--text-muted);}
-.my-profile-bio { font-size: 15px; color: var(--text-main); text-align: center; line-height: 1.5; white-space: pre-wrap; margin-bottom: 16px; }
-.my-profile-bdate { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+/* TELEGRAM SETTINGS PANEL */
+.tg-settings-panel { position: fixed; top: 0; left: 0; width: 100vw; max-width: 400px; height: 100vh; background: var(--bg-main); z-index: 2000; display: flex; flex-direction: column; transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+@media (max-width: 767px) { .tg-settings-panel { max-width: 100%; transform: translateX(100%); left: auto; right: 0; } }
+.tg-settings-panel.active { transform: translateX(0); }
+.tg-panel-header { display: flex; align-items: center; padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px; background: var(--bg-card); border-bottom: 1px solid var(--border-light); z-index: 10; min-height: 60px;}
+.tg-back-btn { background: none; border: none; font-size: 28px; color: var(--text-muted); cursor: pointer; padding: 0 16px 0 0; display: flex; align-items: center; transition: color 0.2s;}
+.tg-back-btn:hover { color: var(--text-main); }
+.tg-header-title { flex: 1; font-size: 18px; font-weight: 500; text-align: center; color: var(--text-main); margin: 0; }
+.tg-panel-content { flex: 1; overflow-y: auto; background: var(--bg-main); display: flex; flex-direction: column; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+.tg-profile-cover { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; background: var(--bg-card); margin-bottom: 8px; border-bottom: 1px solid var(--border-light); }
+.tg-avatar-wrapper { position: relative; width: 100px; height: 100px; border-radius: 50%; margin-bottom: 16px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+.tg-profile-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: var(--avatar-bg); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 500;}
+.tg-avatar-camera-overlay { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-card); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.tg-avatar-camera-overlay svg { width: 18px; height: 18px; stroke: #fff;}
+.tg-profile-name { font-size: 20px; font-weight: 500; color: var(--text-main); margin-bottom: 4px; text-align: center; }
+.tg-profile-status { font-size: 14px; color: var(--text-muted); text-align: center; }
+.tg-section { background: var(--bg-card); margin-bottom: 8px; display: flex; flex-direction: column; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
+.tg-menu-item { display: flex; align-items: center; padding: 12px 20px; cursor: pointer; transition: background 0.2s; position: relative; }
+.tg-menu-item:not(:last-child)::after { content: ''; position: absolute; bottom: 0; left: 60px; right: 0; height: 1px; background: var(--border-light); }
+.tg-menu-item:hover { background: var(--hover-bg); }
+.tg-menu-icon { width: 24px; height: 24px; margin-right: 20px; color: var(--text-muted); }
+.text-danger .tg-menu-icon, .tg-menu-text.text-danger { color: #e74c3c; }
+.tg-menu-text { font-size: 16px; color: var(--text-main); font-weight: 400; flex: 1; }
+.tg-menu-labeled { display: flex; flex-direction: column; justify-content: center; width: 100%;}
+.tg-menu-label { font-size: 16px; color: var(--text-main); margin-bottom: 2px; line-height: 1.4; word-break: break-word; }
+.tg-menu-sublabel { font-size: 13px; color: var(--text-muted); }
+.tg-input-group { display: flex; flex-direction: column; padding: 12px 20px; border-bottom: 1px solid var(--border-light); }
+.tg-input-label { font-size: 13px; color: var(--accent); margin-bottom: 6px; font-weight: 500; }
+.tg-input-field { border: none; background: transparent; font-size: 16px; color: var(--text-main); outline: none; width: 100%;}
+.tg-input-field::placeholder { color: var(--text-placeholder); }
+.tg-btn { width: 100%; border: none; padding: 12px; font-size: 15px; font-weight: 500; border-radius: 8px; cursor: pointer; transition: background 0.2s; text-align: center; }
+.tg-btn.primary { background: var(--accent); color: #fff; }
+.tg-btn.secondary { background: transparent; color: var(--text-muted); }
+.tg-btn.secondary:hover { background: var(--hover-bg); }
 
 #forward-modal .modal-content { width: 100%; max-height: 300px; overflow-y: auto; margin-bottom: 16px; background: var(--hover-bg); border-radius: 8px;}
 #forward-modal .chat-item { padding: 12px; border-bottom: 1px solid var(--border-light); margin: 0; border-radius: 0;}
