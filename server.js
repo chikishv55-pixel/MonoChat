@@ -13,7 +13,7 @@ const io = new Server(server, {
     }
 }); 
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 
 const { initDB } = require('./src/db/database');
 
