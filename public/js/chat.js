@@ -26,7 +26,10 @@ function loadRecentChats() {
                 chatItem.onclick = () => selectChat(user);
                 
                 const displayName = escapeHTML(myContacts[user.username] || user.display_name);
-                let avatarHTML = user.avatar ? `<img class="chat-avatar" src="${escapeHTML(getFullUrl(user.avatar))}">` : `<div class="chat-avatar">${displayName.substring(0,2).toUpperCase()}</div>`;
+                const isUserPremium = !!user.is_premium;
+                const premiumBadge = isUserPremium ? '<span class="premium-star" title="Premium">★</span>' : '';
+
+                let avatarHTML = renderAvatarHTML(user.avatar, displayName, 'chat-avatar');
                 const statusDotHTML = user.isGroup ? '' : `<div class="status-dot ${user.isOnline ? 'online' : 'offline'}"></div>`;
                 
                 const snippetText = createMessageSnippet(user.lastMessage);
@@ -34,25 +37,43 @@ function loadRecentChats() {
 
                 chatItem.innerHTML = `<div class="avatar-wrapper">${avatarHTML}${statusDotHTML}</div>
                     <div class="chat-info">
-                        <span class="chat-name">${displayName}</span>
+                        <span class="chat-name">${displayName} ${premiumBadge}</span>
                         ${lastMessageHTML}
                     </div>`;
                 chatsList.appendChild(chatItem);
             });
         }
 
+        let lastChatRequestId = 0;
         function selectChat(user) {
             currentChatUser = user;
+            
+            // Сбрасываем поле ввода и другие состояния
+            cancelReply();
+            document.getElementById('message-text').value = '';
+            document.getElementById('message-input-area').classList.remove('has-text');
+
+            // Мгновенная очистка сообщений и показ лоадера
+            const area = document.getElementById('messages-area');
+            area.innerHTML = '<div class="chat-loader"><div class="spinner"></div><span>Загрузка сообщений...</span></div>';
+            
+            const requestId = ++lastChatRequestId;
             const displayName = myContacts[user.username] || user.display_name;
             const safeDisplayName = escapeHTML(displayName);
             const safeUsername = escapeHTML(user.username);
-            setAvatarUI('current-chat-avatar-img', 'current-chat-avatar-text', user.avatar, safeDisplayName);
-            document.getElementById('current-chat-name').innerHTML = `${safeDisplayName} <span class="username-tag" style="color:inherit">@${safeUsername}</span>`;
+            
+            const isUserPremium = !!user.is_premium;
+            const premiumBadge = isUserPremium ? '<span class="premium-star" title="Premium">★</span>' : '';
+            
+            const avatarWrapper = document.querySelector('.messages-header .avatar-wrapper');
+            avatarWrapper.innerHTML = renderAvatarHTML(user.avatar, displayName, 'partner-avatar') + 
+                `<div class="status-dot" id="current-chat-status-dot" style="display:none;"></div>`;
+
+            document.getElementById('current-chat-name').innerHTML = `${safeDisplayName} ${premiumBadge} <span class="username-tag" style="color:inherit">@${safeUsername}</span>`;
             const dot = document.getElementById('current-chat-status-dot');
             const statusText = document.getElementById('current-chat-status-text');
             const addContactBtn = document.getElementById('add-contact-btn');
-            const audioCallBtn = document.getElementById('audio-call-btn');
-            const videoCallBtn = document.getElementById('video-call-btn');
+            const callChoiceBtn = document.getElementById('call-choice-btn');
 
             if (user.isGroup) {
                 dot.style.display = 'none';
@@ -60,8 +81,7 @@ function loadRecentChats() {
                 let membersStr = user.member_count ? `${user.member_count} ${user.type === 'channel' ? 'подписчиков' : 'участников'}` : typeStr;
                 statusText.textContent = membersStr;
                 addContactBtn.style.display = 'none';
-                audioCallBtn.style.display = 'none';
-                videoCallBtn.style.display = 'none';
+                callChoiceBtn.style.display = 'none';
                 
                 // Скрываем поле ввода, если это канал и пользователь не админ
                 if (user.type === 'channel' && user.my_role !== 'admin') {
@@ -74,15 +94,18 @@ function loadRecentChats() {
                 dot.className = `status-dot ${user.isOnline ? 'online' : 'offline'}`;
                 statusText.textContent = user.isOnline ? 'в сети' : 'офлайн';
                 addContactBtn.style.display = myContacts[user.username] ? 'none' : 'block';
-                audioCallBtn.style.display = 'block';
-                videoCallBtn.style.display = 'block';
+                callChoiceBtn.style.display = 'block';
                 document.getElementById('message-input-area').style.display = 'flex';
             }
             
             // Адаптация для мобилок: добавляем класс активности чата
             document.querySelector('.chat-container').classList.add('chat-active');
             
-            socket.emit('get history', user.username, renderMessages);
+            socket.emit('get history', user.username, (messages) => {
+                if (requestId === lastChatRequestId) {
+                    renderMessages(messages);
+                }
+            });
 
             // Обновляем активный чат в списке
             document.querySelectorAll('.chat-item').forEach(el => {
@@ -542,18 +565,38 @@ function loadRecentChats() {
         });
 
         function renderMessages(messages) {
-            const area = document.getElementById('messages-area'); area.innerHTML = '';
-            messages.forEach(appendMessageUI); area.scrollTop = area.scrollHeight;
+            const area = document.getElementById('messages-area');
+            area.innerHTML = '';
+            
+            if (messages.length === 0) {
+                area.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-muted); opacity: 0.5;">История сообщений пуста</div>';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            messages.forEach(msg => {
+                const msgEl = createMessageElement(msg);
+                fragment.appendChild(msgEl);
+            });
+            
+            area.appendChild(fragment);
+            area.scrollTop = area.scrollHeight;
+            
+            // Запускаем отрисовку реакций после вставки в DOM
+            messages.forEach(msg => {
+                if (msg.reactions && msg.reactions.length > 0) {
+                    renderReactions(msg.id, msg.reactions);
+                }
+            });
         }
 
-        function appendMessageUI(msg) {
-            try {
-            const area = document.getElementById('messages-area');
+        function createMessageElement(msg) {
             const isMine = msg.sender === currentUser.username;
             const div = document.createElement('div');
             div.className = `message ${isMine ? 'mine' : 'other'}`;
             div.id = `msg-${msg.id}`;
             div.dataset.reactions = JSON.stringify(msg.reactions || []);
+            
             let content = '';
             let bubbleClass = 'bubble';
 
@@ -562,7 +605,7 @@ function loadRecentChats() {
                 const [sender, ...snippetParts] = msg.reply_snippet.split(': ');
                 const snippet = snippetParts.join(': ');
                 replyHTML = `
-                    <div class="reply-block" id="reply-block-${msg.id}">
+                    <div class="reply-block" onclick="scrollToMessage(${msg.reply_to_message_id})">
                         <b>${escapeHTML(sender)}</b>
                         <p>${escapeHTML(snippet)}</p>
                     </div>
@@ -582,25 +625,20 @@ function loadRecentChats() {
             let images = [];
             if (msg.type === 'image') {
                 bubbleClass += ' image-bubble';
-                content = `<img src="${escapeHTML(getFullUrl(msg.text))}" class="message-img" id="img-${msg.id}" onload="this.style.background='none'" loading="lazy">`;
+                content = `<img src="${escapeHTML(getFullUrl(msg.text))}" class="message-img" id="img-${msg.id}" loading="lazy">`;
             } else if (msg.type === 'gallery') {
                 try {
-                    images = JSON.parse(msg.text).map(getFullUrl); // Сервер присылает JSON-строку с путями
+                    images = JSON.parse(msg.text).map(getFullUrl);
                     bubbleClass += ' gallery-bubble';
-                    content = `<div class="gallery-grid">${images.map((src, index) => `<img src="${escapeHTML(src)}" class="message-img" id="gallery-${msg.id}-${index}" onload="this.style.background='none'" loading="lazy">`).join('')}</div>`;
-                } catch(e) {
-                    content = "<i>Ошибка загрузки галереи</i>";
-                }
+                    content = `<div class="gallery-grid">${images.map((src, index) => `<img src="${escapeHTML(src)}" class="message-img" id="gallery-${msg.id}-${index}" loading="lazy">`).join('')}</div>`;
+                } catch(e) { content = "<i>Ошибка галереи</i>"; }
             } else if (msg.type === 'audio') {
                 let barWidth = Math.min(100 + ((msg.duration || 0) * 15), 280);
-                content = `
-                <div class="voice-player" style="width: ${barWidth}px;">
-                    <button class="play-btn" id="play-voice-${msg.id}">
+                content = `<div class="voice-player" style="width: ${barWidth}px;">
+                    <button class="play-btn" onclick="playVoice(this, '${escapeHTML(msg.text)}')">
                         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
-                    <div class="voice-wave voice-dynamic-wave">
-                        <div class="voice-progress"></div>
-                    </div>
+                    <div class="voice-wave voice-dynamic-wave"><div class="voice-progress"></div></div>
                     <audio class="hidden-audio" src="${escapeHTML(getFullUrl(msg.text))}"></audio>
                 </div>`;
             } else if (msg.type === 'circle_video') {
@@ -612,22 +650,21 @@ function loadRecentChats() {
             } else {
                 content = escapeHTML((msg.text || '').toString());
             }
-            
+
             let commentsHTML = '';
             if (currentChatUser && currentChatUser.type === 'channel') {
-                commentsHTML = `
-                    <div class="message-comments-btn" onclick="openComments(${msg.id})">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right:6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        Комментарии (<span id="comment-count-${msg.id}">${msg.comment_count || 0}</span>)
-                    </div>`;
+                commentsHTML = `<div class="message-comments-btn" onclick="openComments(${msg.id})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right:6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Комментарии (<span id="comment-count-${msg.id}">${msg.comment_count || 0}</span>)
+                </div>`;
             }
-            
+
             div.innerHTML = `
                 <div class="message-actions">
-                    <button class="msg-action-btn" title="Реакция"><svg viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5"></path><path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke-width="1.5" stroke-linecap="round"></path><path d="M9 9H9.01" stroke-width="1.5" stroke-linecap="round"></path><path d="M15 9H15.01" stroke-width="1.5" stroke-linecap="round"></path></svg></button>
-                    <button class="msg-action-btn" title="Ответить"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
-                    <button class="msg-action-btn" title="Переслать"><svg viewBox="0 0 24 24" transform="scale(1, -1) rotate(90)"><path d="M18 9.5l-6-6-6 6"></path><path d="M12 3v13.5"></path><path d="M5 15h14"></path></svg></button>
-                    <button class="msg-action-btn" title="Удалить"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                    <button class="msg-action-btn" title="Реакция" onclick="openReactionPicker(this, ${msg.id})"><svg viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5"></path><path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke-width="1.5" stroke-linecap="round"></path><path d="M9 9H9.01" stroke-width="1.5" stroke-linecap="round"></path><path d="M15 9H15.01" stroke-width="1.5" stroke-linecap="round"></path></svg></button>
+                    <button class="msg-action-btn" title="Ответить" onclick="showReplyUI(${msg.id}, '${escapeHTML(msg.sender)}', '${escapeHTML(msg.text)}', '${msg.type}')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
+                    <button class="msg-action-btn" title="Переслать" onclick="openForwardModal(${msg.id})"><svg viewBox="0 0 24 24" transform="scale(1, -1) rotate(90)"><path d="M18 9.5l-6-6-6 6"></path><path d="M12 3v13.5"></path><path d="M5 15h14"></path></svg></button>
+                    <button class="msg-action-btn" title="Удалить" onclick="openDeleteModal(${msg.id}, ${isMine})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                 </div>
                 <div class="${bubbleClass}">
                     ${forwardedHTML}
@@ -641,53 +678,31 @@ function loadRecentChats() {
                         <span class="message-time">${msg.time}</span>
                     </div>
                 </div>`;
-            
-            // Программно добавляем обработчики, чтобы избежать проблем с кавычками в тексте сообщения
-            const btnReaction = div.querySelector('button[title="Реакция"]');
-            if (btnReaction) btnReaction.onclick = (e) => openReactionPicker(e.currentTarget, msg.id);
-            
-            const btnReply = div.querySelector('button[title="Ответить"]');
-            if (btnReply) btnReply.onclick = () => showReplyUI(msg.id, msg.sender, msg.text, msg.type);
-            
-            const btnForward = div.querySelector('button[title="Переслать"]');
-            if (btnForward) btnForward.onclick = () => openForwardModal(msg.id);
-            
-            const btnDelete = div.querySelector('button[title="Удалить"]');
-            if (btnDelete) btnDelete.onclick = () => openDeleteModal(msg.id, isMine);
 
-            if (msg.reply_to_message_id && msg.reply_snippet) {
-                const replyBlock = div.querySelector(`#reply-block-${msg.id}`);
-                if (replyBlock) replyBlock.onclick = () => scrollToMessage(msg.reply_to_message_id);
-            }
-
+            // Обработчики для изображений
             if (msg.type === 'image') {
-                const imgEl = div.querySelector(`#img-${msg.id}`);
-                if (imgEl) imgEl.onclick = () => openImageViewer([getFullUrl(msg.text)], 0);
+                const img = div.querySelector('.message-img');
+                img.onclick = () => openImageViewer([getFullUrl(msg.text)], 0);
             } else if (msg.type === 'gallery' && images.length > 0) {
-                images.forEach((src, index) => {
-                    const imgEl = div.querySelector(`#gallery-${msg.id}-${index}`);
-                    if (imgEl) imgEl.onclick = () => openImageViewer(images, index);
+                div.querySelectorAll('.message-img').forEach((img, i) => {
+                    img.onclick = () => openImageViewer(images, i);
                 });
-            } else if (msg.type === 'audio') {
-                const playBtn = div.querySelector(`#play-voice-${msg.id}`);
-                if (playBtn) playBtn.onclick = () => playVoice(playBtn, msg.text);
             }
 
-            // Add hover delay logic
+            // Навешиваем ховеры для действий
             div.onmouseenter = () => showMessageActionsWithDelay(div);
             div.onmouseleave = () => hideMessageActionsWithDelay(div);
-            const actionsEl = div.querySelector('.message-actions');
-            if (actionsEl) {
-                actionsEl.onmouseenter = () => cancelHideMessageActions(div);
-                actionsEl.onmouseleave = () => hideMessageActionsWithDelay(div);
-            }
 
-            area.appendChild(div); 
+            return div;
+        }
+
+        // Старая функция appendMessageUI теперь может использовать createMessageElement
+        function appendMessageUI(msg) {
+            const area = document.getElementById('messages-area');
+            const el = createMessageElement(msg);
+            area.appendChild(el);
             area.scrollTop = area.scrollHeight;
-            renderReactions(msg.id, msg.reactions);
-            } catch (error) {
-                console.error("Ошибка при отрисовке сообщения:", msg, error);
-            }
+            if (msg.reactions && msg.reactions.length > 0) renderReactions(msg.id, msg.reactions);
         }
 
         function playVoice(btn, src) {

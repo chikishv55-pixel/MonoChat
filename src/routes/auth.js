@@ -57,7 +57,8 @@ router.post('/register', async (req, res) => {
                 avatar: null,
                 bio: null,
                 birth_date: null,
-                music_status: null
+                music_status: null,
+                is_premium: 0
             };
             const token = jwt.sign({ username: lowerUser }, JWT_SECRET, { expiresIn: '7d' });
             
@@ -97,7 +98,7 @@ router.post('/login', async (req, res) => {
         }
 
         const lowerUser = username.toLowerCase();
-        const row = await dbGet(`SELECT username, display_name, password, avatar, bio, birth_date, music_status, fcm_token FROM users WHERE username = ?`, [lowerUser]);
+        const row = await dbGet(`SELECT username, display_name, password, avatar, bio, birth_date, music_status, fcm_token, is_premium FROM users WHERE username = ?`, [lowerUser]);
         
         if (!row) {
             return res.status(401).json({ success: false, message: 'Пользователь не найден!' });
@@ -136,12 +137,28 @@ router.get('/me', async (req, res) => {
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, JWT_SECRET);
         
-        const row = await dbGet(`SELECT username, display_name, avatar, bio, birth_date, music_status, fcm_token FROM users WHERE username = ?`, [decoded.username]);
+        const row = await dbGet(`SELECT username, display_name, avatar, bio, birth_date, music_status, fcm_token, is_premium FROM users WHERE username = ?`, [decoded.username]);
         if (!row) return res.status(404).json({ success: false, message: 'Пользователь не найден' });
         
         res.json({ success: true, user: row });
     } catch(e) {
         res.status(401).json({ success: false, message: 'Токен недействителен' });
+    }
+});
+
+router.post('/premium', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+        
+        const { isPremium } = req.body;
+        const value = isPremium ? 1 : 0;
+        
+        await dbRun(`UPDATE users SET is_premium = ? WHERE username = ?`, [value, decoded.username]);
+        res.json({ success: true, is_premium: value });
+    } catch(e) {
+        res.status(500).json({ success: false, message: 'Ошибка при обновлении статуса' });
     }
 });
 

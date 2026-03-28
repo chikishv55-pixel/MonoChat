@@ -45,6 +45,18 @@ router.post('/avatar', async (req, res) => {
     try {
         const { avatar } = req.body;
         if (!avatar) return res.status(400).json({ success: false });
+        
+        // Проверяем формат (видео или фото)
+        const isVideo = avatar.startsWith('data:video/');
+        
+        if (isVideo) {
+            // Проверяем премиум статус
+            const user = await dbGet(`SELECT is_premium FROM users WHERE username = ?`, [req.user.username]);
+            if (!user || !user.is_premium) {
+                return res.status(403).json({ success: false, message: 'Видео-аватарки доступны только Premium пользователям' });
+            }
+        }
+
         const publicPath = await saveMediaDataUrl(avatar, req.user.username, 'avatars');
         await dbRun(`UPDATE users SET avatar = ? WHERE username = ?`, [publicPath, req.user.username]);
         res.json({ success: true, path: publicPath });

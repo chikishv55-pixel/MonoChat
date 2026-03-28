@@ -30,10 +30,13 @@ function showLogin() { document.getElementById('login-card').classList.remove('h
             user.bio = user.bio || '';
             user.birth_date = user.birth_date || '';
             currentUser = user;
+            isPremium = !!user.is_premium;
+            
             document.getElementById('profile-name').textContent = user.display_name;
             document.getElementById('profile-username-label').textContent = '@' + user.username;
             updateAllMyAvatars(user.avatar, user.display_name);
             updateMyMusicUI(user.music_status);
+            if (typeof updatePremiumUI === 'function') updatePremiumUI();
             
             socket.emit('get contacts', (contacts) => {
                 myContacts = {};

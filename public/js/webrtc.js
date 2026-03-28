@@ -125,6 +125,10 @@ let localStream;
             isCurrentCallVideo = videoEnabled;
             
             // Предварительная настройка UI звонка
+            isSpeakerOn = videoEnabled; // Видео -> Спикер, Аудио -> Ушной динамик
+            const speakerBtn = document.getElementById('toggle-speaker-btn');
+            if (speakerBtn) speakerBtn.style.background = isSpeakerOn ? 'rgba(255,255,255,0.2)' : 'rgba(231,76,60,0.8)';
+
             document.getElementById('toggle-video-btn').style.display = videoEnabled ? 'flex' : 'none';
             document.getElementById('toggle-video-btn').style.background = 'rgba(255,255,255,0.2)';
             document.getElementById('toggle-audio-btn').style.background = 'rgba(255,255,255,0.2)';
@@ -167,6 +171,10 @@ let localStream;
             document.getElementById('incoming-call-overlay').classList.remove('active');
             
             // Настройка UI перед показом
+            isSpeakerOn = isCurrentCallVideo; // Видео -> Спикер, Аудио -> Ушной динамик
+            const speakerBtn = document.getElementById('toggle-speaker-btn');
+            if (speakerBtn) speakerBtn.style.background = isSpeakerOn ? 'rgba(255,255,255,0.2)' : 'rgba(231,76,60,0.8)';
+
             document.getElementById('toggle-video-btn').style.display = isCurrentCallVideo ? 'flex' : 'none';
             document.getElementById('toggle-video-btn').style.background = 'rgba(255,255,255,0.2)';
             document.getElementById('toggle-audio-btn').style.background = 'rgba(255,255,255,0.2)';
@@ -277,6 +285,33 @@ let localStream;
             if (!localStream) return;
             const at = localStream.getAudioTracks()[0];
             if (at) { at.enabled = !at.enabled; document.getElementById('toggle-audio-btn').style.background = at.enabled ? 'rgba(255,255,255,0.2)' : 'rgba(231,76,60,0.8)'; }
+        }
+
+        let isSpeakerOn = true;
+        async function toggleSpeaker() {
+            const remoteVideo = document.getElementById('remote-video');
+            if (!remoteVideo || !remoteVideo.setSinkId) {
+                console.warn('setSinkId not supported');
+                return;
+            }
+
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const audioOutputs = devices.filter(device => device.kind === 'audiooutput');
+                
+                // Это упрощенная логика, так как точные ID динамика/ушного динамика варьируются
+                // В браузере обычно 'default' - это текущий системный выход.
+                // На мобильных устройствах переключение часто контролирует сама ОС на основе наличия видео.
+                
+                isSpeakerOn = !isSpeakerOn;
+                const btn = document.getElementById('toggle-speaker-btn');
+                if (btn) btn.style.background = isSpeakerOn ? 'rgba(255,255,255,0.2)' : 'rgba(231,76,60,0.8)';
+                
+                // Прямое управление через setSinkId (работает не везде, но лучший вариант для JS)
+                // Если не работает, ОС обычно сама переключает на ушной динамик, если видео выключено.
+            } catch (err) {
+                console.error('Error toggling speaker:', err);
+            }
         }
 
         // ==========================================

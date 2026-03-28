@@ -27,6 +27,7 @@ const typingTimeout = 2000; // 2 секунды
 let isCurrentlyTyping = false;
 const typingUsers = new Map(); // chatId -> Set of displayNames
 let currentCommentMessageId = null;
+let isPremium = false;
 
 let imageViewerData = {
     sources: [],
@@ -39,6 +40,38 @@ function getFullUrl(path) {
         return SERVER_URL + path;
     }
     return path;
+}
+
+function isVideoPath(path) {
+    if (!path) return false;
+    const ext = path.split('.').pop().toLowerCase();
+    return ['mp4', 'webm', 'ogg', 'mov'].includes(ext);
+}
+
+function renderAvatarHTML(avatar, displayName, className = 'avatar', isPremiumUser = false) {
+    const safeName = escapeHTML(displayName);
+    const firstChars = safeName.substring(0, 2).toUpperCase();
+    let html = '';
+    
+    if (!avatar) {
+        html = `<div class="${className}">${firstChars}</div>`;
+    } else {
+        const url = escapeHTML(getFullUrl(avatar));
+        if (isVideoPath(avatar)) {
+            html = `<video class="${className}" src="${url}" autoplay loop muted playsinline></video>`;
+        } else {
+            html = `<img class="${className}" src="${url}">`;
+        }
+    }
+
+    if (isPremiumUser) {
+        // We append the star inside the same wrapper if needed, 
+        // but often the star is placed next to the name.
+        // For consistent UI, let's keep it next to the name in chat list/header,
+        // but maybe a small badge on the avatar itself is also good.
+        // For now, we'll return JUST the avatar element.
+    }
+    return html;
 }
 
 /**
@@ -93,15 +126,30 @@ window.addEventListener('load', () => {
     const token = localStorage.getItem('monochrome_token');
     if (token) {
         fetch(SERVER_URL + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
-            .then(res => res.json())
             .then(res => {
-                if (res.success) authSuccess(res.user);
-                else throw new Error('Invalid token');
-                hideSplash();
+                if (res.status === 401 || res.status === 403) {
+                    throw new Error('AUTH_FAILED');
+                }
+                return res.json();
+            })
+            .then(res => {
+                if (res.success) {
+                    isPremium = !!res.user.is_premium;
+                    authSuccess(res.user);
+                    hideSplash();
+                } else {
+                    throw new Error('AUTH_FAILED');
+                }
             }).catch(e => {
-                localStorage.removeItem('monochrome_token');
-                localStorage.removeItem('monochrome_user');
-                document.getElementById('auth-screen').classList.add('active');
+                if (e.message === 'AUTH_FAILED') {
+                    localStorage.removeItem('monochrome_token');
+                    localStorage.removeItem('monochrome_user');
+                    document.getElementById('auth-screen').classList.add('active');
+                } else {
+                    // Сетевая ошибка или сервер временно недоступен - даем дойти до экрана логина без удаления токена
+                    console.warn('Auto-login network error, keeping token:', e);
+                    document.getElementById('auth-screen').classList.add('active');
+                }
                 hideSplash();
             });
     } else {

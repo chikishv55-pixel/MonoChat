@@ -35,28 +35,63 @@ function postStory(input) {
         // Обрезка аватарки
         function uploadAvatar(input) {
             const file = input.files[0]; if (!file) return;
+            
+            const isVideo = file.type.startsWith('video/');
+            if (isVideo && !isPremium) {
+                alert('Видео-аватарки доступны только Premium пользователям');
+                input.value = '';
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = e => {
-                // Закрываем модалку профиля, чтобы открыть модалку обрезки
-                document.getElementById('my-profile-modal').classList.remove('active');
-                document.getElementById('crop-image').src = e.target.result;
-                document.getElementById('crop-modal').classList.add('active');
+                if (isVideo) {
+                    if (confirm('Установить это видео как аватар?')) {
+                        uploadAvatarFile(e.target.result);
+                    }
+                } else {
+                    // Закрываем модалку профиля, чтобы открыть модалку обрезки
+                    document.getElementById('my-profile-modal').classList.remove('active');
+                    document.getElementById('crop-image').src = e.target.result;
+                    document.getElementById('crop-modal').classList.add('active');
 
-                if (cropper) cropper.destroy();
-                const image = document.getElementById('crop-image');
-                cropper = new Cropper(image, {
-                    aspectRatio: 1, 
-                    viewMode: 1,
-                    dragMode: 'move',
-                    guides: false,
-                    center: false,
-                    cropBoxMovable: true,
-                    cropBoxResizable: true,
-                    toggleDragModeOnDblclick: false,
-                });
+                    if (cropper) cropper.destroy();
+                    const image = document.getElementById('crop-image');
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1, 
+                        viewMode: 1,
+                        dragMode: 'move',
+                        guides: false,
+                        center: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                    });
+                }
             };
             reader.readAsDataURL(file);
             input.value = ''; 
+        }
+
+        function uploadAvatarFile(dataUrl) {
+            const oldAvatar = currentUser.avatar;
+            updateAllMyAvatars(dataUrl, currentUser.display_name); // Оптимистичное обновление
+            
+            fetch(SERVER_URL + '/api/upload/avatar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('monochrome_token') },
+                body: JSON.stringify({ avatar: dataUrl })
+            }).then(r => r.json()).then(res => {
+                if (res.success) {
+                    currentUser.avatar = res.path;
+                    localStorage.setItem('monochrome_user', JSON.stringify(currentUser));
+                    updateAllMyAvatars(currentUser.avatar, currentUser.display_name);
+                } else {
+                    alert('Ошибка обновления аватара: ' + (res.message || ''));
+                    currentUser.avatar = oldAvatar;
+                    updateAllMyAvatars(oldAvatar, currentUser.display_name);
+                }
+            });
         }
 
         function closeCropModal() {
@@ -68,27 +103,7 @@ function postStory(input) {
             if (!cropper) return;
             const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
             const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            
-            const oldAvatar = currentUser.avatar;
-            updateAllMyAvatars(dataUrl, currentUser.display_name); // Оптимистичное обновление
-            
-            fetch(SERVER_URL + '/api/upload/avatar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('monochrome_token') },
-            body: JSON.stringify({ avatar: dataUrl })
-        }).then(r => r.json()).then(res => {
-                if (res.success) {
-                    // Обновляем на путь с сервера
-                    currentUser.avatar = res.path;
-                    localStorage.setItem('monochrome_user', JSON.stringify(currentUser));
-                    updateAllMyAvatars(currentUser.avatar, currentUser.display_name);
-                } else {
-                    alert('Ошибка обновления аватара: ' + (res.message || ''));
-                    // В случае ошибки возвращаем старый аватар
-                    currentUser.avatar = oldAvatar;
-                    updateAllMyAvatars(oldAvatar, currentUser.display_name);
-                }
-            });
+            uploadAvatarFile(dataUrl);
             closeCropModal();
         }
 
@@ -183,10 +198,10 @@ function postStory(input) {
                 list.innerHTML = '';
                 chats.forEach(chat => {
                     const displayName = myContacts[chat.username] || chat.display_name;
-                    const avatarHTML = chat.avatar ? `<img class="chat-avatar" src="${getFullUrl(chat.avatar)}">` : `<div class="chat-avatar">${displayName.substring(0,2).toUpperCase()}</div>`;
+                    const avatarHTML = renderAvatarHTML(chat.avatar, displayName, 'chat-avatar');
                     const item = document.createElement('div');
                     item.className = 'chat-item';
-                    item.innerHTML = `<label><input type="checkbox" name="forward-target" value="${chat.username}"><div class="avatar-wrapper">${avatarHTML}</div><div class="chat-info"><span class="chat-name">${displayName}</span></div></label>`;
+                    item.innerHTML = `<label><input type="checkbox" name="forward-target" value="${chat.username}"><div class="avatar-wrapper">${avatarHTML}</div><div class="chat-info"><span class="chat-name">${displayName}</span>${chat.is_premium ? '<span class="premium-star">★</span>' : ''}</div></label>`;
                     list.appendChild(item);
                 });
                 document.getElementById('main-overlay').classList.add('active');
@@ -232,10 +247,9 @@ function postStory(input) {
             div.style.display = 'flex'; div.style.gap = '12px';
             
             const safeName = escapeHTML(comment.display_name);
-            const avatarUrl = comment.avatar ? getFullUrl(comment.avatar) : null;
-            const avatarHTML = avatarUrl ? `<img src="${escapeHTML(avatarUrl)}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: var(--avatar-bg); color: var(--avatar-text); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0;">${safeName.substring(0,2).toUpperCase()}</div>`;
+            const avatarHTML = renderAvatarHTML(comment.avatar, comment.display_name, 'comment-avatar');
             
-            div.innerHTML = `${avatarHTML}<div style="flex: 1; display: flex; flex-direction: column;"><div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;"><span style="font-size: 14px; font-weight: 600; color: var(--text-main);">${safeName}</span><span style="font-size: 11px; color: var(--text-muted);">${comment.time}</span></div><div style="background: var(--bg-card); padding: 12px 16px; border-radius: 4px 16px 16px 16px; font-size: 14px; line-height: 1.5; color: var(--text-main); border: 1px solid var(--border-light); box-shadow: 0 4px 12px rgba(0,0,0,0.05); white-space: pre-wrap; word-break: break-word;">${escapeHTML(comment.text)}</div></div>`;
+            div.innerHTML = `${avatarHTML}<div style="flex: 1; display: flex; flex-direction: column;"><div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;"><span style="font-size: 14px; font-weight: 600; color: var(--text-main);">${safeName}${comment.is_premium ? ' <span class="premium-star">★</span>' : ''}</span><span style="font-size: 11px; color: var(--text-muted);">${comment.time}</span></div><div style="background: var(--bg-card); padding: 12px 16px; border-radius: 4px 16px 16px 16px; font-size: 14px; line-height: 1.5; color: var(--text-main); border: 1px solid var(--border-light); box-shadow: 0 4px 12px rgba(0,0,0,0.05); white-space: pre-wrap; word-break: break-word;">${escapeHTML(comment.text)}</div></div>`;
             list.appendChild(div);
             list.scrollTop = list.scrollHeight;
         }
@@ -333,4 +347,60 @@ function postStory(input) {
 
         function clientToggleReaction(messageId, emoji) {
             socket.emit('toggle reaction', { messageId, emoji });
+        }
+        function showCallChoice() {
+            document.getElementById('main-overlay').classList.add('active');
+            document.getElementById('call-choice-modal').classList.add('active');
+        }
+
+        function closeCallChoice() {
+            document.getElementById('call-choice-modal').classList.remove('active');
+            if (!document.querySelector('.custom-modal.active:not(#call-choice-modal)')) {
+                document.getElementById('main-overlay').classList.remove('active');
+            }
+        }
+
+        function togglePremium() {
+            const newValue = !isPremium;
+            fetch(SERVER_URL + '/api/auth/premium', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('monochrome_token') },
+                body: JSON.stringify({ isPremium: newValue })
+            }).then(r => r.json()).then(res => {
+                if (res.success) {
+                    isPremium = !!res.is_premium;
+                    currentUser.is_premium = res.is_premium;
+                    localStorage.setItem('monochrome_user', JSON.stringify(currentUser));
+                    alert(isPremium ? 'Поздравляем! Теперь у вас есть Premium.' : 'Подписка Premium отменена.');
+                    location.reload(); // Перезагружаем для обновления UI
+                } else {
+                    alert('Ошибка при обновлении подписки.');
+                }
+            });
+        }
+
+        function updatePremiumUI() {
+            const label = document.getElementById('premium-status-label');
+            const sublabel = document.getElementById('premium-status-sublabel');
+            const btn = document.getElementById('premium-action-btn');
+            const icon = document.querySelector('.premium-icon');
+
+            if (label && sublabel && btn && icon) {
+                if (isPremium) {
+                    label.textContent = 'Monochrome Premium Активен';
+                    sublabel.textContent = 'Вам доступны видео-аватарки';
+                    btn.textContent = 'Активен';
+                    btn.style.color = 'var(--text-muted)';
+                    
+                    const profileName = document.getElementById('profile-name');
+                    if (profileName && !profileName.innerHTML.includes('premium-star')) {
+                        profileName.innerHTML += ' <span class="premium-star">★</span>';
+                    }
+                } else {
+                    label.textContent = 'Monochrome Premium';
+                    sublabel.textContent = 'Разблокировать видео-аватарки';
+                    btn.textContent = 'Подключить';
+                    btn.style.color = 'var(--accent)';
+                }
+            }
         }

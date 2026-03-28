@@ -448,11 +448,25 @@ function openNewChatChoiceModal() {
         }
 
         function setAvatarUI(imgId, textId, data, name) {
-            const img = document.getElementById(imgId); const txt = document.getElementById(textId);
-            // Добавим кэш-бастер для немедленного обновления
-            const finalData = data && data.startsWith('/uploads/') ? `${getFullUrl(data)}?t=${new Date().getTime()}` : data;
-            if (finalData) { img.src = finalData; img.style.display = 'flex'; txt.style.display = 'none'; }
-            else { img.style.display = 'none'; txt.style.display = 'flex'; txt.textContent = name ? name.substring(0,2).toUpperCase() : '??'; }
+            const container = document.getElementById(imgId).parentElement;
+            if (container) {
+                container.innerHTML = `<img id="${imgId}" src="" style="display:none" class="avatar-img-actual">
+                                      <div id="${textId}" style="display:none" class="avatar-text-actual"></div>`;
+                const img = document.getElementById(imgId); 
+                const txt = document.getElementById(textId);
+                const finalData = data && data.startsWith('/uploads/') ? `${getFullUrl(data)}?t=${new Date().getTime()}` : data;
+                
+                if (finalData) {
+                    if (isVideoPath(data)) {
+                        container.innerHTML = `<video id="${imgId}" src="${finalData}" autoplay loop muted playsinline class="avatar-img-actual" style="display:flex; object-fit:cover; width:100%; height:100%"></video>
+                                              <div id="${textId}" style="display:none" class="avatar-text-actual"></div>`;
+                    } else {
+                        img.src = finalData; img.style.display = 'flex'; txt.style.display = 'none';
+                    }
+                } else {
+                    img.style.display = 'none'; txt.style.display = 'flex'; txt.textContent = name ? name.substring(0,2).toUpperCase() : '??';
+                }
+            }
         }
 
         function logout() { localStorage.removeItem('monochrome_user'); localStorage.removeItem('monochrome_token'); window.location.reload(); }
