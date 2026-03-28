@@ -3,7 +3,7 @@ const router = express.Router();
 const fs = require('fs').promises;
 const path = require('path');
 const mime = require('mime-types');
-const { dbRun } = require('../db/database');
+const { dbRun, dbGet } = require('../db/database');
 const jwt = require('../utils/jwt');
 const { JWT_SECRET } = require('./auth');
 
