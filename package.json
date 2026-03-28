@@ -14,6 +14,7 @@
     "bcrypt": "^6.0.0",
     "cordova-plugin-background-mode": "^0.7.3",
     "express": "^4.18.2",
+    "mime-types": "^2.1.35",
     "socket.io": "^4.7.2",
     "sqlite3": "^5.1.6"
   },

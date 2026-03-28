@@ -1,5 +1,5 @@
 const SERVER_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || !window.location.hostname)
-    ? 'http://5.35.95.248:3000' // Сменили https на http и добавили порт :3000
+    ? (window.location.port === '3000' ? 'http://localhost:3000' : 'http://5.35.95.248:3000') 
     : window.location.origin;
 
 const socket = io(SERVER_URL);
@@ -71,7 +71,11 @@ function createMessageSnippet(message) {
 }
 
 window.addEventListener('load', () => {
-    initEmojiPicker();
+    try {
+        if (typeof initEmojiPicker === 'function') initEmojiPicker();
+    } catch (e) {
+        console.error('Ошибка инициализации EmojiPicker:', e);
+    }
 
     let savedTheme = localStorage.getItem('appTheme');
     if (!savedTheme && localStorage.getItem('darkTheme') === 'true') savedTheme = 'dark-theme'; // Миграция со старой версии

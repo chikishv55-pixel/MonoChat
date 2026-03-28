@@ -30,10 +30,12 @@ function initEmojiPicker() {
                 tabStickers.appendChild(div);
             });
 
-            document.addEventListener('click', (e) => {
-                const picker = document.getElementById('emoji-picker');
-                const btn = document.getElementById('emoji-picker-btn');
-                if (picker && picker.classList.contains('active') && !picker.contains(e.target) && !btn.contains(e.target)) {
-                    picker.classList.remove('active');
-                }
-        }\n
+    document.addEventListener('click', (e) => {
+        const picker = document.getElementById('emoji-picker');
+        const btn = document.getElementById('emoji-picker-btn');
+        if (picker && picker.classList.contains('active') && !picker.contains(e.target) && !btn.contains(e.target)) {
+            picker.classList.remove('active');
+        }
+    });
+}
+
