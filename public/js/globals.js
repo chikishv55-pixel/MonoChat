@@ -10,6 +10,7 @@ socket.on('connect_error', (error) => {
 
 // --- Глобальные переменные состояния ---
 let currentUser = null;
+let fcmToken = null;
 let currentChatUser = null;
 let messageToDeleteId = null;
 let myContacts = {};

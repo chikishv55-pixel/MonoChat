@@ -29,7 +29,13 @@ app.use((req, res, next) => {
     // Разрешаем CORS для статических файлов (чтобы приложение из Capacitor могло скачивать картинки)
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
+    // Handle preflight
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+
     // Защита от кликджекинга
     res.setHeader('X-Frame-Options', 'DENY');
     // Запрещает браузеру "угадывать" тип контента
