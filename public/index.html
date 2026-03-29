@@ -304,8 +304,9 @@
 
     <div class="custom-modal" id="crop-modal" style="z-index: 2005; width: 95vw; max-width: 800px; height: 90vh;">
         <h3 style="margin-bottom: 0; font-weight: 400; flex-shrink: 0;">Обрезка (выберите круг)</h3>
-        <div style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
+        <div id="crop-container" style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
             <img id="crop-image" src="" style="display: block; max-width: 100%; max-height: 100%;">
+            <video id="crop-video" src="" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;" autoplay loop muted playsinline></video>
         </div>
         <button class="settings-action-btn" onclick="saveCroppedAvatar()" style="width: 100%; border: none; padding: 12px; background: var(--text-main); color: var(--bg-main); cursor: pointer; text-transform: uppercase; flex-shrink: 0;">Сохранить аватар</button>
         <button class="modal-btn" onclick="closeCropModal()" style="border-color: transparent; margin-top: 0; flex-shrink: 0;">Отмена</button>

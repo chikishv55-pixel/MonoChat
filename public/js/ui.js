@@ -45,19 +45,36 @@ function postStory(input) {
 
             const reader = new FileReader();
             reader.onload = e => {
+                const dataUrl = e.target.result;
+                const modal = document.getElementById('crop-modal');
+                const img = document.getElementById('crop-image');
+                const video = document.getElementById('crop-video');
+                const title = modal.querySelector('h3');
+
+                // Закрываем модалку профиля, чтобы открыть модалку обрезки
+                document.getElementById('my-profile-modal').classList.remove('active');
+                modal.classList.add('active');
+
                 if (isVideo) {
-                    if (confirm('Установить это видео как аватар?')) {
-                        uploadAvatarFile(e.target.result);
-                    }
+                    title.textContent = 'Предпросмотр видео';
+                    img.style.display = 'none';
+                    video.style.display = 'block';
+                    video.src = dataUrl;
+                    video.classList.add('preview-mode');
+                    if (cropper) cropper.destroy();
+                    // Сохраняем dataUrl в дата-атрибут для последующей загрузки
+                    modal.dataset.currentVideo = dataUrl;
                 } else {
-                    // Закрываем модалку профиля, чтобы открыть модалку обрезки
-                    document.getElementById('my-profile-modal').classList.remove('active');
-                    document.getElementById('crop-image').src = e.target.result;
-                    document.getElementById('crop-modal').classList.add('active');
+                    title.textContent = 'Обрезка (выберите круг)';
+                    img.style.display = 'block';
+                    video.style.display = 'none';
+                    video.src = '';
+                    video.classList.remove('preview-mode');
+                    img.src = dataUrl;
+                    modal.dataset.currentVideo = '';
 
                     if (cropper) cropper.destroy();
-                    const image = document.getElementById('crop-image');
-                    cropper = new Cropper(image, {
+                    cropper = new Cropper(img, {
                         aspectRatio: 1, 
                         viewMode: 1,
                         dragMode: 'move',
@@ -96,14 +113,23 @@ function postStory(input) {
 
         function closeCropModal() {
             document.getElementById('crop-modal').classList.remove('active');
+            const video = document.getElementById('crop-video');
+            video.pause();
+            video.src = '';
             if(cropper) cropper.destroy();
         }
 
         function saveCroppedAvatar() {
-            if (!cropper) return;
-            const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            uploadAvatarFile(dataUrl);
+            const modal = document.getElementById('crop-modal');
+            const videoData = modal.dataset.currentVideo;
+
+            if (videoData) {
+                uploadAvatarFile(videoData);
+            } else if (cropper) {
+                const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                uploadAvatarFile(dataUrl);
+            }
             closeCropModal();
         }
 
