@@ -56,7 +56,10 @@ app.use((req, res, next) => {
 // JSON body parser с увеличенным лимитом для переваривания Base64
 app.use(express.json({ limit: '50mb' }));
 
-app.use('/api/auth', require('./src/routes/auth').router);
+const authRouter = require('./src/routes/auth').router;
+console.log('--- Registered Auth Routes ---');
+authRouter.stack.forEach(s => { if(s.route) console.log('Route loaded:', s.route.path); });
+app.use('/api/auth', authRouter);
 app.use('/api/upload', require('./src/routes/upload'));
 
 app.use(express.static(path.join(__dirname, 'public')));

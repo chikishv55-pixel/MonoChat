@@ -2,6 +2,10 @@ const SERVER_URL = (window.location.hostname === 'localhost' || window.location.
     ? (window.location.port === '3000' ? 'http://localhost:3000' : 'http://5.35.95.248:3000') 
     : window.location.origin;
 
+// Заглушки, чтобы избежать ReferenceError при загрузке
+window.loadStories = window.loadStories || function() { console.log('Stories script not yet ready...'); };
+window.loadRecentChats = window.loadRecentChats || function() { console.log('Chat list script not yet ready...'); };
+
 const socket = io(SERVER_URL);
 
 socket.on('connect_error', (error) => {

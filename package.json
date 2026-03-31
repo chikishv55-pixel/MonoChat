@@ -19,7 +19,8 @@
     "express": "^4.18.2",
     "mime-types": "^2.1.35",
     "socket.io": "^4.7.2",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.6",
+    "nodemailer": "^6.9.1"
   },
   "devDependencies": {
     "electron": "^28.0.0",
