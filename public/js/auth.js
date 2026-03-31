@@ -46,8 +46,15 @@ function authSuccess(user) {
     currentUser = user;
     isPremium = !!user.is_premium;
     
-    document.getElementById('profile-name').textContent = user.display_name;
-    document.getElementById('profile-username-label').textContent = '@' + user.username;
+    // Update IDs that actually exist in index.html
+    const nameFooter = document.getElementById('my-name-footer');
+    const namePanel = document.getElementById('pm-name');
+    const usernamePanel = document.getElementById('pm-username');
+
+    if (nameFooter) nameFooter.textContent = user.display_name;
+    if (namePanel) namePanel.textContent = user.display_name;
+    if (usernamePanel) usernamePanel.textContent = '@' + user.username;
+
     updateAllMyAvatars(user.avatar, user.display_name);
     updateMyMusicUI(user.music_status);
     if (typeof updatePremiumUI === 'function') updatePremiumUI();
@@ -55,10 +62,15 @@ function authSuccess(user) {
     socket.emit('get contacts', (contacts) => {
         myContacts = {};
         contacts.forEach(c => myContacts[c.contact_username] = c.alias);
-        document.getElementById('auth-screen').classList.remove('active');
-        document.getElementById('chat-screen').classList.add('active');
-        loadRecentChats();
-        loadStories();
+        
+        const authScreen = document.getElementById('auth-screen');
+        const chatScreen = document.getElementById('chat-screen');
+        if (authScreen) authScreen.classList.remove('active');
+        if (chatScreen) chatScreen.classList.add('active');
+
+        // Safety checks for deferred scripts
+        if (typeof loadRecentChats === 'function') loadRecentChats();
+        if (typeof loadStories === 'function') loadStories();
     });
 }
 
@@ -78,7 +90,14 @@ async function login() {
             socket.auth = { token: res.token };
             socket.disconnect().connect();
             authSuccess(res.user);
-        } else alert(res.message);
+        } else {
+            alert(res.message);
+            // Если аккаунт не подтвержден, показываем поле ввода кода (бэкенд вернет 403)
+            if (response.status === 403) {
+                document.getElementById('reg-username').value = username; // Сохраняем имя для верификации
+                showVerify();
+            }
+        }
     } catch (err) { alert('Ошибка'); }
 }
 
@@ -99,7 +118,7 @@ async function register() {
             return;
         }
 
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch(SERVER_URL + '/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, displayName, password, email })
@@ -123,7 +142,7 @@ async function verifyCode() {
     if (code.length !== 6) return alert('Введите 6-значный код');
 
     try {
-        const response = await fetch('/api/auth/verify-code', {
+        const response = await fetch(SERVER_URL + '/api/auth/verify-code', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, code })
@@ -140,15 +159,14 @@ async function verifyCode() {
     }
 }
 
-let resendTimer = 0;
 async function resendCode() {
     if (resendTimer > 0) return;
     
     const username = document.getElementById('reg-username').value.trim();
-    if (!username) return alert('Ошибка: юзернейм не найден');
+    if (!username) return alert('Ошибка: сначала введите ваш юзернейм в поле регистрации');
 
     try {
-        const response = await fetch('/api/auth/resend-code', {
+        const response = await fetch(SERVER_URL + '/api/auth/resend-code', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username })

@@ -44,7 +44,8 @@ app.use((req, res, next) => {
     res.setHeader('Content-Security-Policy', 
         "default-src 'self' *; " +
         "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.socket.io; " +
-        "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; " +
+        "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
+        "font-src 'self' https://fonts.gstatic.com; " +
         "img-src 'self' data: blob: *; " +
         "media-src 'self' data: blob: *; " +
         "connect-src 'self' ws: wss: *;"

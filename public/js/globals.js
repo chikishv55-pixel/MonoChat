@@ -135,7 +135,11 @@ window.addEventListener('load', () => {
             .then(res => {
                 if (res.success) {
                     isPremium = !!res.user.is_premium;
-                    authSuccess(res.user);
+                    try {
+                        authSuccess(res.user);
+                    } catch (err) {
+                        console.error('Ошибка при инициализации профиля:', err);
+                    }
                     hideSplash();
                 } else {
                     throw new Error('AUTH_FAILED');
