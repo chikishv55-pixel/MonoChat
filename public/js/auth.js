@@ -69,24 +69,43 @@ function showLogin() { document.getElementById('login-card').classList.remove('h
         }
 
         async function register() {
-            const displayName = document.getElementById('reg-displayname').value.trim();
-            const username = document.getElementById('reg-username').value.trim();
-            const password = document.getElementById('reg-password').value;
-            const passwordCheck = document.getElementById('reg-password2').value;
-            if (password !== passwordCheck) return alert('Пароли не совпадают');
-            if(!username || !displayName || !password) return alert('Заполните все поля');
-            try {
-                const response = await fetch(SERVER_URL + '/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, displayName, password, fcmToken: localStorage.getItem('fcm_token') || fcmToken })
-                });
-                const res = await response.json();
-                if (res.success) {
-                    localStorage.setItem('monochrome_token', res.token);
-                    socket.auth = { token: res.token };
-                    socket.disconnect().connect();
-                    authSuccess(res.user);
-                } else alert(res.message);
-            } catch (err) { alert('Ошибка'); }
+    try {
+        const displayName = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const username = document.getElementById('reg-username').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const passwordCheck = document.getElementById('reg-password-confirm').value;
+
+        if (!email.includes('@')) {
+            alert('Введите корректный Gmail');
+            return;
         }
+        if (password !== passwordCheck) {
+            alert('Пароли не совпадают!');
+            return;
+        }
+
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, displayName, password, email })
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert('Регистрация успешна! Проверьте вашу почту для подтверждения аккаунта (5 минут).');
+            showLogin();
+        } else {
+            alert(data.message || 'Ошибка регистрации');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Ошибка соединения с сервером');
+    }
+}
+
+// Banned Notification
+if (typeof socket !== 'undefined') {
+    socket.on('banned_notification', () => {
+        document.getElementById('banned-overlay').classList.remove('hidden');
+    });
+}

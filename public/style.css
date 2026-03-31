@@ -142,7 +142,27 @@ input, textarea { -webkit-user-select: text !important; user-select: text !impor
 .profile-settings-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 50%; transition: background 0.2s; }
 .profile-settings-btn:hover { background: var(--hover-bg); }
 .settings-icon { width: 24px; height: 24px; stroke: var(--text-muted); fill: none; }
-.search-box { position: relative; margin-top: 16px; padding: 0 4px; }
+
+/* НИЖНИЙ ПРОФИЛЬ (PC) */
+.profile-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+}
+.profile-footer .avatar-wrapper { width: 40px; height: 40px; }
+.profile-footer .profile-info h3 { font-size: 14px; }
+.profile-footer .profile-status { font-size: 12px; }
+
+.search-container {
+    padding: 16px 16px 8px 16px;
+    background: var(--bg-panel);
+}
+
+.search-box { position: relative; margin-top: 0; padding: 0; }
 .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; stroke: var(--text-muted); fill: none; pointer-events: none;}
 .search-input { width: 100%; border: none; background: var(--hover-bg); border-radius: 20px; padding: 10px 16px 10px 42px; font-size: 15px; color: var(--text-main); transition: 0.2s; }
 .search-input::placeholder { color: var(--text-placeholder); }
@@ -491,6 +511,95 @@ body.dark-theme .message.mine .reply-block b { color: #fff; }
 .premium-icon { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; margin-right: 16px; }
 .tg-btn-link { background: none; border: none; color: var(--accent); font-weight: 500; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: 0.2s; }
 .tg-btn-link:hover { background: rgba(51, 144, 236, 0.1); }
+
+/* DEV BADGE */
+.dev-badge {
+    background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 6px;
+    box-shadow: 0 0 10px rgba(142, 68, 173, 0.4);
+    vertical-align: middle;
+}
+.dev-badge svg { width: 10px; height: 10px; fill: currentColor; }
+
+/* MOD MODERN ADMIN PANEL */
+.admin-panel-tabs {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 16px;
+}
+.admin-tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: 0.2s;
+}
+.admin-tab.active {
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+}
+.admin-content-section {
+    display: none;
+    width: 100%;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.admin-content-section.active {
+    display: block;
+}
+
+/* USER MANAGEMENT ITEM */
+.admin-user-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-bottom: 1px solid var(--border-light);
+}
+.admin-user-info { flex: 1; min-width: 0; }
+.admin-user-name { font-weight: 500; font-size: 14px; }
+.admin-user-sub { font-size: 12px; color: var(--text-muted); }
+.admin-user-actions { display: flex; gap: 8px; }
+.ban-btn {
+    background: #ff3b30;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.unban-btn {
+    background: #34c759;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.banned-overlay {
+    position: fixed; top:0; left:0; width:100vw; height:100vh;
+    background: #000; color: #fff; z-index: 10000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 20px;
+}
+.banned-overlay h1 { color: #ff3b30; margin-bottom: 10px; }
+
 
 /* VIDEO AVATARS */
 video.chat-avatar, video.partner-avatar, video.avatar, video.tg-profile-avatar, video.comment-avatar { object-fit: cover; background: #000; }

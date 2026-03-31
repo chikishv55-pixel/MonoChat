@@ -270,6 +270,23 @@ window.addEventListener('load', () => {
 
 
 document.addEventListener('keydown', (e) => {
+    // Обновляем футер (PC)
+    const nameFooter = document.getElementById('my-name-footer');
+    const avatarFooter = document.getElementById('my-avatar-footer');
+    
+    if (nameFooter) nameFooter.textContent = currentUser.display_name;
+    if (avatarFooter) {
+        avatarFooter.textContent = '';
+        if (currentUser.avatar) {
+            if (currentUser.avatar.endsWith('.mp4') || currentUser.avatar.endsWith('.webm')) {
+                avatarFooter.innerHTML = `<video src="${currentUser.avatar}" autoplay loop muted playsinline></video>`;
+            } else {
+                avatarFooter.style.backgroundImage = `url(${currentUser.avatar})`;
+            }
+        } else {
+            avatarFooter.textContent = currentUser.display_name[0].toUpperCase();
+        }
+    }
     const viewer = document.getElementById('image-viewer');
     if (viewer.classList.contains('active')) {
         if (e.key === 'Escape') {

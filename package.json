@@ -2,9 +2,12 @@
   "name": "monochrome-chat",
   "version": "1.0.0",
   "description": "Minimalist real-time chat",
-  "main": "server.js",
+  "main": "electron-main.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "electron:start": "electron .",
+    "electron:build": "electron-builder --win --dir",
+    "electron:pack": "electron-builder --win"
   },
   "dependencies": {
     "@capacitor/android": "^8.2.0",
@@ -18,8 +21,33 @@
     "socket.io": "^4.7.2",
     "sqlite3": "^5.1.6"
   },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.monochat.app",
+    "productName": "MonoChat",
+    "win": {
+      "target": "nsis",
+      "icon": "public/favicon.ico"
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "public/**/*",
+      "src/**/*",
+      "server.js",
+      "electron-main.js",
+      "package.json"
+    ],
+    "extraResources": [
+      "chat.db"
+    ]
+  },
   "keywords": [],
-  "author": "",
+  "author": "Sivoiv",
   "license": "ISC",
   "type": "commonjs"
 }

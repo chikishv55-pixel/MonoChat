@@ -28,10 +28,11 @@
 
             <div class="card hidden" id="register-card">
                 <h1>⚲ РЕГИСТРАЦИЯ</h1>
-                <div class="input-group"><input type="text" class="input-field" id="reg-displayname" placeholder="Ваше Имя (видят все)"></div>
+                <div class="input-group"><input type="text" class="input-field" id="reg-name" placeholder="Ваше Имя (видят все)"></div>
                 <div class="input-group"><input type="text" class="input-field" id="reg-username" placeholder="Уникальный юзернейм (без @)"></div>
+                <div class="input-group"><input type="email" class="input-field" id="reg-email" placeholder="Электронная почта (Gmail)"></div>
                 <div class="input-group"><input type="password" class="input-field" id="reg-password" placeholder="пароль"></div>
-                <div class="input-group"><input type="password" class="input-field" id="reg-password2" placeholder="повторите пароль"></div>
+                <div class="input-group"><input type="password" class="input-field" id="reg-password-confirm" placeholder="повторите пароль"></div>
                 <button class="action-btn" onclick="register()">регистрация</button>
                 <div class="card-footer">
                     <button class="footer-btn" onclick="showLogin()">⏤ вход ⏤</button>
@@ -44,46 +45,35 @@
     <div id="chat-screen" class="screen">
         <div class="chat-container">
             <div class="chats-column">
-                <div class="profile-section">
-                    <div class="profile-row">
-                        <div class="avatar-wrapper" style="cursor: pointer;" onclick="openMyProfileModal()">
-                            <img class="avatar" id="profile-avatar-img" src="" style="display: none;">
-                            <div class="avatar" id="profile-avatar-text">МХ</div>
-                            <div class="status-dot online"></div>
-                        </div>
-                        <div class="profile-info" style="cursor: pointer;" onclick="openMyProfileModal()">
-                            <h3 id="profile-name">Имя</h3>
-                            <div class="profile-status" id="profile-username-label">@username</div>
-                        </div>
-                        <button class="profile-settings-btn" onclick="openMyProfileModal()">
-                            <svg class="settings-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-                        </button>
-                    </div>
-                    
+                <div class="search-container">
                     <div class="search-box">
-                        <svg class="search-icon" viewBox="0 0 24 24"><path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 21L16.65 16.65" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        <input type="text" class="search-input" placeholder="Введите точный юзернейм, Enter..." id="search-input" onkeydown="handleSearch(event)" oninput="if(this.value==='') handleSearch(event)">
-                    </div>
-                </div>
-                
-                <div class="music-widget" onclick="promptMusicStatus()" id="my-music-widget">
-                    <div class="music-icon"><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div></div>
-                    <div class="music-info">
-                        <div class="music-title">Сейчас играет</div>
-                        <div class="music-text" id="my-music-text">Установить музыку...</div>
+                        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="search-input" class="search-input" placeholder="Поиск" onkeydown="handleSearch(event)">
                     </div>
                 </div>
 
-                <div class="stories-bar" id="stories-area">
-                    <div class="story-item story-add" onclick="document.getElementById('story-upload').click()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 8v8m-4-4h8"/><circle cx="12" cy="12" r="10"/></svg>
-                    </div>
-                </div>
-                <input type="file" id="story-upload" accept="image/*" style="display:none" onchange="postStory(this)">
+                <div id="music-widget-container" class="hidden"></div>
+                <div class="stories-bar" id="stories-bar"></div>
                 <div class="chats-list" id="chats-list"></div>
-                <button class="fab" onclick="openNewChatChoiceModal()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                
+                <button class="fab" onclick="document.getElementById('main-overlay').classList.add('active'); document.getElementById('create-chat-modal').classList.add('active');">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
                 </button>
+
+                <!-- Profile Footer at the bottom -->
+                <div class="profile-footer" id="my-profile-footer">
+                    <div class="avatar-wrapper" onclick="openMySettings()">
+                        <div id="my-avatar-footer" class="avatar"></div>
+                        <div class="status-dot online"></div>
+                    </div>
+                    <div class="profile-info" onclick="openMySettings()" style="cursor:pointer">
+                        <h3 id="my-name-footer">Загрузка...</h3>
+                        <span class="profile-status">в сети</span>
+                    </div>
+                    <button class="profile-settings-btn" onclick="openMySettings()">
+                        <svg class="settings-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </button>
+                </div>
             </div>
 
             <div class="messages-column">

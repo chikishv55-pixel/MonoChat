@@ -37,19 +37,19 @@ module.exports = function(io, onlineUsers) {
         return `/uploads/${filename}`;
     };
 
-    io.use((socket, next) => {
+    io.use(async (socket, next) => {
         const token = socket.handshake.auth.token;
-        if (!token) return next(new Error('Authentication error: No token'));
-        
+        if (!token) return next(new Error('Authentication error'));
         try {
             const decoded = jwt.verify(token, JWT_SECRET);
-            dbGet(`SELECT username, display_name, avatar, bio, birth_date, music_status, fcm_token, is_premium FROM users WHERE username = ?`, [decoded.username])
-                .then(row => {
-                    if (!row) return next(new Error('Authentication error: User not found'));
-                    socket.user = row;
-                    next();
-                })
-                .catch(err => next(new Error('Authentication error: DB error')));
+            const user = await dbGet(`SELECT username, is_admin, is_banned, display_name, avatar, bio, birth_date, music_status, fcm_token, is_premium FROM users WHERE username = ?`, [decoded.username]);
+            if (!user) return next(new Error('User not found'));
+            if (user.is_banned) return next(new Error('Your account is banned'));
+            
+            socket.user = user;
+            socket.username = user.username;
+            socket.isAdmin = !!user.is_admin;
+            next();
         } catch (err) {
             next(new Error('Authentication error: Invalid token'));
         }

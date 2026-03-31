@@ -76,7 +76,12 @@ async function initDB() {
             birth_date TEXT,
             music_status TEXT,
             fcm_token TEXT,
-            is_premium INTEGER DEFAULT 0
+            is_premium INTEGER DEFAULT 0,
+            is_admin INTEGER DEFAULT 0,
+            is_banned INTEGER DEFAULT 0,
+            is_verified INTEGER DEFAULT 0,
+            verification_token TEXT,
+            email TEXT
         )`);
 
         await dbRun(`CREATE TABLE IF NOT EXISTS contacts (
@@ -144,6 +149,11 @@ async function initDB() {
         await addColumnIfNotExists('users', 'music_status', 'TEXT');
         await addColumnIfNotExists('users', 'fcm_token', 'TEXT');
         await addColumnIfNotExists('users', 'is_premium', 'INTEGER DEFAULT 0');
+        await addColumnIfNotExists('users', 'is_admin', 'INTEGER DEFAULT 0');
+        await addColumnIfNotExists('users', 'is_banned', 'INTEGER DEFAULT 0');
+        await addColumnIfNotExists('users', 'is_verified', 'INTEGER DEFAULT 0');
+        await addColumnIfNotExists('users', 'verification_token', 'TEXT');
+        await addColumnIfNotExists('users', 'email', 'TEXT');
 
         // Создаем папки для загрузок, если их нет
         const uploadsDir = path.join(__dirname, '../../public/uploads');

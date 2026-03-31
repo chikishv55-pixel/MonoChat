@@ -730,6 +730,62 @@ function loadRecentChats() {
             document.getElementById('delete-modal').classList.add('active');
         }
 
+        // ADMIN MODERN PANEL LOGIC
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.admin-content-section').forEach(s => s.classList.remove('active'));
+            
+            document.querySelector(`.admin-tab[onclick*="${tabName}"]`).classList.add('active');
+            document.getElementById(`admin-section-${tabName}`).classList.add('active');
+            
+            if (tabName === 'users') handleAdminUserSearch();
+        }
+
+        function handleAdminUserSearch() {
+            const query = document.getElementById('admin-user-search').value.trim();
+            socket.emit('admin_search_users', { query });
+        }
+
+        socket.on('admin_search_results', (users) => {
+            const list = document.getElementById('admin-users-list');
+            list.innerHTML = '';
+            if (users.length === 0) {
+                list.innerHTML = '<div style="padding:20px; text-align:center; color:#888;">Пользователи не найдены</div>';
+                return;
+            }
+            users.forEach(u => {
+                const item = document.createElement('div');
+                item.className = 'admin-user-item';
+                item.innerHTML = `
+                    <div class="admin-user-info">
+                        <div class="admin-user-name">${u.display_name} (@${u.username})</div>
+                        <div class="admin-user-sub">${u.email || 'Нет почты'} | [${u.is_verified ? 'Verified' : 'Pending'}]</div>
+                    </div>
+                    <div class="admin-user-actions">
+                        ${u.is_banned 
+                            ? `<button class="unban-btn" onclick="adminUnban('${u.username}')">Разбанить</button>`
+                            : `<button class="ban-btn" onclick="adminBan('${u.username}')">Бан</button>`
+                        }
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        });
+
+        function adminBan(username) {
+            if (confirm(`Забанить ${username}?`)) {
+                socket.emit('admin_ban_user', { username });
+                handleAdminUserSearch();
+            }
+        }
+
+        function adminUnban(username) {
+            if (confirm(`Разбанить ${username}?`)) {
+                socket.emit('admin_unban_user', { username });
+                handleAdminUserSearch();
+            }
+        }
+
         function executeDelete(type) {
             socket.emit('delete message', { msgId: messageToDeleteId, deleteType: type });
             closeAllModals();

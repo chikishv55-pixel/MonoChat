@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('../utils/jwt');
 const { dbRun, dbGet } = require('../db/database');
+const nodemailer = require('nodemailer');
+const config = require('../config');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'monochrome-super-secret-key-123';
 const SALT_ROUNDS = 10;
@@ -29,9 +31,9 @@ router.post('/register', async (req, res) => {
             registerAttempts.set(ip, attempts);
         }
 
-        const { username, displayName, password, fcmToken } = req.body;
+        const { username, displayName, password, email, fcmToken } = req.body;
         
-        if (!username || !displayName || !password) {
+        if (!username || !displayName || !password || !email) {
             return res.status(400).json({ success: false, message: 'Все поля обязательны.' });
         }
         if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
@@ -42,33 +44,51 @@ router.post('/register', async (req, res) => {
         }
 
         const lowerUser = username.toLowerCase();
+        const lowerEmail = email.toLowerCase();
+        
+        // --- ПРОВЕРКА УНИКАЛЬНОСТИ ПОЧТЫ И ОЧИСТКА СТАРЫХ ЗАЯВОК ---
+        const existingEmailUser = await dbGet(`SELECT username, is_verified FROM users WHERE email = ?`, [lowerEmail]);
+        if (existingEmailUser) {
+            if (existingEmailUser.is_verified) {
+                return res.status(409).json({ success: false, message: 'Эта почта уже привязана к другому аккаунту!' });
+            } else {
+                await dbRun(`DELETE FROM users WHERE username = ?`, [existingEmailUser.username]);
+            }
+        }
+
         const hash = await bcrypt.hash(password, SALT_ROUNDS);
+        const verificationToken = jwt.sign({ username: lowerUser }, JWT_SECRET, { expiresIn: '5m' }); // 5 минут
 
         try {
-            await dbRun(`INSERT INTO users (username, display_name, password, fcm_token) VALUES (?, ?, ?, ?)`, 
-                [lowerUser, displayName, hash, fcmToken || null]);
+            await dbRun(`INSERT INTO users (username, display_name, password, email, verification_token, is_verified, fcm_token) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
+                [lowerUser, displayName, hash, lowerEmail, verificationToken, 0, fcmToken || null]);
             
             registerAttempts.delete(ip);
             
-            const user = { 
-                username: lowerUser, 
-                display_name: displayName, 
-                fcm_token: fcmToken,
-                avatar: null,
-                bio: null,
-                birth_date: null,
-                music_status: null,
-                is_premium: 0
+            // Отправка письма
+            const transporter = nodemailer.createTransport(config.emailConfig);
+            const verifyUrl = `${config.serverUrl}/api/auth/verify/${verificationToken}`;
+            const mailOptions = {
+                from: `"Monochrome Chat" <${config.emailConfig.auth.user}>`,
+                to: email,
+                subject: 'Подтверждение регистрации (5 минут)',
+                html: `
+                    <div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 500px; margin: auto; border: 1px solid #eee; border-radius: 12px;">
+                        <h2 style="color: #3390ec;">Добро пожаловать в Monochrome!</h2>
+                        <p>Для завершения регистрации, пожалуйста, подтвердите почту. Ссылка действительна <b>5 минут</b>:</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${verifyUrl}" style="display: inline-block; padding: 14px 28px; background: #3390ec; color: #fff; text-decoration: none; border-radius: 10px; font-weight: bold;">Подтвердить почту</a>
+                        </div>
+                        <p style="font-size: 13px; color: #888;">Если ссылка не открывается: <a href="${verifyUrl}">${verifyUrl}</a></p>
+                    </div>
+                `
             };
-            const token = jwt.sign({ username: lowerUser }, JWT_SECRET, { expiresIn: '7d' });
             
-            res.json({ success: true, user, token });
+            await transporter.sendMail(mailOptions);
+            res.json({ success: true, message: 'Проверьте почту для подтверждения.' });
         } catch (err) {
-            if (err.code === 'SQLITE_CONSTRAINT') {
-                return res.status(409).json({ success: false, message: 'Этот юзернейм уже занят!' });
-            } else {
-                throw err;
-            }
+            console.error(err);
+            res.status(500).json({ success: false, message: 'Ошибка при регистрации.' });
         }
     } catch (e) {
         console.error('Registration error:', e);
@@ -98,25 +118,32 @@ router.post('/login', async (req, res) => {
         }
 
         const lowerUser = username.toLowerCase();
-        const row = await dbGet(`SELECT username, display_name, password, avatar, bio, birth_date, music_status, fcm_token, is_premium FROM users WHERE username = ?`, [lowerUser]);
+        const user = await dbGet(`SELECT * FROM users WHERE username = ?`, [lowerUser]);
         
-        if (!row) {
+        if (!user) {
             return res.status(401).json({ success: false, message: 'Пользователь не найден!' });
         }
 
-        const match = await bcrypt.compare(password, row.password);
+        const match = await bcrypt.compare(password, user.password);
         if (match) {
             loginAttempts.delete(ip);
 
-            if (fcmToken && fcmToken !== row.fcm_token) {
-                await dbRun(`UPDATE users SET fcm_token = ? WHERE username = ?`, [fcmToken, row.username]);
-                row.fcm_token = fcmToken;
+            if (user.is_banned) {
+                return res.status(403).json({ success: false, message: 'Ваш аккаунт заблокирован.' });
+            }
+            if (!user.is_verified) {
+                return res.status(403).json({ success: false, message: 'Пожалуйста, подтвердите вашу почту перед входом.' });
             }
 
-            const userResponse = { ...row };
+            if (fcmToken && fcmToken !== user.fcm_token) {
+                await dbRun(`UPDATE users SET fcm_token = ? WHERE username = ?`, [fcmToken, user.username]);
+                user.fcm_token = fcmToken;
+            }
+
+            const userResponse = { ...user };
             delete userResponse.password;
             
-            const token = jwt.sign({ username: row.username }, JWT_SECRET, { expiresIn: '7d' });
+            const token = jwt.sign({ username: user.username }, JWT_SECRET, { expiresIn: '30d' });
 
             res.json({ success: true, user: userResponse, token });
         } else {
