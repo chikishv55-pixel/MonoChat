@@ -278,7 +278,7 @@ document.addEventListener('keydown', (e) => {
     const nameFooter = document.getElementById('my-name-footer');
     const avatarFooter = document.getElementById('my-avatar-footer');
     
-    if (nameFooter) nameFooter.textContent = currentUser.display_name;
+    if (nameFooter && currentUser) nameFooter.textContent = currentUser.display_name;
     if (avatarFooter) {
         avatarFooter.textContent = '';
         if (currentUser.avatar) {

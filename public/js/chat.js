@@ -1,9 +1,9 @@
-function loadRecentChats() {
-            socket.emit('get recent chats', (users) => renderChatsList(users, 'У вас пока нет переписок.'));
+﻿function loadRecentChats() {
+            socket.emit('get recent chats', (users) => renderChatsList(users, 'РЈ РІР°СЃ РїРѕРєР° РЅРµС‚ РїРµСЂРµРїРёСЃРѕРє.'));
         }
 
         function handleSearch(e) {
-            // Поиск только по нажатию Enter или если поле пустое (сброс)
+            // РџРѕРёСЃРє С‚РѕР»СЊРєРѕ РїРѕ РЅР°Р¶Р°С‚РёСЋ Enter РёР»Рё РµСЃР»Рё РїРѕР»Рµ РїСѓСЃС‚РѕРµ (СЃР±СЂРѕСЃ)
             if (e && e.type === 'keydown' && e.key !== 'Enter') return;
             const query = document.getElementById('search-input').value.trim();
             if (query.length === 0) {
@@ -11,7 +11,7 @@ function loadRecentChats() {
                 return loadRecentChats();
             }
             document.querySelector('.chats-column').classList.add('is-searching');
-            socket.emit('search users', query, (users) => renderChatsList(users.filter(u => u.username !== currentUser.username), 'Пользователь не найден'));
+            socket.emit('search users', query, (users) => renderChatsList(users.filter(u => u.username !== currentUser.username), 'РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ РЅР°Р№РґРµРЅ'));
         }
 
         function renderChatsList(users, emptyText) {
@@ -27,7 +27,7 @@ function loadRecentChats() {
                 
                 const displayName = escapeHTML(myContacts[user.username] || user.display_name);
                 const isUserPremium = !!user.is_premium;
-                const premiumBadge = isUserPremium ? '<span class="premium-star" title="Premium">★</span>' : '';
+                const premiumBadge = isUserPremium ? '<span class="premium-star" title="Premium">в…</span>' : '';
 
                 let avatarHTML = renderAvatarHTML(user.avatar, displayName, 'chat-avatar');
                 const statusDotHTML = user.isGroup ? '' : `<div class="status-dot ${user.isOnline ? 'online' : 'offline'}"></div>`;
@@ -48,14 +48,14 @@ function loadRecentChats() {
         function selectChat(user) {
             currentChatUser = user;
             
-            // Сбрасываем поле ввода и другие состояния
+            // РЎР±СЂР°СЃС‹РІР°РµРј РїРѕР»Рµ РІРІРѕРґР° Рё РґСЂСѓРіРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
             cancelReply();
             document.getElementById('message-text').value = '';
             document.getElementById('message-input-area').classList.remove('has-text');
 
-            // Мгновенная очистка сообщений и показ лоадера
+            // РњРіРЅРѕРІРµРЅРЅР°СЏ РѕС‡РёСЃС‚РєР° СЃРѕРѕР±С‰РµРЅРёР№ Рё РїРѕРєР°Р· Р»РѕР°РґРµСЂР°
             const area = document.getElementById('messages-area');
-            area.innerHTML = '<div class="chat-loader"><div class="spinner"></div><span>Загрузка сообщений...</span></div>';
+            area.innerHTML = '<div class="chat-loader"><div class="spinner"></div><span>Р—Р°РіСЂСѓР·РєР° СЃРѕРѕР±С‰РµРЅРёР№...</span></div>';
             
             const requestId = ++lastChatRequestId;
             const displayName = myContacts[user.username] || user.display_name;
@@ -63,7 +63,7 @@ function loadRecentChats() {
             const safeUsername = escapeHTML(user.username);
             
             const isUserPremium = !!user.is_premium;
-            const premiumBadge = isUserPremium ? '<span class="premium-star" title="Premium">★</span>' : '';
+            const premiumBadge = isUserPremium ? '<span class="premium-star" title="Premium">в…</span>' : '';
             
             const avatarWrapper = document.querySelector('.messages-header .avatar-wrapper');
             avatarWrapper.innerHTML = renderAvatarHTML(user.avatar, displayName, 'partner-avatar') + 
@@ -77,13 +77,13 @@ function loadRecentChats() {
 
             if (user.isGroup) {
                 dot.style.display = 'none';
-                let typeStr = user.type === 'channel' ? 'Канал' : 'Группа';
-                let membersStr = user.member_count ? `${user.member_count} ${user.type === 'channel' ? 'подписчиков' : 'участников'}` : typeStr;
+                let typeStr = user.type === 'channel' ? 'РљР°РЅР°Р»' : 'Р“СЂСѓРїРїР°';
+                let membersStr = user.member_count ? `${user.member_count} ${user.type === 'channel' ? 'РїРѕРґРїРёСЃС‡РёРєРѕРІ' : 'СѓС‡Р°СЃС‚РЅРёРєРѕРІ'}` : typeStr;
                 statusText.textContent = membersStr;
                 addContactBtn.style.display = 'none';
                 callChoiceBtn.style.display = 'none';
                 
-                // Скрываем поле ввода, если это канал и пользователь не админ
+                // РЎРєСЂС‹РІР°РµРј РїРѕР»Рµ РІРІРѕРґР°, РµСЃР»Рё СЌС‚Рѕ РєР°РЅР°Р» Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ Р°РґРјРёРЅ
                 if (user.type === 'channel' && user.my_role !== 'admin') {
                     document.getElementById('message-input-area').style.display = 'none';
                 } else {
@@ -92,13 +92,13 @@ function loadRecentChats() {
             } else {
                 dot.style.display = 'block';
                 dot.className = `status-dot ${user.isOnline ? 'online' : 'offline'}`;
-                statusText.textContent = user.isOnline ? 'в сети' : 'офлайн';
+                statusText.textContent = user.isOnline ? 'РІ СЃРµС‚Рё' : 'РѕС„Р»Р°Р№РЅ';
                 addContactBtn.style.display = myContacts[user.username] ? 'none' : 'block';
                 callChoiceBtn.style.display = 'block';
                 document.getElementById('message-input-area').style.display = 'flex';
             }
             
-            // Адаптация для мобилок: добавляем класс активности чата
+            // РђРґР°РїС‚Р°С†РёСЏ РґР»СЏ РјРѕР±РёР»РѕРє: РґРѕР±Р°РІР»СЏРµРј РєР»Р°СЃСЃ Р°РєС‚РёРІРЅРѕСЃС‚Рё С‡Р°С‚Р°
             document.querySelector('.chat-container').classList.add('chat-active');
             
             socket.emit('get history', user.username, (messages) => {
@@ -107,7 +107,7 @@ function loadRecentChats() {
                 }
             });
 
-            // Обновляем активный чат в списке
+            // РћР±РЅРѕРІР»СЏРµРј Р°РєС‚РёРІРЅС‹Р№ С‡Р°С‚ РІ СЃРїРёСЃРєРµ
             document.querySelectorAll('.chat-item').forEach(el => {
                 el.classList.remove('active');
                 if (el.getAttribute('data-username') === user.username) {
@@ -119,14 +119,14 @@ function loadRecentChats() {
             updateTypingIndicator(user.username);
         }
 
-        // Кнопка назад для мобилок
+        // РљРЅРѕРїРєР° РЅР°Р·Р°Рґ РґР»СЏ РјРѕР±РёР»РѕРє
         function closeChatMobile() {
             document.querySelector('.chat-container').classList.remove('chat-active');
             currentChatUser = null;
         }
 
         function addCurrentToContacts() {
-            const alias = prompt("Имя для контакта:", currentChatUser.display_name);
+            const alias = prompt("РРјСЏ РґР»СЏ РєРѕРЅС‚Р°РєС‚Р°:", currentChatUser.display_name);
             if (alias) {
                 socket.emit('add contact', { username: currentChatUser.username, alias }, () => {
                     myContacts[currentChatUser.username] = alias;
@@ -142,7 +142,7 @@ function loadRecentChats() {
             if (currentChatUser && currentChatUser.username === data.username) {
                 currentChatUser.isOnline = data.online;
                 document.getElementById('current-chat-status-dot').className = `status-dot ${data.online ? 'online' : 'offline'}`;
-                document.getElementById('current-chat-status-text').textContent = data.online ? 'в сети' : 'офлайн';
+                document.getElementById('current-chat-status-text').textContent = data.online ? 'РІ СЃРµС‚Рё' : 'РѕС„Р»Р°Р№РЅ';
             }
         });
 
@@ -178,7 +178,7 @@ function loadRecentChats() {
              bioEl.style.display = currentChatUser.bio ? 'block' : 'none';
 
              if (currentChatUser.birth_date) {
-                 bdateEl.textContent = `Дата рождения: ${new Date(currentChatUser.birth_date).toLocaleDateString()}`;
+                 bdateEl.textContent = `Р”Р°С‚Р° СЂРѕР¶РґРµРЅРёСЏ: ${new Date(currentChatUser.birth_date).toLocaleDateString()}`;
                  bdateEl.style.display = 'block';
              } else {
                  bdateEl.style.display = 'none';
@@ -220,7 +220,7 @@ function loadRecentChats() {
 
             emitMessage(text, 'text'); 
             input.value = '';
-            input.dispatchEvent(new Event('input')); // Обновляем видимость кнопок
+            input.dispatchEvent(new Event('input')); // РћР±РЅРѕРІР»СЏРµРј РІРёРґРёРјРѕСЃС‚СЊ РєРЅРѕРїРѕРє
         }
 
         function sendImage(input) {
@@ -228,7 +228,7 @@ function loadRecentChats() {
             if (!files || files.length === 0) return;
 
             if (files.length === 1) {
-                // Если выбрано одно фото - открываем окно предпросмотра с кнопкой "Отправить"
+                // Р•СЃР»Рё РІС‹Р±СЂР°РЅРѕ РѕРґРЅРѕ С„РѕС‚Рѕ - РѕС‚РєСЂС‹РІР°РµРј РѕРєРЅРѕ РїСЂРµРґРїСЂРѕСЃРјРѕС‚СЂР° СЃ РєРЅРѕРїРєРѕР№ "РћС‚РїСЂР°РІРёС‚СЊ"
                 const reader = new FileReader();
                 reader.onload = e => openMessageCropModal(e.target.result);
                 reader.readAsDataURL(files[0]);
@@ -243,7 +243,7 @@ function loadRecentChats() {
                     .then(images => {
                         images.forEach((img, index) => setTimeout(() => emitMessage(img, 'image'), index * 300));
                     })
-                    .catch(err => alert("Не удалось загрузить изображения."));
+                    .catch(err => alert("РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ."));
             }
             input.value = '';
         }
@@ -255,7 +255,7 @@ function loadRecentChats() {
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.start(); 
                 document.getElementById('record-btn').classList.add('recording');
-            } catch (err) { alert('Нет доступа к микрофону!'); }
+            } catch (err) { alert('РќРµС‚ РґРѕСЃС‚СѓРїР° Рє РјРёРєСЂРѕС„РѕРЅСѓ!'); }
         }
 
         function stopVoice() {
@@ -298,7 +298,7 @@ function loadRecentChats() {
                 circleMediaRecorder.start();
                 document.getElementById('record-btn').classList.add('recording');
             } catch (err) { 
-                alert('Нет доступа к камере или микрофону!'); 
+                alert('РќРµС‚ РґРѕСЃС‚СѓРїР° Рє РєР°РјРµСЂРµ РёР»Рё РјРёРєСЂРѕС„РѕРЅСѓ!'); 
                 if (circleStream) {
                     circleStream.getTracks().forEach(t => t.stop());
                     circleStream = null;
@@ -341,7 +341,7 @@ function loadRecentChats() {
             };
         }
 
-        // --- Логика переключения режима записи ---
+        // --- Р›РѕРіРёРєР° РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ СЂРµР¶РёРјР° Р·Р°РїРёСЃРё ---
         let recordMode = 'voice'; // 'voice' | 'video'
         let isRecordingMedia = false;
         let recordHoldTimer = null;
@@ -361,7 +361,7 @@ function loadRecentChats() {
                 isRecordingMedia = true;
                 if (recordMode === 'voice') startVoice();
                 else startCircleVideo();
-            }, 300); // 300мс удержания для старта записи
+            }, 300); // 300РјСЃ СѓРґРµСЂР¶Р°РЅРёСЏ РґР»СЏ СЃС‚Р°СЂС‚Р° Р·Р°РїРёСЃРё
         }
 
         function handleRecordStop(e) {
@@ -424,7 +424,7 @@ function loadRecentChats() {
                     if (data.success) {
                         finalContent = data.path;
                     } else {
-                        return alert('Ошибка загрузки медиа');
+                        return alert('РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РјРµРґРёР°');
                     }
                 } catch(e) { return alert('Network error during upload'); }
             }
@@ -445,11 +445,11 @@ function loadRecentChats() {
         }
 
         socket.on('private message', (msg) => {
-            // При получении любого сообщения, перезагружаем список чатов,
-            // чтобы он отсортировался по-новому и обновилось последнее сообщение.
+            // РџСЂРё РїРѕР»СѓС‡РµРЅРёРё Р»СЋР±РѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ, РїРµСЂРµР·Р°РіСЂСѓР¶Р°РµРј СЃРїРёСЃРѕРє С‡Р°С‚РѕРІ,
+            // С‡С‚РѕР±С‹ РѕРЅ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°Р»СЃСЏ РїРѕ-РЅРѕРІРѕРјСѓ Рё РѕР±РЅРѕРІРёР»РѕСЃСЊ РїРѕСЃР»РµРґРЅРµРµ СЃРѕРѕР±С‰РµРЅРёРµ.
             loadRecentChats();
 
-            // Далее, если чат открыт, добавляем сообщение в окно.
+            // Р”Р°Р»РµРµ, РµСЃР»Рё С‡Р°С‚ РѕС‚РєСЂС‹С‚, РґРѕР±Р°РІР»СЏРµРј СЃРѕРѕР±С‰РµРЅРёРµ РІ РѕРєРЅРѕ.
             if (!currentChatUser) return;
             
             const isGroupMsg = msg.receiver.startsWith('g');
@@ -463,7 +463,7 @@ function loadRecentChats() {
             if (chatIsActive) {
                 appendMessageUI(msg);
             } else {
-                // Чат не активен, но мы уже перезагрузили список выше.
+                // Р§Р°С‚ РЅРµ Р°РєС‚РёРІРµРЅ, РЅРѕ РјС‹ СѓР¶Рµ РїРµСЂРµР·Р°РіСЂСѓР·РёР»Рё СЃРїРёСЃРѕРє РІС‹С€Рµ.
             }
         });
 
@@ -475,7 +475,7 @@ function loadRecentChats() {
 
             const lastMessageSpan = document.getElementById(`lm-${chatId}`);
             if (lastMessageSpan) {
-                lastMessageSpan.innerHTML = `<em class="typing">печатает...</em>`;
+                lastMessageSpan.innerHTML = `<em class="typing">РїРµС‡Р°С‚Р°РµС‚...</em>`;
             }
 
             updateTypingIndicator(chatId);
@@ -488,15 +488,15 @@ function loadRecentChats() {
                 if (typingUsers.get(chatId).size === 0) typingUsers.delete(chatId);
             }
             
-            // Если в этом чате больше никто не печатает, нужно восстановить последнее сообщение
+            // Р•СЃР»Рё РІ СЌС‚РѕРј С‡Р°С‚Рµ Р±РѕР»СЊС€Рµ РЅРёРєС‚Рѕ РЅРµ РїРµС‡Р°С‚Р°РµС‚, РЅСѓР¶РЅРѕ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕСЃР»РµРґРЅРµРµ СЃРѕРѕР±С‰РµРЅРёРµ
             if (!typers || typers.size === 0) {
                 const lastMessageSpan = document.getElementById(`lm-${chatId}`);
-                // Обновляем список, только если мы действительно показывали "печатает..."
+                // РћР±РЅРѕРІР»СЏРµРј СЃРїРёСЃРѕРє, С‚РѕР»СЊРєРѕ РµСЃР»Рё РјС‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ РїРѕРєР°Р·С‹РІР°Р»Рё "РїРµС‡Р°С‚Р°РµС‚..."
                 if (lastMessageSpan && lastMessageSpan.querySelector('.typing')) {
-                    loadRecentChats(); // Самый надежный способ получить актуальное последнее сообщение
+                    loadRecentChats(); // РЎР°РјС‹Р№ РЅР°РґРµР¶РЅС‹Р№ СЃРїРѕСЃРѕР± РїРѕР»СѓС‡РёС‚СЊ Р°РєС‚СѓР°Р»СЊРЅРѕРµ РїРѕСЃР»РµРґРЅРµРµ СЃРѕРѕР±С‰РµРЅРёРµ
                 }
             }
-            updateTypingIndicator(chatId); // Обновляем заголовок в любом случае
+            updateTypingIndicator(chatId); // РћР±РЅРѕРІР»СЏРµРј Р·Р°РіРѕР»РѕРІРѕРє РІ Р»СЋР±РѕРј СЃР»СѓС‡Р°Рµ
         });
         
         socket.on('new_comment', (comment) => {
@@ -525,27 +525,27 @@ function loadRecentChats() {
         });
 
         socket.on('message failed', ({ time, error }) => {
-            alert(`Не удалось отправить сообщение: ${error}`);
+            alert(`РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ: ${error}`);
         });
 
-        socket.on('new story', loadStories);
+        socket.on('new story', () => { if(typeof loadStories === 'function') loadStories(); });
 
         socket.on('group_member_removed', ({ groupId, removedUsername, removerUsername }) => {
             const groupUsername = `g${groupId}`;
             if (removedUsername === currentUser.username) {
-                alert(`Вы были удалены из группы.`);
-                // Если текущий чат - эта группа, закрываем его
+                alert(`Р’С‹ Р±С‹Р»Рё СѓРґР°Р»РµРЅС‹ РёР· РіСЂСѓРїРїС‹.`);
+                // Р•СЃР»Рё С‚РµРєСѓС‰РёР№ С‡Р°С‚ - СЌС‚Р° РіСЂСѓРїРїР°, Р·Р°РєСЂС‹РІР°РµРј РµРіРѕ
                 if (currentChatUser && currentChatUser.username === groupUsername) {
                     closeChatMobile();
                     document.getElementById('message-input-area').style.display = 'none';
                     document.getElementById('messages-area').innerHTML = '';
-                    document.getElementById('current-chat-name').textContent = 'Выберите чат';
+                    document.getElementById('current-chat-name').textContent = 'Р’С‹Р±РµСЂРёС‚Рµ С‡Р°С‚';
                 }
-                // Удаляем чат из списка
+                // РЈРґР°Р»СЏРµРј С‡Р°С‚ РёР· СЃРїРёСЃРєР°
                 const chatItem = document.querySelector(`.chat-item[data-username="${groupUsername}"]`);
                 if (chatItem) chatItem.remove();
             } else {
-                // Если открыт этот чат, обновляем инфо
+                // Р•СЃР»Рё РѕС‚РєСЂС‹С‚ СЌС‚РѕС‚ С‡Р°С‚, РѕР±РЅРѕРІР»СЏРµРј РёРЅС„Рѕ
                 if (currentChatUser && currentChatUser.username === groupUsername) {
                     openGroupInfoModal(); // Re-fetch details
                 }
@@ -569,7 +569,7 @@ function loadRecentChats() {
             area.innerHTML = '';
             
             if (messages.length === 0) {
-                area.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-muted); opacity: 0.5;">История сообщений пуста</div>';
+                area.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-muted); opacity: 0.5;">РСЃС‚РѕСЂРёСЏ СЃРѕРѕР±С‰РµРЅРёР№ РїСѓСЃС‚Р°</div>';
                 return;
             }
 
@@ -582,7 +582,7 @@ function loadRecentChats() {
             area.appendChild(fragment);
             area.scrollTop = area.scrollHeight;
             
-            // Запускаем отрисовку реакций после вставки в DOM
+            // Р—Р°РїСѓСЃРєР°РµРј РѕС‚СЂРёСЃРѕРІРєСѓ СЂРµР°РєС†РёР№ РїРѕСЃР»Рµ РІСЃС‚Р°РІРєРё РІ DOM
             messages.forEach(msg => {
                 if (msg.reactions && msg.reactions.length > 0) {
                     renderReactions(msg.id, msg.reactions);
@@ -617,7 +617,7 @@ function loadRecentChats() {
                 forwardedHTML = `
                     <div class="forwarded-label">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15l5-5-5-5"/></svg>
-                        Переслано от @${escapeHTML(msg.forwarded_from_username)}
+                        РџРµСЂРµСЃР»Р°РЅРѕ РѕС‚ @${escapeHTML(msg.forwarded_from_username)}
                     </div>
                 `;
             }
@@ -631,7 +631,7 @@ function loadRecentChats() {
                     images = JSON.parse(msg.text).map(getFullUrl);
                     bubbleClass += ' gallery-bubble';
                     content = `<div class="gallery-grid">${images.map((src, index) => `<img src="${escapeHTML(src)}" class="message-img" id="gallery-${msg.id}-${index}" loading="lazy">`).join('')}</div>`;
-                } catch(e) { content = "<i>Ошибка галереи</i>"; }
+                } catch(e) { content = "<i>РћС€РёР±РєР° РіР°Р»РµСЂРµРё</i>"; }
             } else if (msg.type === 'audio') {
                 let barWidth = Math.min(100 + ((msg.duration || 0) * 15), 280);
                 content = `<div class="voice-player" style="width: ${barWidth}px;">
@@ -655,16 +655,16 @@ function loadRecentChats() {
             if (currentChatUser && currentChatUser.type === 'channel') {
                 commentsHTML = `<div class="message-comments-btn" onclick="openComments(${msg.id})">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-right:6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    Комментарии (<span id="comment-count-${msg.id}">${msg.comment_count || 0}</span>)
+                    РљРѕРјРјРµРЅС‚Р°СЂРёРё (<span id="comment-count-${msg.id}">${msg.comment_count || 0}</span>)
                 </div>`;
             }
 
             div.innerHTML = `
                 <div class="message-actions">
-                    <button class="msg-action-btn" title="Реакция" onclick="openReactionPicker(this, ${msg.id})"><svg viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5"></path><path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke-width="1.5" stroke-linecap="round"></path><path d="M9 9H9.01" stroke-width="1.5" stroke-linecap="round"></path><path d="M15 9H15.01" stroke-width="1.5" stroke-linecap="round"></path></svg></button>
-                    <button class="msg-action-btn" title="Ответить" onclick="showReplyUI(${msg.id}, '${escapeHTML(msg.sender)}', '${escapeHTML(msg.text)}', '${msg.type}')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
-                    <button class="msg-action-btn" title="Переслать" onclick="openForwardModal(${msg.id})"><svg viewBox="0 0 24 24" transform="scale(1, -1) rotate(90)"><path d="M18 9.5l-6-6-6 6"></path><path d="M12 3v13.5"></path><path d="M5 15h14"></path></svg></button>
-                    <button class="msg-action-btn" title="Удалить" onclick="openDeleteModal(${msg.id}, ${isMine})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                    <button class="msg-action-btn" title="Р РµР°РєС†РёСЏ" onclick="openReactionPicker(this, ${msg.id})"><svg viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5"></path><path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke-width="1.5" stroke-linecap="round"></path><path d="M9 9H9.01" stroke-width="1.5" stroke-linecap="round"></path><path d="M15 9H15.01" stroke-width="1.5" stroke-linecap="round"></path></svg></button>
+                    <button class="msg-action-btn" title="РћС‚РІРµС‚РёС‚СЊ" onclick="showReplyUI(${msg.id}, '${escapeHTML(msg.sender)}', '${escapeHTML(msg.text)}', '${msg.type}')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
+                    <button class="msg-action-btn" title="РџРµСЂРµСЃР»Р°С‚СЊ" onclick="openForwardModal(${msg.id})"><svg viewBox="0 0 24 24" transform="scale(1, -1) rotate(90)"><path d="M18 9.5l-6-6-6 6"></path><path d="M12 3v13.5"></path><path d="M5 15h14"></path></svg></button>
+                    <button class="msg-action-btn" title="РЈРґР°Р»РёС‚СЊ" onclick="openDeleteModal(${msg.id}, ${isMine})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                 </div>
                 <div class="${bubbleClass}">
                     ${forwardedHTML}
@@ -679,7 +679,7 @@ function loadRecentChats() {
                     </div>
                 </div>`;
 
-            // Обработчики для изображений
+            // РћР±СЂР°Р±РѕС‚С‡РёРєРё РґР»СЏ РёР·РѕР±СЂР°Р¶РµРЅРёР№
             if (msg.type === 'image') {
                 const img = div.querySelector('.message-img');
                 img.onclick = () => openImageViewer([getFullUrl(msg.text)], 0);
@@ -689,14 +689,14 @@ function loadRecentChats() {
                 });
             }
 
-            // Навешиваем ховеры для действий
+            // РќР°РІРµС€РёРІР°РµРј С…РѕРІРµСЂС‹ РґР»СЏ РґРµР№СЃС‚РІРёР№
             div.onmouseenter = () => showMessageActionsWithDelay(div);
             div.onmouseleave = () => hideMessageActionsWithDelay(div);
 
             return div;
         }
 
-        // Старая функция appendMessageUI теперь может использовать createMessageElement
+        // РЎС‚Р°СЂР°СЏ С„СѓРЅРєС†РёСЏ appendMessageUI С‚РµРїРµСЂСЊ РјРѕР¶РµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ createMessageElement
         function appendMessageUI(msg) {
             const area = document.getElementById('messages-area');
             const el = createMessageElement(msg);
@@ -750,7 +750,7 @@ function loadRecentChats() {
             const list = document.getElementById('admin-users-list');
             list.innerHTML = '';
             if (users.length === 0) {
-                list.innerHTML = '<div style="padding:20px; text-align:center; color:#888;">Пользователи не найдены</div>';
+                list.innerHTML = '<div style="padding:20px; text-align:center; color:#888;">РџРѕР»СЊР·РѕРІР°С‚РµР»Рё РЅРµ РЅР°Р№РґРµРЅС‹</div>';
                 return;
             }
             users.forEach(u => {
@@ -759,12 +759,12 @@ function loadRecentChats() {
                 item.innerHTML = `
                     <div class="admin-user-info">
                         <div class="admin-user-name">${u.display_name} (@${u.username})</div>
-                        <div class="admin-user-sub">${u.email || 'Нет почты'} | [${u.is_verified ? 'Verified' : 'Pending'}]</div>
+                        <div class="admin-user-sub">${u.email || 'РќРµС‚ РїРѕС‡С‚С‹'} | [${u.is_verified ? 'Verified' : 'Pending'}]</div>
                     </div>
                     <div class="admin-user-actions">
                         ${u.is_banned 
-                            ? `<button class="unban-btn" onclick="adminUnban('${u.username}')">Разбанить</button>`
-                            : `<button class="ban-btn" onclick="adminBan('${u.username}')">Бан</button>`
+                            ? `<button class="unban-btn" onclick="adminUnban('${u.username}')">Р Р°Р·Р±Р°РЅРёС‚СЊ</button>`
+                            : `<button class="ban-btn" onclick="adminBan('${u.username}')">Р‘Р°РЅ</button>`
                         }
                     </div>
                 `;
@@ -773,14 +773,14 @@ function loadRecentChats() {
         });
 
         function adminBan(username) {
-            if (confirm(`Забанить ${username}?`)) {
+            if (confirm(`Р—Р°Р±Р°РЅРёС‚СЊ ${username}?`)) {
                 socket.emit('admin_ban_user', { username });
                 handleAdminUserSearch();
             }
         }
 
         function adminUnban(username) {
-            if (confirm(`Разбанить ${username}?`)) {
+            if (confirm(`Р Р°Р·Р±Р°РЅРёС‚СЊ ${username}?`)) {
                 socket.emit('admin_unban_user', { username });
                 handleAdminUserSearch();
             }
