@@ -39,6 +39,19 @@
                     <button class="help-btn" onclick="showHelp()">?</button>
                 </div>
             </div>
+
+            <div class="card hidden" id="verify-card">
+                <h1>⚲ ПОДТВЕРЖДЕНИЕ</h1>
+                <p style="font-size: 14px; margin-bottom: 20px; color: var(--text-muted);">Введите 6-значный код, отправленный на вашу почту.</p>
+                <div class="input-group">
+                    <input type="text" class="input-field" id="verify-code-input" placeholder="000000" maxlength="6" style="text-align: center; letter-spacing: 12px; font-size: 24px; font-weight: bold;">
+                </div>
+                <button class="action-btn" onclick="verifyCode()">подтвердить</button>
+                <div class="card-footer" style="flex-direction: column; gap: 10px;">
+                    <button class="footer-btn" id="resend-code-btn" onclick="resendCode()">отправить код повторно</button>
+                    <button class="footer-btn" onclick="showRegister()">⏤ назад к регистрации ⏤</button>
+                </div>
+            </div>
         </div>
     </div>
 

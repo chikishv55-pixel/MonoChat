@@ -121,6 +121,16 @@ input, textarea { -webkit-user-select: text !important; user-select: text !impor
 .card-footer { display: flex; justify-content: space-between; margin-top: 20px; border-top: none; padding-top: 0; }
 .footer-btn, .help-btn { background: none; border: none; font-size: 14px; color: var(--accent); cursor: pointer; text-decoration: none; font-weight: 500; transition: 0.2s; padding: 8px; border-radius: 8px;}
 .footer-btn:hover, .help-btn:hover { background: var(--hover-bg); }
+.footer-btn:disabled { color: var(--text-muted); cursor: not-allowed; opacity: 0.6; }
+
+#verify-code-input {
+    letter-spacing: 8px;
+    text-indent: 8px;
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+    font-family: monospace;
+}
 
 /* ЧАТ */
 .chat-container { width: 100%; height: 100%; display: flex; flex-direction: row; overflow: hidden; }

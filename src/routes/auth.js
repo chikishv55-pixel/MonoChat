@@ -57,29 +57,28 @@ router.post('/register', async (req, res) => {
         }
 
         const hash = await bcrypt.hash(password, SALT_ROUNDS);
-        const verificationToken = jwt.sign({ username: lowerUser }, JWT_SECRET, { expiresIn: '5m' }); // 5 минут
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6 цифр
 
         try {
             await dbRun(`INSERT INTO users (username, display_name, password, email, verification_token, is_verified, fcm_token) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
-                [lowerUser, displayName, hash, lowerEmail, verificationToken, 0, fcmToken || null]);
+                [lowerUser, displayName, hash, lowerEmail, verificationCode, 0, fcmToken || null]);
             
             registerAttempts.delete(ip);
             
             // Отправка письма
             const transporter = nodemailer.createTransport(config.emailConfig);
-            const verifyUrl = `${config.serverUrl}/api/auth/verify/${verificationToken}`;
             const mailOptions = {
                 from: `"Monochrome Chat" <${config.emailConfig.auth.user}>`,
                 to: email,
-                subject: 'Подтверждение регистрации (5 минут)',
+                subject: 'Код подтверждения (5 минут)',
                 html: `
-                    <div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 500px; margin: auto; border: 1px solid #eee; border-radius: 12px;">
-                        <h2 style="color: #3390ec;">Добро пожаловать в Monochrome!</h2>
-                        <p>Для завершения регистрации, пожалуйста, подтвердите почту. Ссылка действительна <b>5 минут</b>:</p>
+                    <div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 500px; margin: auto; border: 1px solid #1a1a1a; border-radius: 16px; background-color: #ffffff;">
+                        <h2 style="color: #000; text-align: center;">⚲ MONOCHROME</h2>
+                        <p style="text-align: center; font-size: 16px;">Ваш код подтверждения для завершения регистрации:</p>
                         <div style="text-align: center; margin: 30px 0;">
-                            <a href="${verifyUrl}" style="display: inline-block; padding: 14px 28px; background: #3390ec; color: #fff; text-decoration: none; border-radius: 10px; font-weight: bold;">Подтвердить почту</a>
+                            <span style="display: inline-block; padding: 15px 30px; background: #f4f4f4; color: #000; font-size: 32px; font-weight: bold; letter-spacing: 5px; border-radius: 10px; border: 1px solid #ddd;">${verificationCode}</span>
                         </div>
-                        <p style="font-size: 13px; color: #888;">Если ссылка не открывается: <a href="${verifyUrl}">${verifyUrl}</a></p>
+                        <p style="font-size: 13px; color: #888; text-align: center;">Код действителен <b>5 минут</b>. Если вы не регистрировались, просто проигнорируйте это письмо.</p>
                     </div>
                 `
             };
@@ -170,6 +169,63 @@ router.get('/me', async (req, res) => {
         res.json({ success: true, user: row });
     } catch(e) {
         res.status(401).json({ success: false, message: 'Токен недействителен' });
+    }
+});
+
+router.post('/verify-code', async (req, res) => {
+    try {
+        const { username, code } = req.body;
+        if (!username || !code) return res.status(400).json({ success: false, message: 'Все поля обязательны.' });
+
+        const user = await dbGet(`SELECT * FROM users WHERE username = ?`, [username.toLowerCase()]);
+        if (!user) return res.status(404).json({ success: false, message: 'Пользователь не найден.' });
+        if (user.is_verified) return res.status(400).json({ success: false, message: 'Аккаунт уже подтвержден.' });
+
+        if (user.verification_token === code) {
+            await dbRun(`UPDATE users SET is_verified = 1, verification_token = NULL WHERE username = ?`, [user.username]);
+            res.json({ success: true, message: 'Аккаунт успешно подтвержден! Теперь вы можете войти.' });
+        } else {
+            res.status(400).json({ success: false, message: 'Неверный код подтверждения.' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Ошибка при проверке кода.' });
+    }
+});
+
+router.post('/resend-code', async (req, res) => {
+    try {
+        const { username } = req.body;
+        if (!username) return res.status(400).json({ success: false, message: 'Юзернейм обязателен.' });
+
+        const user = await dbGet(`SELECT * FROM users WHERE username = ?`, [username.toLowerCase()]);
+        if (!user) return res.status(404).json({ success: false, message: 'Пользователь не найден.' });
+        if (user.is_verified) return res.status(400).json({ success: false, message: 'Аккаунт уже подтвержден.' });
+
+        const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+        await dbRun(`UPDATE users SET verification_token = ? WHERE username = ?`, [newCode, user.username]);
+
+        const transporter = nodemailer.createTransport(config.emailConfig);
+        const mailOptions = {
+            from: `"Monochrome Chat" <${config.emailConfig.auth.user}>`,
+            to: user.email,
+            subject: 'Новый код подтверждения',
+            html: `
+                <div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 500px; margin: auto; border: 1px solid #1a1a1a; border-radius: 16px; background-color: #ffffff;">
+                    <h2 style="color: #000; text-align: center;">⚲ MONOCHROME</h2>
+                    <p style="text-align: center; font-size: 16px;">Ваш новый код подтверждения:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <span style="display: inline-block; padding: 15px 30px; background: #f4f4f4; color: #000; font-size: 32px; font-weight: bold; letter-spacing: 5px; border-radius: 10px; border: 1px solid #ddd;">${newCode}</span>
+                    </div>
+                    <p style="font-size: 13px; color: #888; text-align: center;">Код действителен <b>5 минут</b>.</p>
+                </div>
+            `
+        };
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true, message: 'Новый код отправлен на почту.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Ошибка при повторной отправке кода.' });
     }
 });
 

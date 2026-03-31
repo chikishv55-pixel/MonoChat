@@ -1,74 +1,88 @@
-function showLogin() { document.getElementById('login-card').classList.remove('hidden'); document.getElementById('register-card').classList.add('hidden'); }
-        function showRegister() { document.getElementById('login-card').classList.add('hidden'); document.getElementById('register-card').classList.remove('hidden'); }
-        function showHelp() { alert("МОНОХРОМ - приватный чат."); }
+function showLogin() { 
+    document.getElementById('login-card').classList.remove('hidden'); 
+    document.getElementById('register-card').classList.add('hidden'); 
+    document.getElementById('verify-card').classList.add('hidden'); 
+}
+function showRegister() { 
+    document.getElementById('login-card').classList.add('hidden'); 
+    document.getElementById('register-card').classList.remove('hidden'); 
+    document.getElementById('verify-card').classList.add('hidden'); 
+}
+function showVerify() {
+    document.getElementById('login-card').classList.add('hidden');
+    document.getElementById('register-card').classList.add('hidden');
+    document.getElementById('verify-card').classList.remove('hidden');
+}
 
-        function closeAllModals() {
-            document.getElementById('main-overlay').classList.remove('active');
-            document.getElementById('profile-modal').classList.remove('active');
-            document.getElementById('delete-modal').classList.remove('active');
-            document.getElementById('create-chat-modal').classList.remove('active');
-            document.getElementById('group-info-modal').classList.remove('active');
-            document.getElementById('edit-group-modal').classList.remove('active');
-            document.getElementById('my-profile-modal').classList.remove('active');
-            document.getElementById('forward-modal').classList.remove('active');
-            document.getElementById('new-chat-choice-modal').classList.remove('active');
-            document.getElementById('story-preview-modal').classList.remove('active');
-            document.getElementById('music-modal').classList.remove('active');
-            const picker = document.getElementById('emoji-picker');
-            if (picker) picker.classList.remove('active');
-            closeMessageCropModal();
-            closeCommentsModal();
-            cancelReply();
-            closeReactionPicker();
-            closeImageViewer();
-            closeCropModal();
-        }
+function showHelp() { alert("МОНОХРОМ - приватный чат."); }
 
-        function authSuccess(user) {
-            localStorage.setItem('monochrome_user', JSON.stringify(user));
-            // Ensure all fields are present
-            user.bio = user.bio || '';
-            user.birth_date = user.birth_date || '';
-            currentUser = user;
-            isPremium = !!user.is_premium;
-            
-            document.getElementById('profile-name').textContent = user.display_name;
-            document.getElementById('profile-username-label').textContent = '@' + user.username;
-            updateAllMyAvatars(user.avatar, user.display_name);
-            updateMyMusicUI(user.music_status);
-            if (typeof updatePremiumUI === 'function') updatePremiumUI();
-            
-            socket.emit('get contacts', (contacts) => {
-                myContacts = {};
-                contacts.forEach(c => myContacts[c.contact_username] = c.alias);
-                document.getElementById('auth-screen').classList.remove('active');
-                document.getElementById('chat-screen').classList.add('active');
-                loadRecentChats();
-                loadStories();
-            });
-        }
+function closeAllModals() {
+    document.getElementById('main-overlay').classList.remove('active');
+    document.getElementById('profile-modal').classList.remove('active');
+    document.getElementById('delete-modal').classList.remove('active');
+    document.getElementById('create-chat-modal').classList.remove('active');
+    document.getElementById('group-info-modal').classList.remove('active');
+    document.getElementById('edit-group-modal').classList.remove('active');
+    document.getElementById('my-profile-modal').classList.remove('active');
+    document.getElementById('forward-modal').classList.remove('active');
+    document.getElementById('new-chat-choice-modal').classList.remove('active');
+    document.getElementById('story-preview-modal').classList.remove('active');
+    document.getElementById('music-modal').classList.remove('active');
+    const picker = document.getElementById('emoji-picker');
+    if (picker) picker.classList.remove('active');
+    closeMessageCropModal();
+    closeCommentsModal();
+    cancelReply();
+    closeReactionPicker();
+    closeImageViewer();
+    closeCropModal();
+}
 
-        async function login() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value;
-            if(!username || !password) return alert('Введите данные');
-            try {
-                const response = await fetch(SERVER_URL + '/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, fcmToken: localStorage.getItem('fcm_token') || fcmToken })
-                });
-                const res = await response.json();
-                if (res.success) {
-                    localStorage.setItem('monochrome_token', res.token);
-                    socket.auth = { token: res.token };
-                    socket.disconnect().connect();
-                    authSuccess(res.user);
-                } else alert(res.message);
-            } catch (err) { alert('Ошибка'); }
-        }
+function authSuccess(user) {
+    localStorage.setItem('monochrome_user', JSON.stringify(user));
+    // Ensure all fields are present
+    user.bio = user.bio || '';
+    user.birth_date = user.birth_date || '';
+    currentUser = user;
+    isPremium = !!user.is_premium;
+    
+    document.getElementById('profile-name').textContent = user.display_name;
+    document.getElementById('profile-username-label').textContent = '@' + user.username;
+    updateAllMyAvatars(user.avatar, user.display_name);
+    updateMyMusicUI(user.music_status);
+    if (typeof updatePremiumUI === 'function') updatePremiumUI();
+    
+    socket.emit('get contacts', (contacts) => {
+        myContacts = {};
+        contacts.forEach(c => myContacts[c.contact_username] = c.alias);
+        document.getElementById('auth-screen').classList.remove('active');
+        document.getElementById('chat-screen').classList.add('active');
+        loadRecentChats();
+        loadStories();
+    });
+}
 
-        async function register() {
+async function login() {
+    const username = document.getElementById('username-input').value.trim();
+    const password = document.getElementById('password-input').value;
+    if(!username || !password) return alert('Введите данные');
+    try {
+        const response = await fetch(SERVER_URL + '/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, fcmToken: localStorage.getItem('fcm_token') || fcmToken })
+        });
+        const res = await response.json();
+        if (res.success) {
+            localStorage.setItem('monochrome_token', res.token);
+            socket.auth = { token: res.token };
+            socket.disconnect().connect();
+            authSuccess(res.user);
+        } else alert(res.message);
+    } catch (err) { alert('Ошибка'); }
+}
+
+async function register() {
     try {
         const displayName = document.getElementById('reg-name').value.trim();
         const email = document.getElementById('reg-email').value.trim();
@@ -92,8 +106,8 @@ function showLogin() { document.getElementById('login-card').classList.remove('h
         });
         const data = await response.json();
         if (data.success) {
-            alert('Регистрация успешна! Проверьте вашу почту для подтверждения аккаунта (5 минут).');
-            showLogin();
+            alert('Регистрация успешна! Введите код подтверждения из вашей почты.');
+            showVerify();
         } else {
             alert(data.message || 'Ошибка регистрации');
         }
@@ -101,6 +115,70 @@ function showLogin() { document.getElementById('login-card').classList.remove('h
         console.error(err);
         alert('Ошибка соединения с сервером');
     }
+}
+
+async function verifyCode() {
+    const username = document.getElementById('reg-username').value.trim();
+    const code = document.getElementById('verify-code-input').value.trim();
+    if (code.length !== 6) return alert('Введите 6-значный код');
+
+    try {
+        const response = await fetch('/api/auth/verify-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, code })
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert(data.message);
+            showLogin();
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        alert('Ошибка при проверке кода');
+    }
+}
+
+let resendTimer = 0;
+async function resendCode() {
+    if (resendTimer > 0) return;
+    
+    const username = document.getElementById('reg-username').value.trim();
+    if (!username) return alert('Ошибка: юзернейм не найден');
+
+    try {
+        const response = await fetch('/api/auth/resend-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        });
+        const data = await response.json();
+        alert(data.message);
+        
+        if (data.success) {
+            startResendTimer(60);
+        }
+    } catch (err) {
+        alert('Ошибка при повторной отправке');
+    }
+}
+
+function startResendTimer(seconds) {
+    resendTimer = seconds;
+    const btn = document.getElementById('resend-code-btn');
+    btn.disabled = true;
+    
+    const interval = setInterval(() => {
+        resendTimer--;
+        if (resendTimer <= 0) {
+            clearInterval(interval);
+            btn.textContent = 'отправить код повторно';
+            btn.disabled = false;
+        } else {
+            btn.textContent = `отправить повторно (${resendTimer}с)`;
+        }
+    }, 1000);
 }
 
 // Banned Notification
