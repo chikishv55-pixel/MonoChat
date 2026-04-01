@@ -1,58 +1,111 @@
-const sqlite3 = require('sqlite3').verbose();
+const initSqlJs = require('sql.js');
 const path = require('path');
 const fs = require('fs').promises;
 
 // Path to chat.db from the root directory
 const dbPath = path.join(__dirname, '../../chat.db');
 
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('Ошибка подключения к БД:', err);
-        process.exit(1);
-    } else {
-        console.log('Подключено к базе данных SQLite.');
+let dbInstance = null;
+
+/**
+ * Saves the current in-memory database to the filesystem.
+ */
+async function saveDB() {
+    if (!dbInstance) return;
+    try {
+        const data = dbInstance.export();
+        const buffer = Buffer.from(data);
+        await fs.writeFile(dbPath, buffer);
+    } catch (err) {
+        console.error('Ошибка сохранения БД на диск:', err);
     }
-});
+}
 
 // --- Обертки для работы с базой данных через async/await ---
-const dbRun = (sql, params = []) => new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
-        if (err) {
-            if (err.code !== 'SQLITE_CONSTRAINT') {
-                console.error('Ошибка выполнения запроса:', sql, params, err.message);
-            }
-            reject(err);
-        } else {
-            resolve({ lastID: this.lastID, changes: this.changes });
+const dbRun = async (sql, params = []) => {
+    if (!dbInstance) throw new Error('БД не инициализирована');
+    try {
+        // sql.js uses object-based params usually, but it can handle arrays if we prepare.
+        // For simplicity, we use run() for non-query commands.
+        dbInstance.run(sql, params);
+        
+        // sql.js doesn't provide lastID easily from run() unless it's a statement.
+        // We can get last_insert_rowid()
+        const lastIDRes = dbInstance.exec("SELECT last_insert_rowid() as id");
+        const lastID = lastIDRes[0].values[0][0];
+        
+        // Save to disk after every write to ensure persistence (Option A simplicity)
+        await saveDB();
+        
+        return { lastID, changes: 1 }; 
+    } catch (err) {
+        if (err.message && !err.message.includes('UNIQUE constraint failed')) {
+            console.error('Ошибка выполнения запроса:', sql, params, err.message);
         }
-    });
-});
+        throw err;
+    }
+};
 
-const dbGet = (sql, params = []) => new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-        if (err) {
-            console.error('Ошибка получения записи:', sql, params, err.message);
-            reject(err);
-        } else {
-            resolve(row);
-        }
-    });
-});
+const dbGet = async (sql, params = []) => {
+    if (!dbInstance) throw new Error('БД не инициализирована');
+    try {
+        const res = dbInstance.exec(sql, params);
+        if (res.length === 0) return null;
+        
+        // Convert sql.js format to standard object format
+        const columns = res[0].columns;
+        const values = res[0].values[0];
+        if (!values) return null;
+        
+        const row = {};
+        columns.forEach((col, i) => {
+            row[col] = values[i];
+        });
+        return row;
+    } catch (err) {
+        console.error('Ошибка получения записи:', sql, params, err.message);
+        throw err;
+    }
+};
 
-const dbAll = (sql, params = []) => new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-        if (err) {
-            console.error('Ошибка получения записей:', sql, params, err.message);
-            reject(err);
-        } else {
-            resolve(rows);
-        }
-    });
-});
+const dbAll = async (sql, params = []) => {
+    if (!dbInstance) throw new Error('БД не инициализирована');
+    try {
+        const res = dbInstance.exec(sql, params);
+        if (res.length === 0) return [];
+        
+        const columns = res[0].columns;
+        const rows = res[0].values.map(values => {
+            const row = {};
+            columns.forEach((col, i) => {
+                row[col] = values[i];
+            });
+            return row;
+        });
+        return rows;
+    } catch (err) {
+        console.error('Ошибка получения записей:', sql, params, err.message);
+        throw err;
+    }
+};
 
 // --- Инициализация таблиц в БД ---
 async function initDB() {
     try {
+        const SQL = await initSqlJs();
+        
+        let fileBuffer;
+        try {
+            fileBuffer = await fs.readFile(dbPath);
+            console.log('Загрузка существующей базы данных...');
+        } catch (e) {
+            console.log('Создание новой базы данных...');
+            fileBuffer = Buffer.alloc(0);
+        }
+
+        dbInstance = new SQL.Database(fileBuffer);
+
+        // --- Создание таблиц ---
         await dbRun(`CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             sender TEXT,
@@ -103,16 +156,16 @@ async function initDB() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             avatar TEXT,
-            type TEXT NOT NULL, -- 'group' or 'channel',
+            type TEXT NOT NULL,
             creator_username TEXT NOT NULL,
-            public_id TEXT UNIQUE, -- e.g. @mycoolgroup
-            visibility TEXT NOT NULL DEFAULT 'public' -- 'public' or 'private'
+            public_id TEXT UNIQUE,
+            visibility TEXT NOT NULL DEFAULT 'public'
         )`);
 
         await dbRun(`CREATE TABLE IF NOT EXISTS group_members (
             group_id INTEGER NOT NULL,
             user_username TEXT NOT NULL,
-            role TEXT NOT NULL, -- 'admin' or 'member'
+            role TEXT NOT NULL,
             PRIMARY KEY(group_id, user_username)
         )`);
 
@@ -120,8 +173,7 @@ async function initDB() {
             message_id INTEGER NOT NULL,
             reactor_username TEXT NOT NULL,
             emoji TEXT NOT NULL,
-            PRIMARY KEY(message_id, reactor_username, emoji),
-            FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
+            PRIMARY KEY(message_id, reactor_username, emoji)
         )`);
 
         await dbRun(`CREATE TABLE IF NOT EXISTS message_comments (
@@ -129,50 +181,54 @@ async function initDB() {
             message_id INTEGER NOT NULL,
             sender TEXT NOT NULL,
             text TEXT NOT NULL,
-            time TEXT NOT NULL,
-            FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
+            time TEXT NOT NULL
         )`);
 
-        // --- Миграция схемы для существующих баз данных ---
-        const addColumnIfNotExists = async (table, column, type) => {
-            const columns = await dbAll(`PRAGMA table_info(${table})`);
-            if (!columns.some(c => c.name === column)) {
-                await dbRun(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
-            }
-        };
-
-        await addColumnIfNotExists('messages', 'reply_to_message_id', 'INTEGER');
-        await addColumnIfNotExists('messages', 'reply_snippet', 'TEXT');
-        await addColumnIfNotExists('users', 'bio', 'TEXT');
-        await addColumnIfNotExists('users', 'birth_date', 'TEXT');
-        await addColumnIfNotExists('messages', 'forwarded_from_username', 'TEXT');
-        await addColumnIfNotExists('users', 'music_status', 'TEXT');
-        await addColumnIfNotExists('users', 'fcm_token', 'TEXT');
-        await addColumnIfNotExists('users', 'is_premium', 'INTEGER DEFAULT 0');
-        await addColumnIfNotExists('users', 'is_admin', 'INTEGER DEFAULT 0');
-        await addColumnIfNotExists('users', 'is_banned', 'INTEGER DEFAULT 0');
-        await addColumnIfNotExists('users', 'is_verified', 'INTEGER DEFAULT 0');
-        await addColumnIfNotExists('users', 'verification_token', 'TEXT');
-        await addColumnIfNotExists('users', 'email', 'TEXT');
+        // --- Миграции ---
+        const columnsInUsers = await dbAll(`PRAGMA table_info(users)`);
+        const hasIsAdmin = columnsInUsers.some(c => c.name === 'is_admin');
+        if (!hasIsAdmin) {
+            // addColumnIfNotExists logic
+            await dbRun(`ALTER TABLE users ADD COLUMN bio TEXT`);
+            await dbRun(`ALTER TABLE users ADD COLUMN birth_date TEXT`);
+            await dbRun(`ALTER TABLE users ADD COLUMN music_status TEXT`);
+            await dbRun(`ALTER TABLE users ADD COLUMN fcm_token TEXT`);
+            await dbRun(`ALTER TABLE users ADD COLUMN is_premium INTEGER DEFAULT 0`);
+            await dbRun(`ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0`);
+            await dbRun(`ALTER TABLE users ADD COLUMN is_banned INTEGER DEFAULT 0`);
+            await dbRun(`ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0`);
+            await dbRun(`ALTER TABLE users ADD COLUMN verification_token TEXT`);
+            await dbRun(`ALTER TABLE users ADD COLUMN email TEXT`);
+        }
+        
+        // Ensure other columns exist too (for existing DBs)
+        const columnsInMessages = await dbAll(`PRAGMA table_info(messages)`);
+        if (!columnsInMessages.some(c => c.name === 'reply_to_message_id')) {
+            await dbRun(`ALTER TABLE messages ADD COLUMN reply_to_message_id INTEGER`);
+            await dbRun(`ALTER TABLE messages ADD COLUMN reply_snippet TEXT`);
+            await dbRun(`ALTER TABLE messages ADD COLUMN forwarded_from_username TEXT`);
+        }
 
         // Создаем папки для загрузок, если их нет
         const uploadsDir = path.join(__dirname, '../../public/uploads');
         await fs.mkdir(path.join(uploadsDir, 'avatars'), { recursive: true });
         await fs.mkdir(path.join(uploadsDir, 'stories'), { recursive: true });
         await fs.mkdir(path.join(uploadsDir, 'media'), { recursive: true });
-        console.log('Папки для загрузок готовы и БД инициализирована.');
+        
+        console.log('sql.js: БД инициализирована и синхронизирована с диском.');
         
         return true;
     } catch (err) {
-        console.error('Ошибка инициализации БД:', err);
+        console.error('Ошибка инициализации БД (sql.js):', err);
         throw err;
     }
 }
 
 module.exports = {
-    db,
+    get db() { return dbInstance; },
     dbRun,
     dbGet,
     dbAll,
-    initDB
+    initDB,
+    saveDB
 };

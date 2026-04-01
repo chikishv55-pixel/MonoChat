@@ -442,13 +442,15 @@ function openNewChatChoiceModal() {
         }
 
         function updateAllMyAvatars(avatarUrl, displayName) {
-            setAvatarUI('profile-avatar-img', 'profile-avatar-text', avatarUrl, displayName);
+            setAvatarUI('pm-avatar-img', 'pm-avatar-text', avatarUrl, displayName);
             setAvatarUI('my-profile-avatar-img', 'my-profile-avatar-text', avatarUrl, displayName);
             setAvatarUI('edit-profile-avatar-img', 'edit-profile-avatar-text', avatarUrl, displayName);
         }
 
         function setAvatarUI(imgId, textId, data, name) {
-            const container = document.getElementById(imgId).parentElement;
+            const imgEl = document.getElementById(imgId);
+            if (!imgEl) return; // Safety check
+            const container = imgEl.parentElement;
             if (container) {
                 container.innerHTML = `<img id="${imgId}" src="" style="display:none" class="avatar-img-actual">
                                       <div id="${textId}" style="display:none" class="avatar-text-actual"></div>`;

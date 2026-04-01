@@ -1,5 +1,5 @@
 const { dbGet, dbRun, dbAll } = require('../db/database');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const fs = require('fs').promises;
 const path = require('path');
 const mime = require('mime-types');

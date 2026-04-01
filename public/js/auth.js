@@ -98,7 +98,10 @@ async function login() {
                 showVerify();
             }
         }
-    } catch (err) { alert('Ошибка'); }
+    } catch (err) { 
+        console.error('Login error:', err);
+        alert('Ошибка при входе. Проверьте соединение с сервером или консоль браузера.'); 
+    }
 }
 
 async function register() {
@@ -154,8 +157,9 @@ async function verifyCode() {
         } else {
             alert(data.message);
         }
-    } catch (err) {
-        alert('Ошибка при проверке кода');
+    } catch (err) { 
+        console.error('Verify code error:', err);
+        alert('Ошибка при проверке кода'); 
     }
 }
 

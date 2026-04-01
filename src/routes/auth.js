@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('../utils/jwt');
 const { dbRun, dbGet } = require('../db/database');
 const nodemailer = require('nodemailer');

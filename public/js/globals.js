@@ -1,6 +1,8 @@
-const SERVER_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || !window.location.hostname)
-    ? (window.location.port === '3000' ? 'http://localhost:3000' : 'http://5.35.95.248:3000') 
-    : window.location.origin;
+const SERVER_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? `http://${window.location.hostname}:3000`
+    : (window.location.protocol === 'file:' || !window.location.hostname)
+        ? 'http://5.35.95.248:3000' // Fallback for Capacitor/Electron if not hosted
+        : window.location.origin;
 
 // Заглушки, чтобы избежать ReferenceError при загрузке
 window.loadStories = window.loadStories || function() { console.log('Stories script not yet ready...'); };

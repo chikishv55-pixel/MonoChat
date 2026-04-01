@@ -3,3 +3,4 @@ chat.db
 public/uploads/
 .env
 .DS_Store
+dist/
