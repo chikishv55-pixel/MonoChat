@@ -62,6 +62,9 @@
                     <div class="search-box">
                         <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         <input type="text" id="search-input" class="search-input" placeholder="Поиск" onkeydown="handleSearch(event)">
+                        <button class="fab-mini" onclick="openNewChatChoiceModal()" title="Создать чат">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                        </button>
                     </div>
                 </div>
 
@@ -69,9 +72,6 @@
                 <div class="stories-bar" id="stories-bar"></div>
                 <div class="chats-list" id="chats-list"></div>
                 
-                <button class="fab" onclick="openNewChatChoiceModal()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                </button>
 
                 <!-- Profile Footer at the bottom -->
                 <div class="profile-footer" id="my-profile-footer">
@@ -86,6 +86,19 @@
                     <button class="profile-settings-btn" onclick="openMySettings()">
                         <svg class="settings-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </button>
+
+                    <!-- Hover Profile Card -->
+                    <div id="profile-hover-card" class="profile-hover-card">
+                        <div class="ph-cover" id="ph-cover"></div>
+                        <div class="ph-info">
+                            <div class="ph-avatar-area">
+                                <div id="ph-avatar" class="avatar"></div>
+                            </div>
+                            <h2 id="ph-name">Name</h2>
+                            <p id="ph-username">@username</p>
+                            <p id="ph-bio" class="ph-bio">О себе...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -285,6 +298,10 @@
                     <div class="tg-input-group">
                         <label class="tg-input-label">О себе</label>
                         <textarea class="tg-input-field" id="edit-profile-bio" placeholder="Расскажите о себе..." rows="2"></textarea>
+                    </div>
+                    <div class="tg-input-group">
+                        <label class="tg-input-label">Фон виджета (URL)</label>
+                        <input type="text" class="tg-input-field" id="edit-profile-card-bg" placeholder="URL картинки для карточки профиля">
                     </div>
                     <div class="tg-input-group">
                         <label class="tg-input-label">Дата рождения</label>

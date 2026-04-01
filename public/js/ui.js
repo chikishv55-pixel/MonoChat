@@ -430,3 +430,62 @@ function postStory(input) {
                 }
             }
         }
+        // --- PROFILE HOVER CARD LOGIC ---
+        let phTimer;
+        document.addEventListener('DOMContentLoaded', () => {
+            const footer = document.getElementById('my-profile-footer');
+            const card = document.getElementById('profile-hover-card');
+
+            if (footer && card) {
+                footer.addEventListener('mouseenter', () => {
+                    clearTimeout(phTimer);
+                    updateHoverCardUI();
+                });
+                footer.addEventListener('mouseleave', () => {
+                    phTimer = setTimeout(() => {
+                        // Card is hidden by CSS hover usually, but we can add more logic here if needed
+                    }, 500);
+                });
+            }
+        });
+
+        function updateHoverCardUI() {
+            if (!currentUser) return;
+            const name = document.getElementById('ph-name');
+            const username = document.getElementById('ph-username');
+            const bio = document.getElementById('ph-bio');
+            const avatar = document.getElementById('ph-avatar');
+            const cover = document.getElementById('ph-cover');
+
+            if (name) name.textContent = currentUser.display_name;
+            if (username) username.textContent = '@' + currentUser.username;
+            if (bio) bio.textContent = currentUser.bio || 'Нет описания';
+            
+            if (avatar) {
+                // Reuse avatar rendering logic
+                const avatarHTML = renderAvatarHTML(currentUser.avatar, currentUser.display_name, 'avatar-ph');
+                avatar.parentElement.innerHTML = avatarHTML;
+                avatar.parentElement.firstChild.id = 'ph-avatar';
+            }
+
+            if (cover) {
+                if (currentUser.profile_card_bg) {
+                    cover.style.backgroundImage = `url(${currentUser.profile_card_bg})`;
+                } else {
+                    cover.style.backgroundImage = '';
+                }
+            }
+        }
+
+        function renderAvatarHTML(avatar, name, className) {
+            const finalData = avatar && avatar.startsWith('/uploads/') ? getFullUrl(avatar) : avatar;
+            if (finalData) {
+                if (isVideoPath(avatar)) {
+                    return `<video src="${finalData}" autoplay loop muted playsinline class="${className}" style="object-fit:cover;"></video>`;
+                } else {
+                    return `<img src="${finalData}" class="${className}">`;
+                }
+            } else {
+                return `<div class="${className}">${name ? name.substring(0,2).toUpperCase() : '??'}</div>`;
+            }
+        }

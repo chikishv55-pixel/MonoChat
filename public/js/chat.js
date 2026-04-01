@@ -449,7 +449,7 @@
             // С‡С‚РѕР±С‹ РѕРЅ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°Р»СЃСЏ РїРѕ-РЅРѕРІРѕРјСѓ Рё РѕР±РЅРѕРІРёР»РѕСЃСЊ РїРѕСЃР»РµРґРЅРµРµ СЃРѕРѕР±С‰РµРЅРёРµ.
             loadRecentChats();
 
-            // Р”Р°Р»РµРµ, РµСЃР»Рё С‡Р°С‚ РѕС‚РєСЂС‹С‚, РґРѕР±Р°РІР»СЏРµРј СЃРѕРѕР±С‰РµРЅРёРµ РІ РѕРєРЅРѕ.
+            // Далее, если чат открыт, добавляем сообщение в окно.
             if (!currentChatUser) return;
             
             const isGroupMsg = msg.receiver.startsWith('g');
@@ -463,7 +463,7 @@
             if (chatIsActive) {
                 appendMessageUI(msg);
             } else {
-                // Р§Р°С‚ РЅРµ Р°РєС‚РёРІРµРЅ, РЅРѕ РјС‹ СѓР¶Рµ РїРµСЂРµР·Р°РіСЂСѓР·РёР»Рё СЃРїРёСЃРѕРє РІС‹С€Рµ.
+                // Чат не активен, но мы уже перезагрузили список выше.
             }
         });
 
@@ -488,15 +488,15 @@
                 if (typingUsers.get(chatId).size === 0) typingUsers.delete(chatId);
             }
             
-            // Р•СЃР»Рё РІ СЌС‚РѕРј С‡Р°С‚Рµ Р±РѕР»СЊС€Рµ РЅРёРєС‚Рѕ РЅРµ РїРµС‡Р°С‚Р°РµС‚, РЅСѓР¶РЅРѕ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕСЃР»РµРґРЅРµРµ СЃРѕРѕР±С‰РµРЅРёРµ
+            // Если в этом чате больше никто не печатает, нужно восстановить последнее сообщение
             if (!typers || typers.size === 0) {
                 const lastMessageSpan = document.getElementById(`lm-${chatId}`);
-                // РћР±РЅРѕРІР»СЏРµРј СЃРїРёСЃРѕРє, С‚РѕР»СЊРєРѕ РµСЃР»Рё РјС‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ РїРѕРєР°Р·С‹РІР°Р»Рё "РїРµС‡Р°С‚Р°РµС‚..."
+                // Обновляем список, только если мы действительно показывали "печатает..."
                 if (lastMessageSpan && lastMessageSpan.querySelector('.typing')) {
-                    loadRecentChats(); // РЎР°РјС‹Р№ РЅР°РґРµР¶РЅС‹Р№ СЃРїРѕСЃРѕР± РїРѕР»СѓС‡РёС‚СЊ Р°РєС‚СѓР°Р»СЊРЅРѕРµ РїРѕСЃР»РµРґРЅРµРµ СЃРѕРѕР±С‰РµРЅРёРµ
+                    loadRecentChats(); // Самый надежный способ получить актуальное последнее сообщение
                 }
             }
-            updateTypingIndicator(chatId); // РћР±РЅРѕРІР»СЏРµРј Р·Р°РіРѕР»РѕРІРѕРє РІ Р»СЋР±РѕРј СЃР»СѓС‡Р°Рµ
+            updateTypingIndicator(chatId); // Обновляем заголовок в любом случае
         });
         
         socket.on('new_comment', (comment) => {
@@ -525,7 +525,7 @@
         });
 
         socket.on('message failed', ({ time, error }) => {
-            alert(`РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ: ${error}`);
+            alert(`Не удалось отправить сообщение: ${error}`);
         });
 
         socket.on('new story', () => { if(typeof loadStories === 'function') loadStories(); });
@@ -541,7 +541,7 @@
                     document.getElementById('messages-area').innerHTML = '';
                     document.getElementById('current-chat-name').textContent = 'Выберите чат';
                 }
-                // РЈРґР°Р»СЏРµРј С‡Р°С‚ РёР· СЃРїРёСЃРєР°
+                // Удаляем чат из списка
                 const chatItem = document.querySelector(`.chat-item[data-username="${groupUsername}"]`);
                 if (chatItem) chatItem.remove();
             } else {
@@ -582,7 +582,7 @@
             area.appendChild(fragment);
             area.scrollTop = area.scrollHeight;
             
-            // Р—Р°РїСѓСЃРєР°РµРј РѕС‚СЂРёСЃРѕРІРєСѓ СЂРµР°РєС†РёР№ РїРѕСЃР»Рµ РІСЃС‚Р°РІРєРё РІ DOM
+            // Запускаем отрисовку реакций после вставки в DOM
             messages.forEach(msg => {
                 if (msg.reactions && msg.reactions.length > 0) {
                     renderReactions(msg.id, msg.reactions);
@@ -598,6 +598,16 @@
             div.dataset.reactions = JSON.stringify(msg.reactions || []);
             
             let content = '';
+            const isGroup = currentChatUser && currentChatUser.isGroup;
+            let senderNameHTML = '';
+            if (isGroup && !isMine) {
+                let badges = '';
+                if (msg.sender === 'xxx') {
+                    badges = '<span class="badge badge-dev" title="Разработчик"></span><span class="badge badge-owner" title="Владелец"></span>';
+                }
+                senderNameHTML = `<div class="message-sender-name">${escapeHTML(msg.sender_display_name || msg.sender)}${badges}</div>`;
+            }
+
             let bubbleClass = 'bubble';
 
             let replyHTML = '';
@@ -661,12 +671,13 @@
 
             div.innerHTML = `
                 <div class="message-actions">
-                    <button class="msg-action-btn" title="Р РµР°РєС†РёСЏ" onclick="openReactionPicker(this, ${msg.id})"><svg viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5"></path><path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke-width="1.5" stroke-linecap="round"></path><path d="M9 9H9.01" stroke-width="1.5" stroke-linecap="round"></path><path d="M15 9H15.01" stroke-width="1.5" stroke-linecap="round"></path></svg></button>
-                    <button class="msg-action-btn" title="РћС‚РІРµС‚РёС‚СЊ" onclick="showReplyUI(${msg.id}, '${escapeHTML(msg.sender)}', '${escapeHTML(msg.text)}', '${msg.type}')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
-                    <button class="msg-action-btn" title="РџРµСЂРµСЃР»Р°С‚СЊ" onclick="openForwardModal(${msg.id})"><svg viewBox="0 0 24 24" transform="scale(1, -1) rotate(90)"><path d="M18 9.5l-6-6-6 6"></path><path d="M12 3v13.5"></path><path d="M5 15h14"></path></svg></button>
-                    <button class="msg-action-btn" title="РЈРґР°Р»РёС‚СЊ" onclick="openDeleteModal(${msg.id}, ${isMine})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                    <button class="msg-action-btn" title="Реакция" onclick="openReactionPicker(this, ${msg.id})"><svg viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5"></path><path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke-width="1.5" stroke-linecap="round"></path><path d="M9 9H9.01" stroke-width="1.5" stroke-linecap="round"></path><path d="M15 9H15.01" stroke-width="1.5" stroke-linecap="round"></path></svg></button>
+                    <button class="msg-action-btn" title="Ответить" onclick="showReplyUI(${msg.id}, '${escapeHTML(msg.sender)}', '${escapeHTML(msg.text)}', '${msg.type}')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
+                    <button class="msg-action-btn" title="Переслать" onclick="openForwardModal(${msg.id})"><svg viewBox="0 0 24 24" transform="scale(1, -1) rotate(90)"><path d="M18 9.5l-6-6-6 6"></path><path d="M12 3v13.5"></path><path d="M5 15h14"></path></svg></button>
+                    <button class="msg-action-btn" title="Удалить" onclick="openDeleteModal(${msg.id}, ${isMine})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                 </div>
                 <div class="${bubbleClass}">
+                    ${senderNameHTML}
                     ${forwardedHTML}
                     ${replyHTML}
                     ${content}
@@ -679,7 +690,7 @@
                     </div>
                 </div>`;
 
-            // РћР±СЂР°Р±РѕС‚С‡РёРєРё РґР»СЏ РёР·РѕР±СЂР°Р¶РµРЅРёР№
+            // Обработчики для изображений
             if (msg.type === 'image') {
                 const img = div.querySelector('.message-img');
                 img.onclick = () => openImageViewer([getFullUrl(msg.text)], 0);
@@ -689,14 +700,14 @@
                 });
             }
 
-            // РќР°РІРµС€РёРІР°РµРј С…РѕРІРµСЂС‹ РґР»СЏ РґРµР№СЃС‚РІРёР№
+            // Навешиваем ховеры для действий
             div.onmouseenter = () => showMessageActionsWithDelay(div);
             div.onmouseleave = () => hideMessageActionsWithDelay(div);
 
             return div;
         }
 
-        // РЎС‚Р°СЂР°СЏ С„СѓРЅРєС†РёСЏ appendMessageUI С‚РµРїРµСЂСЊ РјРѕР¶РµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ createMessageElement
+        // Старая функция appendMessageUI теперь может использовать createMessageElement
         function appendMessageUI(msg) {
             const area = document.getElementById('messages-area');
             const el = createMessageElement(msg);

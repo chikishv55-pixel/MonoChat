@@ -142,6 +142,7 @@ function openNewChatChoiceModal() {
             document.getElementById('my-profile-username-modal').textContent = '@' + currentUser.username;
             document.getElementById('my-profile-bio').textContent = currentUser.bio || 'Нет описания';
             document.getElementById('my-profile-bdate').textContent = currentUser.birth_date ? `Дата рождения: ${new Date(currentUser.birth_date).toLocaleDateString()}` : 'Дата рождения не указана';
+            if (typeof updateHoverCardUI === 'function') updateHoverCardUI();
 
             document.getElementById('main-overlay').classList.add('active');
             document.getElementById('my-profile-modal').classList.add('active');
@@ -154,6 +155,7 @@ function openNewChatChoiceModal() {
             setAvatarUI('edit-profile-avatar-img', 'edit-profile-avatar-text', currentUser.avatar, currentUser.display_name);
             document.getElementById('edit-profile-name').value = currentUser.display_name;
             document.getElementById('edit-profile-bio').value = currentUser.bio || '';
+            document.getElementById('edit-profile-card-bg').value = currentUser.profile_card_bg || '';
             document.getElementById('edit-profile-bdate').value = currentUser.birth_date || '';
         }
 
@@ -166,6 +168,7 @@ function openNewChatChoiceModal() {
             const data = {
                 displayName: document.getElementById('edit-profile-name').value.trim(),
                 bio: document.getElementById('edit-profile-bio').value.trim(),
+                profileCardBg: document.getElementById('edit-profile-card-bg').value.trim(),
                 birthDate: document.getElementById('edit-profile-bdate').value,
             };
             if (!data.displayName) return alert('Имя не может быть пустым.');
