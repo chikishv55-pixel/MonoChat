@@ -547,6 +547,31 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
         </div>
     </div>
 
+    <!-- CONTEXT MENU FOR MESSAGES -->
+    <div id="msg-context-menu" class="msg-context-menu">
+        <div class="menu-item" id="menu-reply">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 0 1 5 5v2m0 0l-4-4m4 4l4-4"/></svg>
+            Ответить
+        </div>
+        <div class="menu-item" id="menu-forward">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+            Переслать
+        </div>
+        <div class="menu-item" id="menu-copy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Копировать текст
+        </div>
+        <div class="menu-item" id="menu-report">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+            Пожаловаться
+        </div>
+        <div class="menu-divider" style="height:1px; background:var(--border-light); margin:4px 0;"></div>
+        <div class="menu-item danger" id="menu-delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Удалить
+        </div>
+    </div>
+
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script src="/js/globals.js" defer></script>

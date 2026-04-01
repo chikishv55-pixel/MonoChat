@@ -511,8 +511,11 @@ function postStory(input) {
             const canvas = document.getElementById('ph-effects-canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            
+            // Resize canvas to parent, or fallback to fixed size if parent hidden
+            const parent = canvas.parentElement;
+            canvas.width = parent.offsetWidth || 320;
+            canvas.height = parent.offsetHeight || 420;
 
             if (type === 'snow') {
                 const flakes = Array.from({ length: 50 }, () => ({
@@ -592,7 +595,8 @@ function postStory(input) {
 
             if (card) {
                 if (currentUser.profile_card_bg) {
-                    card.style.backgroundImage = `url(${currentUser.profile_card_bg})`;
+                    const bgUrl = getFullUrl(currentUser.profile_card_bg);
+                    card.style.backgroundImage = `url(${bgUrl})`;
                     card.style.backgroundSize = 'cover';
                     card.style.backgroundPosition = 'center';
                 } else {

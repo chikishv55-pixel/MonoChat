@@ -331,6 +331,47 @@ module.exports = function(io, onlineUsers) {
             const p = onlineUsers.get(data.to); if (p) io.to(Array.from(p)).emit('webrtc_ice_candidate', { from: socket.user.username, candidate: data.candidate });
         });
 
+        // --- ADMIN & MODERATION ---
+        socket.on('report_message', async (data, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                const me = socket.user; if (!me) return callback({ success: false });
+                await dbRun("INSERT INTO reports (message_id, reporter, reason) VALUES (?, ?, ?)", [data.messageId, me.username, data.reason]);
+                callback({ success: true });
+            } catch (err) { console.error(err); callback({ success: false }); }
+        });
+
+        socket.on('admin_get_reports', async (callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                if (!socket.user || !socket.user.is_admin) return callback([]);
+                const reports = await dbAll(`
+                    SELECT r.*, m.text as message_text, m.sender as message_sender, m.type as message_type 
+                    FROM reports r 
+                    LEFT JOIN messages m ON r.message_id = m.id 
+                    ORDER BY r.id DESC
+                `);
+                callback(reports);
+            } catch (err) { console.error(err); callback([]); }
+        });
+
+        socket.on('admin_ban_user', async (data) => {
+            if (!socket.user || !socket.user.is_admin) return;
+            await dbRun("UPDATE users SET is_banned = 1 WHERE username = ?", [data.username]);
+        });
+
+        socket.on('admin_unban_user', async (data) => {
+            if (!socket.user || !socket.user.is_admin) return;
+            await dbRun("UPDATE users SET is_banned = 0 WHERE username = ?", [data.username]);
+        });
+
+        socket.on('admin_get_users', async (callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            if (!socket.user || !socket.user.is_admin) return callback([]);
+            const users = await dbAll("SELECT username, display_name, is_banned, is_admin FROM users LIMIT 100");
+            callback(users);
+        });
+
         socket.on('disconnect', () => {
             const u = socket.user;
             if (u && onlineUsers.has(u.username)) {

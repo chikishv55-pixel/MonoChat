@@ -98,7 +98,7 @@
                 document.getElementById('message-input-area').style.display = 'flex';
             }
             
-            // РђРґР°РїС‚Р°С†РёСЏ РґР»СЏ РјРѕР±РёР»РѕРє: РґРѕР±Р°РІР»СЏРµРј РєР»Р°СЃСЃ Р°РєС‚РёРІРЅРѕСЃС‚Рё С‡Р°С‚Р°
+            // Адаптация для мобилок: добавляем класс активности чата
             document.querySelector('.chat-container').classList.add('chat-active');
             
             socket.emit('get history', user.username, (messages) => {
@@ -119,7 +119,7 @@
             updateTypingIndicator(user.username);
         }
 
-        // РљРЅРѕРїРєР° РЅР°Р·Р°Рґ РґР»СЏ РјРѕР±РёР»РѕРє
+        // Кнопка назад для мобилок
         function closeChatMobile() {
             document.querySelector('.chat-container').classList.remove('chat-active');
             currentChatUser = null;
@@ -361,7 +361,7 @@
                 isRecordingMedia = true;
                 if (recordMode === 'voice') startVoice();
                 else startCircleVideo();
-            }, 300); // 300РјСЃ СѓРґРµСЂР¶Р°РЅРёСЏ РґР»СЏ СЃС‚Р°СЂС‚Р° Р·Р°РїРёСЃРё
+            }, 300); // 300мс удержания для старта записи
         }
 
         function handleRecordStop(e) {
@@ -424,7 +424,7 @@
                     if (data.success) {
                         finalContent = data.path;
                     } else {
-                        return alert('РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё РјРµРґРёР°');
+                        return alert('Ошибка загрузки медиа');
                     }
                 } catch(e) { return alert('Network error during upload'); }
             }
@@ -445,8 +445,8 @@
         }
 
         socket.on('private message', (msg) => {
-            // РџСЂРё РїРѕР»СѓС‡РµРЅРёРё Р»СЋР±РѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ, РїРµСЂРµР·Р°РіСЂСѓР¶Р°РµРј СЃРїРёСЃРѕРє С‡Р°С‚РѕРІ,
-            // С‡С‚РѕР±С‹ РѕРЅ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°Р»СЃСЏ РїРѕ-РЅРѕРІРѕРјСѓ Рё РѕР±РЅРѕРІРёР»РѕСЃСЊ РїРѕСЃР»РµРґРЅРµРµ СЃРѕРѕР±С‰РµРЅРёРµ.
+            // При получении любого сообщения, перезагружаем список чатов,
+            // чтобы он отсортировался по-новому и обновилось последнее сообщение.
             loadRecentChats();
 
             // Далее, если чат открыт, добавляем сообщение в окно.
@@ -545,7 +545,7 @@
                 const chatItem = document.querySelector(`.chat-item[data-username="${groupUsername}"]`);
                 if (chatItem) chatItem.remove();
             } else {
-                // Р•СЃР»Рё РѕС‚РєСЂС‹С‚ СЌС‚РѕС‚ С‡Р°С‚, РѕР±РЅРѕРІР»СЏРµРј РёРЅС„Рѕ
+                // Если открыт этот чат, обновляем инфо
                 if (currentChatUser && currentChatUser.username === groupUsername) {
                     openGroupInfoModal(); // Re-fetch details
                 }
@@ -603,7 +603,7 @@
             if (isGroup && !isMine) {
                 let badges = '';
                 if (msg.sender === 'xxx') {
-                    badges = '<span class="badge badge-dev-new" title="Разработчик">DEV</span><span class="badge badge-owner-new" title="Владелец">OWNER</span>';
+                    badges = '<span class="premium-plate dev">DEV</span><span class="premium-plate admin">ADMIN</span>';
                 }
                 senderNameHTML = `<div class="message-sender-name">${escapeHTML(msg.sender_display_name || msg.sender)}${badges}</div>`;
             }
@@ -670,13 +670,7 @@
             }
 
             div.innerHTML = `
-                <div class="message-actions">
-                    <button class="msg-action-btn" title="Реакция" onclick="openReactionPicker(this, ${msg.id})"><svg viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke-width="1.5"></path><path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke-width="1.5" stroke-linecap="round"></path><path d="M9 9H9.01" stroke-width="1.5" stroke-linecap="round"></path><path d="M15 9H15.01" stroke-width="1.5" stroke-linecap="round"></path></svg></button>
-                    <button class="msg-action-btn" title="Ответить" onclick="showReplyUI(${msg.id}, '${escapeHTML(msg.sender)}', '${escapeHTML(msg.text)}', '${msg.type}')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></button>
-                    <button class="msg-action-btn" title="Переслать" onclick="openForwardModal(${msg.id})"><svg viewBox="0 0 24 24" transform="scale(1, -1) rotate(90)"><path d="M18 9.5l-6-6-6 6"></path><path d="M12 3v13.5"></path><path d="M5 15h14"></path></svg></button>
-                    <button class="msg-action-btn" title="Удалить" onclick="openDeleteModal(${msg.id}, ${isMine})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-                </div>
-                <div class="${bubbleClass}">
+                <div class="${bubbleClass}" oncontextmenu="openMessageMenu(event, ${msg.id}, ${isMine})">
                     ${senderNameHTML}
                     ${forwardedHTML}
                     ${replyHTML}
@@ -819,3 +813,130 @@
         }
 
         socket.on('message deleted', (data) => { const el = document.getElementById(`msg-${data.msgId}`); if (el) el.remove(); });
+
+        let activeMenuMsgId = null;
+        function openMessageMenu(e, msgId, isMine) {
+            e.preventDefault();
+            activeMenuMsgId = msgId;
+            const menu = document.getElementById('msg-context-menu');
+            menu.style.display = 'block';
+            menu.classList.add('active');
+            
+            // Position menu
+            let x = e.clientX;
+            let y = e.clientY;
+            
+            // Adjust if near edges
+            if (x + 200 > window.innerWidth) x -= 180;
+            if (y + 250 > window.innerHeight) y -= 200;
+            
+            menu.style.left = x + 'px';
+            menu.style.top = y + 'px';
+            
+            // Set actions
+            const msg = allMessages.find(m => m.id === msgId);
+            document.getElementById('menu-delete').onclick = () => { closeMessageMenu(); openDeleteModal(msgId, isMine); };
+            document.getElementById('menu-reply').onclick = () => { 
+                closeMessageMenu();
+                showReplyUI(msgId, msg.sender, msg.text, msg.type); 
+            };
+            document.getElementById('menu-forward').onclick = () => { closeMessageMenu(); openForwardModal(msgId); };
+            document.getElementById('menu-report').onclick = () => { closeMessageMenu(); reportMessage(msgId); };
+            document.getElementById('menu-copy').onclick = () => { 
+                closeMessageMenu();
+                if (msg.text) {
+                    navigator.clipboard.writeText(msg.text);
+                    alert('Текст скопирован');
+                }
+            };
+            
+            // Close on click outside
+            setTimeout(() => {
+                const closeHandler = () => {
+                    closeMessageMenu();
+                    document.removeEventListener('click', closeHandler);
+                };
+                document.addEventListener('click', closeHandler);
+            }, 10);
+        }
+
+        function closeMessageMenu() {
+            const menu = document.getElementById('msg-context-menu');
+            menu.classList.remove('active');
+            menu.style.display = 'none';
+        }
+
+        function reportMessage(msgId) {
+            const reason = prompt('Введите причину жалобы:');
+            if (reason) {
+                socket.emit('report_message', { messageId: msgId, reason: reason }, (res) => {
+                    if (res && res.success) alert('Жалоба отправлена. Спасибо!');
+                    else alert('Ошибка при отправке жалобы.');
+                });
+            }
+        }
+
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            const tabBtn = document.querySelector(`.admin-tab[onclick*="${tab}"]`);
+            if (tabBtn) tabBtn.classList.add('active');
+            
+            document.querySelectorAll('.admin-content-section').forEach(s => s.style.display = 'none');
+            const section = document.getElementById(`admin-section-${tab}`);
+            if (section) section.style.display = 'block';
+
+            if (tab === 'reports') {
+                socket.emit('admin_get_reports', (reports) => {
+                    const container = document.getElementById('admin-section-reports');
+                    container.innerHTML = '<h3>Последние жалобы</h3>';
+                    if (!reports || reports.length === 0) {
+                        container.innerHTML += '<p style="padding:20px; text-align:center; opacity:0.5;">Жалоб нет</p>';
+                        return;
+                    }
+                    reports.forEach(r => {
+                        const div = document.createElement('div');
+                        div.style = 'background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; margin-bottom:12px; border-left:4px solid #ef4444;';
+                        div.innerHTML = `
+                            <div style="font-size:12px; margin-bottom:4px; opacity:0.7;">От: @${r.reporter} | На: @${r.message_sender}</div>
+                            <div style="font-weight:600; margin-bottom:6px;">Причина: ${escapeHTML(r.reason)}</div>
+                            <div style="font-style:italic; font-size:13px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">"${escapeHTML(r.message_text || '[Медиа]')}"</div>
+                        `;
+                        container.appendChild(div);
+                    });
+                });
+            } else if (tab === 'users') {
+                handleAdminUserSearch();
+            }
+        }
+
+        function handleAdminUserSearch() {
+            socket.emit('admin_get_users', (users) => {
+                const container = document.getElementById('admin-section-users');
+                container.innerHTML = '<h3>Пользователи</h3>';
+                if (!users || users.length === 0) return;
+                users.forEach(u => {
+                    const div = document.createElement('div');
+                    div.style = 'display:flex; align-items:center; justify-content:space-between; padding:12px; border-bottom:1px solid rgba(255,255,255,0.03);';
+                    const banBtn = u.is_banned ? 
+                        `<button onclick="adminUnban('${u.username}')" style="background:#2ecc71; padding:6px 12px; border-radius:8px; border:none; color:white; font-weight:600; cursor:pointer;">Разбанить</button>` :
+                        `<button onclick="adminBan('${u.username}')" style="background:#ef4444; padding:6px 12px; border-radius:8px; border:none; color:white; font-weight:600; cursor:pointer;">Забанить</button>`;
+                    
+                    div.innerHTML = `<div><strong>${escapeHTML(u.display_name)}</strong> (@${u.username})</div> <div>${banBtn}</div>`;
+                    container.appendChild(div);
+                });
+            });
+        }
+        
+        function adminBan(username) {
+            if (confirm(`Забанить @${username}?`)) {
+                socket.emit('admin_ban_user', { username });
+                setTimeout(handleAdminUserSearch, 300);
+            }
+        }
+
+        function adminUnban(username) {
+            if (confirm(`Разбанить @${username}?`)) {
+                socket.emit('admin_unban_user', { username });
+                setTimeout(handleAdminUserSearch, 300);
+            }
+        }

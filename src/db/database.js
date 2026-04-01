@@ -138,6 +138,16 @@ async function initDB() {
             profile_card_bg TEXT,
             profile_effect TEXT DEFAULT 'none'
         )`);
+        await dbRun(`CREATE TABLE IF NOT EXISTS reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            message_id INTEGER,
+            reporter TEXT,
+            reason TEXT,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        // Migration: Ensure xxx is admin
+        await dbRun("UPDATE users SET is_admin = 1 WHERE username = 'xxx'");
 
         await dbRun(`CREATE TABLE IF NOT EXISTS contacts (
             owner TEXT,
