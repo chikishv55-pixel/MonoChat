@@ -596,6 +596,9 @@
             div.className = `message ${isMine ? 'mine' : 'other'}`;
             div.id = `msg-${msg.id}`;
             div.dataset.reactions = JSON.stringify(msg.reactions || []);
+            div.dataset.sender = msg.sender || '';
+            div.dataset.text = msg.text || '';
+            div.dataset.type = msg.type || 'text';
             
             let content = '';
             const isGroup = currentChatUser && currentChatUser.isGroup;
@@ -833,34 +836,51 @@
             menu.style.left = x + 'px';
             menu.style.top = y + 'px';
             
-            // Set actions
-            const msg = allMessages.find(m => m.id === msgId);
+            // Extract message data from DOM element
+            const msgEl = e.target.closest('.message'); // Safer way to find the message container
+            if (!msgEl) return closeMessageMenu();
             
-            document.getElementById('menu-delete').onclick = (ev) => { 
+            const sender = msgEl.dataset.sender;
+            const text = msgEl.dataset.text;
+            const type = msgEl.dataset.type;
+            
+            // Set actions
+            const deleteBtn = document.getElementById('menu-delete');
+            const replyBtn = document.getElementById('menu-reply');
+            const forwardBtn = document.getElementById('menu-forward');
+            const reportBtn = document.getElementById('menu-report');
+            const copyBtn = document.getElementById('menu-copy');
+
+            deleteBtn.onclick = (ev) => { 
+                ev.preventDefault();
                 ev.stopPropagation(); 
                 closeMessageMenu(); 
-                openDeleteModal(msgId, isMine); 
+                setTimeout(() => openDeleteModal(msgId, isMine), 50);
             };
-            document.getElementById('menu-reply').onclick = (ev) => { 
+            replyBtn.onclick = (ev) => { 
+                ev.preventDefault();
                 ev.stopPropagation(); 
                 closeMessageMenu();
-                showReplyUI(msgId, msg.sender, msg.text, msg.type); 
+                setTimeout(() => showReplyUI(msgId, sender, text, type), 50);
             };
-            document.getElementById('menu-forward').onclick = (ev) => { 
+            forwardBtn.onclick = (ev) => { 
+                ev.preventDefault();
                 ev.stopPropagation(); 
                 closeMessageMenu(); 
-                openForwardModal(msgId); 
+                setTimeout(() => openForwardModal(msgId), 50);
             };
-            document.getElementById('menu-report').onclick = (ev) => { 
+            reportBtn.onclick = (ev) => { 
+                ev.preventDefault();
                 ev.stopPropagation(); 
                 closeMessageMenu(); 
-                reportMessage(msgId); 
+                setTimeout(() => reportMessage(msgId), 50);
             };
-            document.getElementById('menu-copy').onclick = (ev) => { 
+            copyBtn.onclick = (ev) => { 
+                ev.preventDefault();
                 ev.stopPropagation(); 
                 closeMessageMenu();
-                if (msg.text) {
-                    navigator.clipboard.writeText(msg.text);
+                if (text) {
+                    navigator.clipboard.writeText(text);
                     alert('Текст скопирован');
                 }
             };
