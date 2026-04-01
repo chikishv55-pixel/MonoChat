@@ -584,13 +584,22 @@ function postStory(input) {
             const bio = document.getElementById('ph-bio');
             const avatar = document.getElementById('ph-avatar');
 
-            if (name) name.textContent = currentUser.display_name;
+            if (name) {
+                let badges = '';
+                if (currentUser.username === 'xxx' || currentUser.is_admin) {
+                    badges = '<span class="premium-plate dev">DEV</span><span class="premium-plate admin">ADMIN</span>';
+                } else if (currentUser.is_premium) {
+                    badges = '<span class="premium-plate">PREMIUM</span>';
+                }
+                name.innerHTML = `${escapeHTML(currentUser.display_name)}${badges}`;
+            }
             if (username) username.textContent = '@' + currentUser.username;
             if (bio) bio.textContent = currentUser.bio || 'Нет описания';
             
             if (avatar) {
                 const avatarHTML = renderAvatarHTML(currentUser.avatar, currentUser.display_name, 'avatar-img-actual');
-                avatar.innerHTML = avatarHTML;
+                const statusDotHTML = `<div class="status-dot ${currentUser.isOnline ? 'online' : 'offline'}" style="width:14px; height:14px; bottom:2px; right:2px; border:2px solid var(--bg-card);"></div>`;
+                avatar.innerHTML = avatarHTML + statusDotHTML;
             }
 
             if (card) {

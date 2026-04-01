@@ -876,6 +876,12 @@
             }
         }
 
+        function openAdminPanel() {
+            document.getElementById('main-overlay').classList.add('active');
+            document.getElementById('admin-panel-modal').classList.add('active');
+            switchAdminTab('reports');
+        }
+
         function switchAdminTab(tab) {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
             const tabBtn = document.querySelector(`.admin-tab[onclick*="${tab}"]`);

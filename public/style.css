@@ -1039,9 +1039,7 @@ body.light-theme .profile-hover-card {
     z-index: 2;
     text-align: center;
     margin-top: 0;
-    background: rgba(0,0,0,0.4); /* Always dark overlay for text readability over light photos */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 100%);
     flex: 1;
     display: flex;
     flex-direction: column;
