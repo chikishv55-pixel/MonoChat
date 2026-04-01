@@ -151,8 +151,16 @@ button:hover:not(:disabled), .action-btn:hover, .tg-btn:hover, .modal-btn:hover 
 .profile-section { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 12px 16px; border-bottom: none; }
 .profile-row { display: flex; align-items: center; gap: 12px; margin-bottom: 0; }
 .avatar-wrapper { position: relative; display: inline-block; flex-shrink: 0; }
-.avatar, .chat-avatar, .partner-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: var(--avatar-bg); color: var(--avatar-text); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; border: none; object-fit: cover; text-transform: uppercase; background-image: linear-gradient(135deg, var(--avatar-bg) 0%, rgba(0,0,0,0.2) 100%); }
+.avatar, .chat-avatar, .partner-avatar { width: 50px; height: 50px; border-radius: 50%; background-color: var(--avatar-bg); color: var(--avatar-text); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; border: none; object-fit: cover; text-transform: uppercase; background-image: linear-gradient(135deg, var(--avatar-bg) 0%, rgba(0,0,0,0.2) 100%); overflow: hidden; }
 .chat-avatar, .partner-avatar { width: 48px; height: 48px; }
+
+/* Clip and scale videos in avatars */
+.avatar video, .chat-avatar video, .partner-avatar video, .avatar-img-actual {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+}
 .status-dot { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid var(--bg-panel); transition: background-color 0.3s; }
 .status-dot.online { background-color: #2ecc71; }
 .status-dot.offline { display: none; }
