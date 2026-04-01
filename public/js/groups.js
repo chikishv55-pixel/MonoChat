@@ -43,43 +43,7 @@ function openNewChatChoiceModal() {
 
         // --- Функции создания групп ---
 
-        function openCreateChatModal() {
-            newGroupMembers.clear();
-            document.getElementById('new-group-name').value = '';
-            const searchInput = document.getElementById('new-group-member-search');
-            searchInput.value = '';
-            document.getElementById('new-group-search-results').innerHTML = '';
-            updateNewGroupMembersUI();
 
-            document.getElementById('main-overlay').classList.add('active');
-            document.getElementById('create-chat-modal').classList.add('active');
-
-            searchInput.oninput = () => {
-                const query = searchInput.value.trim();
-                if (query.length > 1) {
-                    socket.emit('search users', query, (users) => {
-                        const resultsContainer = document.getElementById('new-group-search-results');
-                        resultsContainer.innerHTML = '';
-                        users.forEach(user => {
-                            if (newGroupMembers.has(user.username)) return;
-                            const userDiv = document.createElement('div');
-                            userDiv.className = 'search-result-item';
-                            userDiv.innerHTML = `<b>${escapeHTML(user.display_name)}</b> <span class="username-tag">@${escapeHTML(user.username)}</span>`;
-                            userDiv.onclick = () => {
-                                newGroupMembers.add(user.username);
-                                updateNewGroupMembersUI();
-                                searchInput.value = '';
-                                resultsContainer.innerHTML = '';
-                                searchInput.focus();
-                            };
-                            resultsContainer.appendChild(userDiv);
-                        });
-                    });
-                } else {
-                    document.getElementById('new-group-search-results').innerHTML = '';
-                }
-            };
-        }
 
         function updateNewGroupMembersUI() {
             const membersList = document.getElementById('new-group-members-list');
@@ -168,7 +132,8 @@ function openNewChatChoiceModal() {
         }
 
         // --- Функции своего профиля ---
-        function openMyProfileModal() {
+        function openMySettings() {
+            closeAllModals(); // Ensure other modals are closed
             document.getElementById('my-profile-view').classList.remove('hidden');
             document.getElementById('my-profile-edit').classList.add('hidden');
 
@@ -212,7 +177,7 @@ function openNewChatChoiceModal() {
                     localStorage.setItem('monochrome_user', JSON.stringify(res.user));
                     document.getElementById('profile-name').textContent = res.user.display_name;
                     updateAllMyAvatars(res.user.avatar, res.user.display_name);
-                    openMyProfileModal(); // Переоткрываем модалку с обновленными данными
+                    openMySettings(); // Переоткрываем модалку с обновленными данными
                 } else { alert('Ошибка: ' + (res.message || 'Не удалось сохранить профиль.')); }
             });
         }
