@@ -107,7 +107,7 @@
                 }
             });
 
-            // РћР±РЅРѕРІР»СЏРµРј Р°РєС‚РёРІРЅС‹Р№ С‡Р°С‚ РІ СЃРїРёСЃРєРµ
+            // Обновляем активный чат в списке
             document.querySelectorAll('.chat-item').forEach(el => {
                 el.classList.remove('active');
                 if (el.getAttribute('data-username') === user.username) {
@@ -835,14 +835,29 @@
             
             // Set actions
             const msg = allMessages.find(m => m.id === msgId);
-            document.getElementById('menu-delete').onclick = () => { closeMessageMenu(); openDeleteModal(msgId, isMine); };
-            document.getElementById('menu-reply').onclick = () => { 
+            
+            document.getElementById('menu-delete').onclick = (ev) => { 
+                ev.stopPropagation(); 
+                closeMessageMenu(); 
+                openDeleteModal(msgId, isMine); 
+            };
+            document.getElementById('menu-reply').onclick = (ev) => { 
+                ev.stopPropagation(); 
                 closeMessageMenu();
                 showReplyUI(msgId, msg.sender, msg.text, msg.type); 
             };
-            document.getElementById('menu-forward').onclick = () => { closeMessageMenu(); openForwardModal(msgId); };
-            document.getElementById('menu-report').onclick = () => { closeMessageMenu(); reportMessage(msgId); };
-            document.getElementById('menu-copy').onclick = () => { 
+            document.getElementById('menu-forward').onclick = (ev) => { 
+                ev.stopPropagation(); 
+                closeMessageMenu(); 
+                openForwardModal(msgId); 
+            };
+            document.getElementById('menu-report').onclick = (ev) => { 
+                ev.stopPropagation(); 
+                closeMessageMenu(); 
+                reportMessage(msgId); 
+            };
+            document.getElementById('menu-copy').onclick = (ev) => { 
+                ev.stopPropagation(); 
                 closeMessageMenu();
                 if (msg.text) {
                     navigator.clipboard.writeText(msg.text);
@@ -850,11 +865,13 @@
                 }
             };
             
-            // Close on click outside
+            // Close on click outside (but not if clicking the menu itself)
             setTimeout(() => {
-                const closeHandler = () => {
-                    closeMessageMenu();
-                    document.removeEventListener('click', closeHandler);
+                const closeHandler = (ev) => {
+                    if (!menu.contains(ev.target)) {
+                        closeMessageMenu();
+                        document.removeEventListener('click', closeHandler);
+                    }
                 };
                 document.addEventListener('click', closeHandler);
             }, 10);
@@ -874,6 +891,12 @@
                     else alert('Ошибка при отправке жалобы.');
                 });
             }
+        }
+
+        function openForwardModal(msgId) {
+            forwardMessageId = msgId;
+            document.getElementById('main-overlay').classList.add('active');
+            document.getElementById('new-chat-choice-modal').classList.add('active');
         }
 
         function openAdminPanel() {

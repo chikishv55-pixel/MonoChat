@@ -443,26 +443,29 @@ function postStory(input) {
                     document.getElementById('profile-hover-card').classList.add('active');
                 });
                 footer.addEventListener('mouseleave', (e) => {
-                    // Don't hide if moving to the card itself
-                    const card = document.getElementById('profile-hover-card');
-                    if (e.relatedTarget === card || card.contains(e.relatedTarget)) return;
-
                     phTimer = setTimeout(() => {
-                        card.classList.remove('active');
-                        document.getElementById('ph-settings-menu').classList.remove('active');
-                        stopCurrentEffect();
-                    }, 500);
+                        const card = document.getElementById('profile-hover-card');
+                        if (!card.matches(':hover')) {
+                            card.classList.remove('active');
+                            document.getElementById('ph-settings-menu').classList.remove('active');
+                            stopCurrentEffect();
+                        }
+                    }, 300);
                 });
 
-                card.addEventListener('mouseleave', (e) => {
-                    const footer = document.getElementById('my-profile-footer');
-                    if (e.relatedTarget === footer || footer.contains(e.relatedTarget)) return;
+                card.addEventListener('mouseenter', () => {
+                    clearTimeout(phTimer);
+                });
 
+                card.addEventListener('mouseleave', () => {
                     phTimer = setTimeout(() => {
-                        card.classList.remove('active');
-                        document.getElementById('ph-settings-menu').classList.remove('active');
-                        stopCurrentEffect();
-                    }, 500);
+                        const footer = document.getElementById('my-profile-footer');
+                        if (!footer.matches(':hover')) {
+                            card.classList.remove('active');
+                            document.getElementById('ph-settings-menu').classList.remove('active');
+                            stopCurrentEffect();
+                        }
+                    }, 300);
                 });
             }
         });
@@ -476,8 +479,20 @@ function postStory(input) {
             if (!currentUser) return;
             currentUser.profile_effect = effect;
             document.getElementById('ph-settings-menu').classList.remove('active');
+            startEffect(effect);
             
-            // Save to server
+            try {
+                const token = localStorage.getItem('monochrome_token');
+                await fetch(SERVER_URL + '/api/user/update-effect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ effect })
+                });
+            } catch (err) { console.error('Ошибка сохранения эффекта:', err); }
+        }
+
+        async function saveProfile() {
+            if (!currentUser) return;
             socket.emit('update_profile', {
                 displayName: currentUser.display_name,
                 bio: currentUser.bio,
