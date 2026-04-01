@@ -89,7 +89,16 @@
 
                     <!-- Hover Profile Card -->
                     <div id="profile-hover-card" class="profile-hover-card">
+                        <canvas id="ph-effects-canvas"></canvas>
                         <div class="ph-cover" id="ph-cover"></div>
+                        <button class="ph-settings-btn" id="ph-settings-btn" onclick="toggleHoverCardSettings(event)">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                        </button>
+                        <div id="ph-settings-menu" class="ph-settings-menu">
+                            <div class="ph-menu-item" onclick="setProfileEffect('none')">Без эффектов</div>
+                            <div class="ph-menu-item" onclick="setProfileEffect('snow')">Эффект: Снег</div>
+                            <div class="ph-menu-item" onclick="setProfileEffect('stars')">Эффект: Звезды</div>
+                        </div>
                         <div class="ph-info">
                             <div class="ph-avatar-area">
                                 <div id="ph-avatar" class="avatar"></div>
@@ -261,6 +270,13 @@
                             <span class="tg-menu-sublabel" id="premium-status-sublabel">Разблокировать видео-аватарки</span>
                         </div>
                         <button class="tg-btn-link" id="premium-action-btn">Подключить</button>
+                    </div>
+                </div>
+
+                <div class="tg-section" id="admin-tools-section" style="display:none;">
+                    <div class="tg-menu-item" onclick="openAdminPanel()">
+                        <svg class="tg-menu-icon" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                        <span class="tg-menu-text" style="color: var(--accent); font-weight: 600;">Модерация</span>
                     </div>
                 </div>
 
@@ -502,6 +518,33 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
         </div>
         <button class="iv-nav-btn iv-next" onclick="nextImage()">›</button>
         <div class="iv-counter" id="iv-counter"></div>
+    </div>
+
+    <!-- MODERN ADMIN PANEL MODAL -->
+    <div class="custom-modal" id="admin-panel-modal" style="width: 95vw; max-width: 600px; height: 80vh; padding: 0; display: none; flex-direction: column; overflow: hidden; border-radius: 24px;">
+        <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); z-index: 2;">
+            <h3 style="margin: 0; font-weight: 600; font-size: 20px;">Панель модератора</h3>
+            <button onclick="closeAllModals()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: var(--text-muted); line-height: 1;">×</button>
+        </div>
+        <div class="admin-panel-tabs">
+            <div class="admin-tab active" onclick="switchAdminTab('reports')">Жалобы</div>
+            <div class="admin-tab" onclick="switchAdminTab('users')">Пользователи</div>
+            <div class="admin-tab" onclick="switchAdminTab('logs')">Логи</div>
+        </div>
+        <div id="admin-content" style="flex: 1; overflow-y: auto; padding: 20px; background: var(--bg-main);">
+            <div id="admin-section-reports" class="admin-content-section active">
+                <div style="text-align: center; padding: 40px; color: var(--text-muted); opacity: 0.7;">
+                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <p>Жалоб пока нет. Всё спокойно.</p>
+                </div>
+            </div>
+            <div id="admin-section-users" class="admin-content-section" style="display:none;">
+                <!-- User list for ban/unban will be loaded here -->
+            </div>
+            <div id="admin-section-logs" class="admin-content-section" style="display:none;">
+                <!-- Logs will be loaded here -->
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>

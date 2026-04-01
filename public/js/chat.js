@@ -603,7 +603,7 @@
             if (isGroup && !isMine) {
                 let badges = '';
                 if (msg.sender === 'xxx') {
-                    badges = '<span class="badge badge-dev" title="Разработчик"></span><span class="badge badge-owner" title="Владелец"></span>';
+                    badges = '<span class="badge badge-dev-new" title="Разработчик">DEV</span><span class="badge badge-owner-new" title="Владелец">OWNER</span>';
                 }
                 senderNameHTML = `<div class="message-sender-name">${escapeHTML(msg.sender_display_name || msg.sender)}${badges}</div>`;
             }
@@ -742,12 +742,28 @@
         }
 
         // ADMIN MODERN PANEL LOGIC
+        function openAdminPanel() {
+            closeAllModals();
+            document.getElementById('main-overlay').classList.add('active');
+            document.getElementById('admin-panel-modal').classList.add('active');
+            switchAdminTab('reports'); // Open reports by default
+        }
+
         function switchAdminTab(tabName) {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.admin-content-section').forEach(s => s.classList.remove('active'));
             
-            document.querySelector(`.admin-tab[onclick*="${tabName}"]`).classList.add('active');
-            document.getElementById(`admin-section-${tabName}`).classList.add('active');
+            // Highlight the clicked tab
+            const tabs = document.querySelectorAll('.admin-tab');
+            for (let t of tabs) {
+                if (t.textContent.toLowerCase().includes(tabName === 'reports' ? 'жалобы' : (tabName === 'users' ? 'пользователи' : 'логи'))) {
+                    t.classList.add('active');
+                    break;
+                }
+            }
+
+            const section = document.getElementById(`admin-section-${tabName}`);
+            if (section) section.classList.add('active');
             
             if (tabName === 'users') handleAdminUserSearch();
         }

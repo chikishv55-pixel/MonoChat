@@ -134,6 +134,13 @@ function openNewChatChoiceModal() {
         // --- Функции своего профиля ---
         function openMySettings() {
             closeAllModals(); // Ensure other modals are closed
+            
+            // Show admin tools if user is admin
+            const adminSection = document.getElementById('admin-tools-section');
+            if (adminSection) {
+                adminSection.style.display = (currentUser && currentUser.is_admin) ? 'block' : 'none';
+            }
+
             document.getElementById('my-profile-view').classList.remove('hidden');
             document.getElementById('my-profile-edit').classList.add('hidden');
 
@@ -141,7 +148,12 @@ function openNewChatChoiceModal() {
             document.getElementById('my-profile-name-modal').textContent = currentUser.display_name;
             document.getElementById('my-profile-username-modal').textContent = '@' + currentUser.username;
             document.getElementById('my-profile-bio').textContent = currentUser.bio || 'Нет описания';
-            document.getElementById('my-profile-bdate').textContent = currentUser.birth_date ? `Дата рождения: ${new Date(currentUser.birth_date).toLocaleDateString()}` : 'Дата рождения не указана';
+            
+            const bdateEl = document.getElementById('my-profile-bdate');
+            if (bdateEl) {
+                bdateEl.textContent = currentUser.birth_date ? `Дата рождения: ${new Date(currentUser.birth_date).toLocaleDateString()}` : 'Дата рождения не указана';
+            }
+
             if (typeof updateHoverCardUI === 'function') updateHoverCardUI();
 
             document.getElementById('main-overlay').classList.add('active');

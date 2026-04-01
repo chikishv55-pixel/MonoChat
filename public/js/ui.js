@@ -440,14 +440,127 @@ function postStory(input) {
                 footer.addEventListener('mouseenter', () => {
                     clearTimeout(phTimer);
                     updateHoverCardUI();
+                    document.getElementById('profile-hover-card').classList.add('active');
                 });
-                footer.addEventListener('mouseleave', () => {
+                footer.addEventListener('mouseleave', (e) => {
+                    // Don't hide if moving to the card itself
+                    const card = document.getElementById('profile-hover-card');
+                    if (e.relatedTarget === card || card.contains(e.relatedTarget)) return;
+
                     phTimer = setTimeout(() => {
-                        // Card is hidden by CSS hover usually, but we can add more logic here if needed
+                        card.classList.remove('active');
+                        document.getElementById('ph-settings-menu').classList.remove('active');
+                        stopCurrentEffect();
+                    }, 500);
+                });
+
+                card.addEventListener('mouseleave', (e) => {
+                    const footer = document.getElementById('my-profile-footer');
+                    if (e.relatedTarget === footer || footer.contains(e.relatedTarget)) return;
+
+                    phTimer = setTimeout(() => {
+                        card.classList.remove('active');
+                        document.getElementById('ph-settings-menu').classList.remove('active');
+                        stopCurrentEffect();
                     }, 500);
                 });
             }
         });
+
+        function toggleHoverCardSettings(e) {
+            e.stopPropagation();
+            document.getElementById('ph-settings-menu').classList.toggle('active');
+        }
+
+        async function setProfileEffect(effect) {
+            if (!currentUser) return;
+            currentUser.profile_effect = effect;
+            document.getElementById('ph-settings-menu').classList.remove('active');
+            
+            // Save to server
+            socket.emit('update_profile', {
+                displayName: currentUser.display_name,
+                bio: currentUser.bio,
+                birthDate: currentUser.birth_date,
+                profileCardBg: currentUser.profile_card_bg,
+                profileEffect: effect
+            }, (res) => {
+                if (res.success) {
+                    startEffect(effect);
+                }
+            });
+        }
+
+        let effectInterval;
+        function stopCurrentEffect() {
+            if (effectInterval) {
+                cancelAnimationFrame(effectInterval);
+                effectInterval = null;
+            }
+            const canvas = document.getElementById('ph-effects-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function startEffect(type) {
+            stopCurrentEffect();
+            if (type === 'none') return;
+            
+            const canvas = document.getElementById('ph-effects-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            if (type === 'snow') {
+                const flakes = Array.from({ length: 50 }, () => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 3 + 1,
+                    d: Math.random() * 1,
+                    v: Math.random() * 2 + 1
+                }));
+
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+                    ctx.beginPath();
+                    for (let f of flakes) {
+                        ctx.moveTo(f.x, f.y);
+                        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
+                        f.y += f.v;
+                        f.x += Math.sin(f.y / 30);
+                        if (f.y > canvas.height) f.y = -10;
+                    }
+                    ctx.fill();
+                    effectInterval = requestAnimationFrame(draw);
+                }
+                draw();
+            } else if (type === 'stars') {
+                const stars = Array.from({ length: 40 }, () => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 1.5,
+                    opacity: Math.random(),
+                    speed: Math.random() * 0.02 + 0.01
+                }));
+
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (let s of stars) {
+                        ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(Math.sin(s.opacity))})`;
+                        ctx.beginPath();
+                        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                        ctx.fill();
+                        s.opacity += s.speed;
+                    }
+                    effectInterval = requestAnimationFrame(draw);
+                }
+                draw();
+            }
+        }
 
         function updateHoverCardUI() {
             if (!currentUser) return;
@@ -462,10 +575,8 @@ function postStory(input) {
             if (bio) bio.textContent = currentUser.bio || 'Нет описания';
             
             if (avatar) {
-                // Reuse avatar rendering logic
-                const avatarHTML = renderAvatarHTML(currentUser.avatar, currentUser.display_name, 'avatar-ph');
-                avatar.parentElement.innerHTML = avatarHTML;
-                avatar.parentElement.firstChild.id = 'ph-avatar';
+                const avatarHTML = renderAvatarHTML(currentUser.avatar, currentUser.display_name, 'avatar-img-actual');
+                avatar.innerHTML = avatarHTML;
             }
 
             if (cover) {
@@ -474,6 +585,10 @@ function postStory(input) {
                 } else {
                     cover.style.backgroundImage = '';
                 }
+            }
+
+            if (currentUser.profile_effect) {
+                setTimeout(() => startEffect(currentUser.profile_effect), 100);
             }
         }
 
