@@ -385,12 +385,14 @@ function openNewChatChoiceModal() {
         function updateMyMusicUI(status) {
             const widget = document.getElementById('my-music-widget');
             const text = document.getElementById('my-music-text');
-            if (status) {
-                widget.classList.add('playing');
-                text.textContent = status;
-            } else {
-                widget.classList.remove('playing');
-                text.textContent = 'Установить музыку...';
+            if (widget && text) {
+                if (status) {
+                    widget.classList.add('playing');
+                    text.textContent = status;
+                } else {
+                    widget.classList.remove('playing');
+                    text.textContent = 'Установить музыку...';
+                }
             }
         }
 

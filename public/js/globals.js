@@ -280,6 +280,7 @@ window.addEventListener('load', () => {
 
 
 document.addEventListener('keydown', (e) => {
+    if (!currentUser) return;
     // Обновляем футер (PC)
     const nameFooter = document.getElementById('my-name-footer');
     const avatarFooter = document.getElementById('my-avatar-footer');
