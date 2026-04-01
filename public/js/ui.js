@@ -437,6 +437,30 @@ function postStory(input) {
 
         window.showUserProfileBadge = function(username, el) {
             clearTimeout(phHideTimer);
+
+            // IF THIS IS US (FOOTER), SHOW INSTANTLY WITHOUT SOCKET
+            if (currentUser && username === currentUser.username) {
+                clearTimeout(phTimer);
+                updateHoverCardUI(currentUser);
+                const card = document.getElementById('profile-hover-card');
+                if (card) {
+                    const rect = el.getBoundingClientRect();
+                    const settingsBtn = document.getElementById('ph-settings-btn');
+                    if (settingsBtn) settingsBtn.style.display = 'flex';
+                    
+                    card.classList.add('active');
+                    let top = rect.top - card.offsetHeight - 15;
+                    let left = rect.left + (rect.width / 2) - (card.offsetWidth / 2);
+                    if (left < 10) left = 10;
+                    if (left + card.offsetWidth > window.innerWidth - 10) left = window.innerWidth - card.offsetWidth - 10;
+                    if (top < 10) top = rect.bottom + 15;
+                    card.style.top = top + 'px';
+                    card.style.left = left + 'px';
+                }
+                return;
+            }
+
+            // FOR OTHERS, SMALL DELAY TO AVOID FLICKERING
             phTimer = setTimeout(() => {
                 socket.emit('get_user_profile', { username }, (userData) => {
                     if (!userData) return;
@@ -447,30 +471,22 @@ function postStory(input) {
                     if (!card) return;
 
                     const rect = el.getBoundingClientRect();
-                    
-                    // Show settings only for current user
                     const settingsBtn = document.getElementById('ph-settings-btn');
-                    if (settingsBtn) {
-                        settingsBtn.style.display = (currentUser && userData.username === currentUser.username) ? 'flex' : 'none';
-                    }
+                    if (settingsBtn) settingsBtn.style.display = 'none';
 
                     card.classList.add('active');
                     
-                    // Position card (USING FIX COORDINATES RELATIVE TO VIEWPORT)
+                    // Position card
                     let top = rect.top - card.offsetHeight - 15;
                     let left = rect.left + (rect.width / 2) - (card.offsetWidth / 2);
-
-                    // Keep in viewport
                     if (left < 10) left = 10;
                     if (left + card.offsetWidth > window.innerWidth - 10) left = window.innerWidth - card.offsetWidth - 10;
-                    
-                    // If too high, show below
                     if (top < 10) top = rect.bottom + 15;
 
                     card.style.top = top + 'px';
                     card.style.left = left + 'px';
                 });
-            }, 350);
+            }, 200);
         };
 
         window.hideUserProfileBadge = function() {
