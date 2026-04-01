@@ -519,8 +519,7 @@ function postStory(input) {
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
                     r: Math.random() * 3 + 1,
-                    d: Math.random() * 1,
-                    v: Math.random() * 2 + 1
+                    v: Math.random() * 0.6 + 0.3 // Slower snow
                 }));
 
                 function draw() {
@@ -531,20 +530,25 @@ function postStory(input) {
                         ctx.moveTo(f.x, f.y);
                         ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
                         f.y += f.v;
-                        f.x += Math.sin(f.y / 30);
-                        if (f.y > canvas.height) f.y = -10;
+                        f.x += Math.sin(f.y / 50) * 0.5;
+                        if (f.y > canvas.height) {
+                            f.y = -10;
+                            f.x = Math.random() * canvas.width;
+                        }
                     }
                     ctx.fill();
                     effectInterval = requestAnimationFrame(draw);
                 }
                 draw();
             } else if (type === 'stars') {
-                const stars = Array.from({ length: 40 }, () => ({
+                const stars = Array.from({ length: 50 }, () => ({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    size: Math.random() * 1.5,
+                    size: Math.random() * 1.5 + 0.5,
                     opacity: Math.random(),
-                    speed: Math.random() * 0.02 + 0.01
+                    speed: Math.random() * 0.05 + 0.01,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3
                 }));
 
                 function draw() {
@@ -555,6 +559,13 @@ function postStory(input) {
                         ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
                         ctx.fill();
                         s.opacity += s.speed;
+                        s.x += s.vx;
+                        s.y += s.vy;
+
+                        if (s.x < 0) s.x = canvas.width;
+                        if (s.x > canvas.width) s.x = 0;
+                        if (s.y < 0) s.y = canvas.height;
+                        if (s.y > canvas.height) s.y = 0;
                     }
                     effectInterval = requestAnimationFrame(draw);
                 }
@@ -564,11 +575,11 @@ function postStory(input) {
 
         function updateHoverCardUI() {
             if (!currentUser) return;
+            const card = document.getElementById('profile-hover-card');
             const name = document.getElementById('ph-name');
             const username = document.getElementById('ph-username');
             const bio = document.getElementById('ph-bio');
             const avatar = document.getElementById('ph-avatar');
-            const cover = document.getElementById('ph-cover');
 
             if (name) name.textContent = currentUser.display_name;
             if (username) username.textContent = '@' + currentUser.username;
@@ -579,11 +590,13 @@ function postStory(input) {
                 avatar.innerHTML = avatarHTML;
             }
 
-            if (cover) {
+            if (card) {
                 if (currentUser.profile_card_bg) {
-                    cover.style.backgroundImage = `url(${currentUser.profile_card_bg})`;
+                    card.style.backgroundImage = `url(${currentUser.profile_card_bg})`;
+                    card.style.backgroundSize = 'cover';
+                    card.style.backgroundPosition = 'center';
                 } else {
-                    cover.style.backgroundImage = '';
+                    card.style.backgroundImage = '';
                 }
             }
 

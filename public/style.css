@@ -161,7 +161,7 @@ button:hover:not(:disabled), .action-btn:hover, .tg-btn:hover, .modal-btn:hover 
     object-fit: cover !important;
     border-radius: 50% !important;
 }
-.status-dot { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid var(--bg-panel); transition: background-color 0.3s; }
+.status-dot { position: absolute; bottom: 1.5px; right: 1.5px; width: 13px; height: 13px; border-radius: 50%; border: 2.5px solid var(--bg-panel); transition: background-color 0.3s; z-index: 5; }
 .status-dot.online { background-color: #2ecc71; }
 .status-dot.offline { display: none; }
 .messages-header .status-dot { border-color: var(--bg-card); }
@@ -184,6 +184,7 @@ button:hover:not(:disabled), .action-btn:hover, .tg-btn:hover, .modal-btn:hover 
     position: relative; /* For hover card */
 }
 .profile-footer .avatar-wrapper { width: 40px; height: 40px; }
+.profile-footer .status-dot { width: 10px; height: 10px; bottom: 1px; right: 1px; border-width: 2px; }
 .profile-footer .profile-info h3 { font-size: 14px; }
 .profile-footer .profile-status { font-size: 12px; }
 
@@ -883,7 +884,9 @@ body.dark-theme .ph-bio {
     bottom: calc(100% + 20px);
     left: 10px;
     width: 320px;
-    background: rgba(255, 255, 255, 0.05); /* Glass base */
+    background: var(--bg-card);
+    background-size: cover;
+    background-position: center;
     border-radius: 28px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     opacity: 0;
@@ -922,22 +925,16 @@ body.light-theme .profile-hover-card {
 
 .ph-cover {
     height: 140px;
-    background-color: var(--accent);
     background-size: cover;
     background-position: center;
     position: relative;
     z-index: 0;
     transition: background 0.5s ease;
+    display: none; /* Removed background top only - card has full background now */
 }
 
 .ph-cover::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 80%;
-    background: linear-gradient(to top, var(--bg-card), transparent);
+    display: none;
 }
 
 .ph-settings-btn {
@@ -996,11 +993,22 @@ body.light-theme .profile-hover-card {
 .ph-menu-item:hover { background: var(--accent); color: #fff; }
 
 .ph-info {
-    padding: 0 24px 32px 24px;
+    padding: 24px;
     position: relative;
     z-index: 2;
     text-align: center;
-    margin-top: -50px;
+    margin-top: 0;
+    background: rgba(0,0,0,0.4); /* Always dark overlay for text readability over light photos */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+body.light-theme .ph-info {
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .ph-avatar-area {
