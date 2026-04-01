@@ -35,9 +35,9 @@
                 const snippetText = createMessageSnippet(user.lastMessage);
                 const lastMessageHTML = `<span class="chat-last-message" id="lm-${user.username}">${escapeHTML(snippetText)}</span>`;
 
-                chatItem.innerHTML = `<div class="avatar-wrapper">${avatarHTML}${statusDotHTML}</div>
+                chatItem.innerHTML = `<div class="avatar-wrapper" onmouseenter="showUserProfileBadge('${user.username}', this)" onmouseleave="hideUserProfileBadge()">${avatarHTML}${statusDotHTML}</div>
                     <div class="chat-info">
-                        <span class="chat-name">${displayName} ${premiumBadge}</span>
+                        <span class="chat-name" onmouseenter="showUserProfileBadge('${user.username}', this)" onmouseleave="hideUserProfileBadge()">${displayName} ${premiumBadge}</span>
                         ${lastMessageHTML}
                     </div>`;
                 chatsList.appendChild(chatItem);
@@ -68,8 +68,13 @@
             const avatarWrapper = document.querySelector('.messages-header .avatar-wrapper');
             avatarWrapper.innerHTML = renderAvatarHTML(user.avatar, displayName, 'partner-avatar') + 
                 `<div class="status-dot" id="current-chat-status-dot" style="display:none;"></div>`;
+            avatarWrapper.onmouseenter = () => { if(!user.isGroup) showUserProfileBadge(user.username, avatarWrapper); };
+            avatarWrapper.onmouseleave = () => hideUserProfileBadge();
 
-            document.getElementById('current-chat-name').innerHTML = `${safeDisplayName} ${premiumBadge} <span class="username-tag" style="color:inherit">@${safeUsername}</span>`;
+            const headerName = document.getElementById('current-chat-name');
+            headerName.innerHTML = `${safeDisplayName} ${premiumBadge} <span class="username-tag" style="color:inherit">@${safeUsername}</span>`;
+            headerName.onmouseenter = () => { if(!user.isGroup) showUserProfileBadge(user.username, headerName); };
+            headerName.onmouseleave = () => hideUserProfileBadge();
             const dot = document.getElementById('current-chat-status-dot');
             const statusText = document.getElementById('current-chat-status-text');
             const addContactBtn = document.getElementById('add-contact-btn');
@@ -608,7 +613,7 @@
                 if (msg.sender === 'xxx') {
                     badges = '<span class="premium-plate dev">DEV</span><span class="premium-plate admin">ADMIN</span>';
                 }
-                senderNameHTML = `<div class="message-sender-name">${escapeHTML(msg.sender_display_name || msg.sender)}${badges}</div>`;
+                senderNameHTML = `<div class="message-sender-name" onmouseenter="showUserProfileBadge('${msg.sender}', this)" onmouseleave="hideUserProfileBadge()">${escapeHTML(msg.sender_display_name || msg.sender)}${badges}</div>`;
             }
 
             let bubbleClass = 'bubble';

@@ -430,43 +430,71 @@ function postStory(input) {
                 }
             }
         }
-        // --- PROFILE HOVER CARD LOGIC ---
+        // --- UNIVERSAL PROFILE HOVER CARD ---
         let phTimer;
+        let phHideTimer;
+        let currentPhUser = null;
+
+        function showUserProfileBadge(username, el) {
+            clearTimeout(phHideTimer);
+            phTimer = setTimeout(() => {
+                socket.emit('get_user_profile', { username }, (userData) => {
+                    if (!userData) return;
+                    currentPhUser = userData;
+                    updateHoverCardUI(userData);
+                    
+                    const card = document.getElementById('profile-hover-card');
+                    const rect = el.getBoundingClientRect();
+                    
+                    // Show settings only for current user
+                    const settingsBtn = document.getElementById('ph-settings-btn');
+                    if (settingsBtn) {
+                        settingsBtn.style.display = (currentUser && userData.username === currentUser.username) ? 'flex' : 'none';
+                    }
+
+                    card.classList.add('active');
+                    
+                    // Position card
+                    let top = rect.top + window.scrollY - card.offsetHeight - 15;
+                    let left = rect.left + window.scrollX + (rect.width / 2) - (card.offsetWidth / 2);
+
+                    // Keep in viewport
+                    if (left < 10) left = 10;
+                    if (left + card.offsetWidth > window.innerWidth - 10) left = window.innerWidth - card.offsetWidth - 10;
+                    if (top < 10) top = rect.bottom + window.scrollY + 15;
+
+                    card.style.top = top + 'px';
+                    card.style.left = left + 'px';
+                });
+            }, 350);
+        }
+
+        function hideUserProfileBadge() {
+            clearTimeout(phTimer);
+            phHideTimer = setTimeout(() => {
+                const card = document.getElementById('profile-hover-card');
+                if (!card.matches(':hover')) {
+                    card.classList.remove('active');
+                    document.getElementById('ph-settings-menu').classList.remove('active');
+                    stopCurrentEffect();
+                }
+            }, 300);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            const footer = document.getElementById('my-profile-footer');
             const card = document.getElementById('profile-hover-card');
+            if (card) {
+                card.addEventListener('mouseenter', () => clearTimeout(phHideTimer));
+                card.addEventListener('mouseleave', () => hideUserProfileBadge());
+            }
 
-            if (footer && card) {
+            // Also support footer
+            const footer = document.getElementById('my-profile-footer');
+            if (footer) {
                 footer.addEventListener('mouseenter', () => {
-                    clearTimeout(phTimer);
-                    updateHoverCardUI();
-                    document.getElementById('profile-hover-card').classList.add('active');
+                    if (currentUser) showUserProfileBadge(currentUser.username, footer);
                 });
-                footer.addEventListener('mouseleave', (e) => {
-                    phTimer = setTimeout(() => {
-                        const card = document.getElementById('profile-hover-card');
-                        if (!card.matches(':hover')) {
-                            card.classList.remove('active');
-                            document.getElementById('ph-settings-menu').classList.remove('active');
-                            stopCurrentEffect();
-                        }
-                    }, 300);
-                });
-
-                card.addEventListener('mouseenter', () => {
-                    clearTimeout(phTimer);
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    phTimer = setTimeout(() => {
-                        const footer = document.getElementById('my-profile-footer');
-                        if (!footer.matches(':hover')) {
-                            card.classList.remove('active');
-                            document.getElementById('ph-settings-menu').classList.remove('active');
-                            stopCurrentEffect();
-                        }
-                    }, 300);
-                });
+                footer.addEventListener('mouseleave', () => hideUserProfileBadge());
             }
         });
 
@@ -591,8 +619,9 @@ function postStory(input) {
             }
         }
 
-        function updateHoverCardUI() {
-            if (!currentUser) return;
+        function updateHoverCardUI(userData) {
+            const user = userData || currentUser;
+            if (!user) return;
             const card = document.getElementById('profile-hover-card');
             const name = document.getElementById('ph-name');
             const username = document.getElementById('ph-username');
@@ -601,25 +630,26 @@ function postStory(input) {
 
             if (name) {
                 let badges = '';
-                if (currentUser.username === 'xxx' || currentUser.is_admin) {
+                if (user.username === 'xxx' || user.is_admin) {
                     badges = '<span class="premium-plate dev">DEV</span><span class="premium-plate admin">ADMIN</span>';
-                } else if (currentUser.is_premium) {
+                } else if (user.is_premium) {
                     badges = '<span class="premium-plate">PREMIUM</span>';
                 }
-                name.innerHTML = `${escapeHTML(currentUser.display_name)}${badges}`;
+                name.innerHTML = `${escapeHTML(user.display_name || user.username)}${badges}`;
             }
-            if (username) username.textContent = '@' + currentUser.username;
-            if (bio) bio.textContent = currentUser.bio || 'Нет описания';
+            if (username) username.textContent = '@' + user.username;
+            if (bio) bio.textContent = user.bio || 'Нет описания';
             
             if (avatar) {
-                const avatarHTML = renderAvatarHTML(currentUser.avatar, currentUser.display_name, 'avatar-img-actual');
-                const statusDotHTML = `<div class="status-dot ${currentUser.isOnline ? 'online' : 'offline'}" style="width:14px; height:14px; bottom:2px; right:2px; border:2px solid var(--bg-card);"></div>`;
+                const avatarHTML = renderAvatarHTML(user.avatar, user.display_name, 'avatar-img-actual');
+                const isOnline = user.isOnline || (onlineUsers && onlineUsers.has(user.username));
+                const statusDotHTML = `<div class="status-dot ${isOnline ? 'online' : 'offline'}" style="width:14px; height:14px; bottom:2px; right:2px; border:2px solid var(--bg-card);"></div>`;
                 avatar.innerHTML = avatarHTML + statusDotHTML;
             }
 
             if (card) {
-                if (currentUser.profile_card_bg) {
-                    const bgUrl = getFullUrl(currentUser.profile_card_bg);
+                if (user.profile_card_bg) {
+                    const bgUrl = getFullUrl(user.profile_card_bg);
                     card.style.backgroundImage = `url(${bgUrl})`;
                     card.style.backgroundSize = 'cover';
                     card.style.backgroundPosition = 'center';
@@ -628,8 +658,10 @@ function postStory(input) {
                 }
             }
 
-            if (currentUser.profile_effect) {
-                setTimeout(() => startEffect(currentUser.profile_effect), 100);
+            if (user.profile_effect && user.profile_effect !== 'none') {
+                setTimeout(() => startEffect(user.profile_effect), 100);
+            } else {
+                stopCurrentEffect();
             }
         }
 

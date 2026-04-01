@@ -137,6 +137,18 @@ module.exports = function(io, onlineUsers) {
             } catch (err) { callback([]); }
         });
 
+        socket.on('get_user_profile', async (data, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                if (!data.username) return callback(null);
+                const user = await dbGet(`SELECT username, display_name, avatar, bio, is_premium, profile_card_bg, profile_effect FROM users WHERE username = ?`, [data.username]);
+                if (user) {
+                    user.isOnline = onlineUsers.has(user.username);
+                    callback(user);
+                } else callback(null);
+            } catch (err) { callback(null); }
+        });
+
         socket.on('get recent chats', async (callback) => {
             if (typeof callback !== 'function') callback = () => {};
             try {
