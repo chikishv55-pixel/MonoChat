@@ -134,7 +134,8 @@ async function initDB() {
             is_banned INTEGER DEFAULT 0,
             is_verified INTEGER DEFAULT 0,
             verification_token TEXT,
-            email TEXT
+            email TEXT,
+            profile_card_bg TEXT
         )`);
 
         await dbRun(`CREATE TABLE IF NOT EXISTS contacts (
@@ -199,6 +200,11 @@ async function initDB() {
             await dbRun(`ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0`);
             await dbRun(`ALTER TABLE users ADD COLUMN verification_token TEXT`);
             await dbRun(`ALTER TABLE users ADD COLUMN email TEXT`);
+        }
+        
+        // Ensure profile_card_bg exists
+        if (!columnsInUsers.some(c => c.name === 'profile_card_bg')) {
+            await dbRun(`ALTER TABLE users ADD COLUMN profile_card_bg TEXT`);
         }
         
         // Ensure other columns exist too (for existing DBs)

@@ -163,7 +163,7 @@ router.get('/me', async (req, res) => {
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, JWT_SECRET);
         
-        const row = await dbGet(`SELECT username, display_name, avatar, bio, birth_date, music_status, fcm_token, is_premium, is_admin FROM users WHERE username = ?`, [decoded.username]);
+        const row = await dbGet(`SELECT username, display_name, avatar, bio, birth_date, music_status, fcm_token, is_premium, is_admin, profile_card_bg FROM users WHERE username = ?`, [decoded.username]);
         if (!row) return res.status(404).json({ success: false, message: 'Пользователь не найден' });
         
         res.json({ success: true, user: row });

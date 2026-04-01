@@ -42,7 +42,7 @@ module.exports = function(io, onlineUsers) {
         if (!token) return next(new Error('Authentication error'));
         try {
             const decoded = jwt.verify(token, JWT_SECRET);
-            const user = await dbGet(`SELECT username, is_admin, is_banned, display_name, avatar, bio, birth_date, music_status, fcm_token, is_premium FROM users WHERE username = ?`, [decoded.username]);
+            const user = await dbGet(`SELECT username, is_admin, is_banned, display_name, avatar, bio, birth_date, music_status, fcm_token, is_premium, profile_card_bg FROM users WHERE username = ?`, [decoded.username]);
             if (!user) return next(new Error('User not found'));
             if (user.is_banned) return next(new Error('Your account is banned'));
             
@@ -129,7 +129,7 @@ module.exports = function(io, onlineUsers) {
             try {
                 if (!query) return callback([]);
                 const me = socket.user;
-                const userRows = await dbAll(`SELECT username, display_name, avatar, bio, birth_date, music_status, is_premium FROM users WHERE LOWER(username) = LOWER(?) LIMIT 1`, [query.trim()]);
+                const userRows = await dbAll(`SELECT username, display_name, avatar, bio, birth_date, music_status, is_premium, profile_card_bg FROM users WHERE LOWER(username) = LOWER(?) LIMIT 1`, [query.trim()]);
                 const groupRows = await dbAll(`SELECT id, name, avatar, type, public_id FROM groups WHERE visibility = 'public' AND (LOWER(name) LIKE LOWER(?) OR LOWER(public_id) = LOWER(?)) LIMIT 5`, [`%${query}%`, query.trim()]);
                 const usersResult = (userRows || []).filter(u => u.username !== me?.username).map(u => ({ ...u, isOnline: onlineUsers.has(u.username) }));
                 const groupsResult = (groupRows || []).map(g => ({ username: `g${g.id}`, display_name: g.name, avatar: g.avatar, isGroup: true, type: g.type }));
@@ -142,7 +142,7 @@ module.exports = function(io, onlineUsers) {
             try {
                 const me = socket.user;
                 if (!me) return callback([]);
-                const privateChatsRows = await dbAll(`SELECT DISTINCT u.username, u.display_name, u.avatar, u.bio, u.birth_date, u.music_status, u.is_premium FROM users u LEFT JOIN messages m ON (u.username = m.sender OR u.username = m.receiver) LEFT JOIN contacts c ON u.username = c.contact_username AND c.owner = ? WHERE (m.sender = ? OR m.receiver = ? OR c.owner = ?) AND u.username != ?`, [me.username, me.username, me.username, me.username, me.username]);
+                const privateChatsRows = await dbAll(`SELECT DISTINCT u.username, u.display_name, u.avatar, u.bio, u.birth_date, u.music_status, u.is_premium, u.profile_card_bg FROM users u LEFT JOIN messages m ON (u.username = m.sender OR u.username = m.receiver) LEFT JOIN contacts c ON u.username = c.contact_username AND c.owner = ? WHERE (m.sender = ? OR m.receiver = ? OR c.owner = ?) AND u.username != ?`, [me.username, me.username, me.username, me.username, me.username]);
                 const privateChats = (privateChatsRows || []).map(u => ({ ...u, isOnline: onlineUsers.has(u.username), isGroup: false }));
                 const groupChatsRows = await dbAll(`SELECT g.id, g.name, g.avatar, g.type, gm.role as my_role, (SELECT COUNT(*) FROM group_members WHERE group_id = g.id) as member_count FROM groups g JOIN group_members gm ON g.id = gm.group_id WHERE gm.user_username = ?`, [me.username]);
                 const groupChats = (groupChatsRows || []).map(g => ({ username: `g${g.id}`, display_name: g.name, avatar: g.avatar, type: g.type, isGroup: true, my_role: g.my_role, member_count: g.member_count }));
@@ -160,8 +160,8 @@ module.exports = function(io, onlineUsers) {
             try {
                 const me = socket.user;
                 if (!me) return callback({ success: false });
-                await dbRun(`UPDATE users SET display_name = ?, bio = ?, birth_date = ? WHERE username = ?`, [data.displayName, data.bio, data.birthDate, me.username]);
-                me.display_name = data.displayName; me.bio = data.bio; me.birth_date = data.birthDate;
+                await dbRun(`UPDATE users SET display_name = ?, bio = ?, birth_date = ?, profile_card_bg = ? WHERE username = ?`, [data.displayName, data.bio, data.birthDate, data.profileCardBg, me.username]);
+                me.display_name = data.displayName; me.bio = data.bio; me.birth_date = data.birthDate; me.profile_card_bg = data.profileCardBg;
                 socket.broadcast.emit('user data changed', { username: me.username, display_name: me.display_name });
                 callback({ success: true, user: me });
             } catch (err) { callback({ success: false }); }
