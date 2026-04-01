@@ -435,7 +435,7 @@ function postStory(input) {
         let phHideTimer;
         let currentPhUser = null;
 
-        function showUserProfileBadge(username, el) {
+        window.showUserProfileBadge = function(username, el) {
             clearTimeout(phHideTimer);
             phTimer = setTimeout(() => {
                 socket.emit('get_user_profile', { username }, (userData) => {
@@ -444,6 +444,8 @@ function postStory(input) {
                     updateHoverCardUI(userData);
                     
                     const card = document.getElementById('profile-hover-card');
+                    if (!card) return;
+
                     const rect = el.getBoundingClientRect();
                     
                     // Show settings only for current user
@@ -454,22 +456,24 @@ function postStory(input) {
 
                     card.classList.add('active');
                     
-                    // Position card
-                    let top = rect.top + window.scrollY - card.offsetHeight - 15;
-                    let left = rect.left + window.scrollX + (rect.width / 2) - (card.offsetWidth / 2);
+                    // Position card (USING FIX COORDINATES RELATIVE TO VIEWPORT)
+                    let top = rect.top - card.offsetHeight - 15;
+                    let left = rect.left + (rect.width / 2) - (card.offsetWidth / 2);
 
                     // Keep in viewport
                     if (left < 10) left = 10;
                     if (left + card.offsetWidth > window.innerWidth - 10) left = window.innerWidth - card.offsetWidth - 10;
-                    if (top < 10) top = rect.bottom + window.scrollY + 15;
+                    
+                    // If too high, show below
+                    if (top < 10) top = rect.bottom + 15;
 
                     card.style.top = top + 'px';
                     card.style.left = left + 'px';
                 });
             }, 350);
-        }
+        };
 
-        function hideUserProfileBadge() {
+        window.hideUserProfileBadge = function() {
             clearTimeout(phTimer);
             phHideTimer = setTimeout(() => {
                 const card = document.getElementById('profile-hover-card');
@@ -479,7 +483,7 @@ function postStory(input) {
                     stopCurrentEffect();
                 }
             }, 300);
-        }
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             const card = document.getElementById('profile-hover-card');
