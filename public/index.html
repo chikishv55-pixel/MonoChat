@@ -610,40 +610,62 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
         </div>
     </div>
 
-    <!-- PROFILE EFFECTS MODAL -->
+    <!-- PROFILE CUSTOMIZATION EDITOR -->
     <div id="ph-effects-backdrop" class="ph-effects-backdrop" onclick="toggleHoverCardSettings(event)">
-        <div class="ph-effects-modal" onclick="event.stopPropagation()">
-            <div class="ph-effects-header">
-                <div class="ph-effects-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                </div>
-                <div>
-                    <h3>Эффект профиля</h3>
-                    <p>Выберите эффект для вашей карточки</p>
-                </div>
-                <button class="ph-effects-close" onclick="toggleHoverCardSettings(event)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                </button>
+        <div class="ph-editor-modal" onclick="event.stopPropagation()">
+            <div class="ph-editor-header">
+                <h3>Дизайн профиля</h3>
+                <button class="ph-editor-close" onclick="toggleHoverCardSettings(event)">×</button>
             </div>
-            <div class="ph-effects-grid">
-                <div class="ph-effect-item" onclick="setProfileEffect('none')" data-effect="none">
-                    <div class="ph-effect-preview ph-effect-none">
-                        <span class="ph-effect-emoji">🚫</span>
+            
+            <div class="ph-editor-layout">
+                <!-- Left Side: Live Preview -->
+                <div class="ph-preview-side">
+                    <div class="ph-preview-label">Предпросмотр</div>
+                    <div id="ph-live-preview-container">
+                        <!-- The profile card will be mirrored here -->
                     </div>
-                    <span>Без эффекта</span>
                 </div>
-                <div class="ph-effect-item" onclick="setProfileEffect('snow')" data-effect="snow">
-                    <div class="ph-effect-preview ph-effect-snow">
-                        <span class="ph-effect-emoji">❄️</span>
+
+                <!-- Right Side: Controls -->
+                <div class="ph-controls-side">
+                    <!-- Background Section -->
+                    <div class="ph-control-group">
+                        <label>Фон карточки</label>
+                        <div class="ph-presets-grid">
+                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);" data-bg="linear-gradient(135deg, #0f172a 0%, #1e293b 100%)" onclick="previewBg(this)"></div>
+                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);" data-bg="linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)" onclick="previewBg(this)"></div>
+                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" data-bg="linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)" onclick="previewBg(this)"></div>
+                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" data-bg="linear-gradient(135deg, #10b981 0%, #059669 100%)" onclick="previewBg(this)"></div>
+                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" data-bg="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)" onclick="previewBg(this)"></div>
+                            <div class="ph-preset-item" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.1);" data-bg="#ffffff" onclick="previewBg(this)"></div>
+                        </div>
+                        <input type="text" id="ph-custom-bg" class="ph-input" placeholder="CSS Цвет или Градиент..." oninput="previewCustomBg(this.value)">
                     </div>
-                    <span>Снег</span>
-                </div>
-                <div class="ph-effect-item" onclick="setProfileEffect('stars')" data-effect="stars">
-                    <div class="ph-effect-preview ph-effect-stars">
-                        <span class="ph-effect-emoji">✨</span>
+
+                    <!-- Effects Section -->
+                    <div class="ph-control-group">
+                        <label>Эффект профиля</label>
+                        <div class="ph-effects-minimal-grid">
+                            <div class="ph-effect-box" data-effect="none" onclick="previewEffect('none')">
+                                <span class="emoji">🚫</span>
+                                <span>Нет</span>
+                            </div>
+                            <div class="ph-effect-box" data-effect="snow" onclick="previewEffect('snow')">
+                                <span class="emoji">❄️</span>
+                                <span>Снег</span>
+                            </div>
+                            <div class="ph-effect-box" data-effect="stars" onclick="previewEffect('stars')">
+                                <span class="emoji">✨</span>
+                                <span>Звёзды</span>
+                            </div>
+                        </div>
                     </div>
-                    <span>Звёзды</span>
                 </div>
+            </div>
+
+            <div class="ph-editor-footer">
+                <button class="ph-save-btn" onclick="saveProfileCustomization()">Сохранить изменения</button>
             </div>
         </div>
     </div>

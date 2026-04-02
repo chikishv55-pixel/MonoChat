@@ -67,6 +67,7 @@ console.log('--- Registered Auth Routes ---');
 authRouter.stack.forEach(s => { if(s.route) console.log('Route loaded:', s.route.path); });
 app.use('/api/auth', authRouter);
 app.use('/api/upload', require('./src/routes/upload'));
+app.use('/api/user', require('./src/routes/user'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 const onlineUsers = new Map(); // username -> Set<socket.id>

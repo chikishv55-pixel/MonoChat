@@ -517,46 +517,132 @@ function postStory(input) {
             }
         });
 
+        let currentPreviewBg = '';
+        let currentPreviewEffect = 'none';
+
         window.toggleHoverCardSettings = function(e) {
-            e.stopPropagation();
+            if (e) e.stopPropagation();
             const backdrop = document.getElementById('ph-effects-backdrop');
             if (!backdrop) return;
             const isActive = backdrop.classList.contains('active');
+            
             if (isActive) {
+                // Restore card to original position (hidden)
+                const card = document.getElementById('profile-hover-card');
+                if (card) {
+                    card.style.position = '';
+                    card.style.zIndex = '';
+                    card.style.opacity = '';
+                    card.style.visibility = '';
+                    card.style.transform = '';
+                    document.body.appendChild(card);
+                }
                 backdrop.classList.remove('active');
             } else {
-                // Mark current effect as selected
-                if (currentUser) {
-                    document.querySelectorAll('.ph-effect-item').forEach(item => {
-                        item.classList.toggle('selected', item.dataset.effect === (currentUser.profile_effect || 'none'));
-                    });
+                if (!currentUser) return;
+                
+                // Track initial state
+                currentPreviewBg = currentUser.profile_card_bg || '';
+                currentPreviewEffect = currentUser.profile_effect || 'none';
+
+                // Reposition card for live preview inside modal
+                const card = document.getElementById('profile-hover-card');
+                const container = document.getElementById('ph-live-preview-container');
+                if (card && container) {
+                    container.innerHTML = '';
+                    container.appendChild(card);
+                    card.style.position = 'relative';
+                    card.style.zIndex = '1';
+                    card.style.opacity = '1';
+                    card.style.visibility = 'visible';
+                    card.style.transform = 'none';
+                    card.style.pointerEvents = 'none';
                 }
+
+                // Setup UI
+                updateEditorUI();
                 backdrop.classList.add('active');
             }
         };
 
-        window.setProfileEffect = async function(effect) {
-            if (!currentUser) return;
-            currentUser.profile_effect = effect;
-            const backdrop = document.getElementById('ph-effects-backdrop');
-            if (backdrop) backdrop.classList.remove('active');
-            // Update selected UI
-            document.querySelectorAll('.ph-effect-item').forEach(item => {
-                item.classList.toggle('selected', item.dataset.effect === effect);
+        function updateEditorUI() {
+            // Background
+            document.getElementById('ph-custom-bg').value = currentPreviewBg;
+            document.querySelectorAll('.ph-preset-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.bg === currentPreviewBg);
             });
-            startEffect(effect);
-            
-            try {
-                const token = localStorage.getItem('monochrome_token');
-                await fetch(SERVER_URL + '/api/user/update-effect', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ effect })
-                });
-            } catch (err) { console.error('Ошибка сохранения эффекта:', err); }
+
+            // Effects
+            document.querySelectorAll('.ph-effect-box').forEach(item => {
+                item.classList.toggle('active', item.dataset.effect === currentPreviewEffect);
+            });
+
+            // Apply to card
+            previewBgOnCard(currentPreviewBg);
+            previewEffectOnCard(currentPreviewEffect);
+        }
+
+        window.previewBg = function(el) {
+            currentPreviewBg = el.dataset.bg;
+            document.getElementById('ph-custom-bg').value = currentPreviewBg;
+            updateEditorUI();
         };
 
-        // saveProfile() определена в groups.js — не дублировать здесь
+        window.previewCustomBg = function(val) {
+            currentPreviewBg = val;
+            updateEditorUI();
+        };
+
+        window.previewEffect = function(effect) {
+            currentPreviewEffect = effect;
+            updateEditorUI();
+        };
+
+        function previewBgOnCard(bg) {
+            const cover = document.getElementById('ph-cover');
+            if (cover) cover.style.background = bg || 'linear-gradient(45deg, var(--accent), #0056b3)';
+        }
+
+        function previewEffectOnCard(effect) {
+            startEffect(effect);
+        }
+
+        window.saveProfileCustomization = async function() {
+            if (!currentUser) return;
+            
+            const saveBtn = document.querySelector('.ph-save-btn');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Сохранение...';
+            saveBtn.disabled = true;
+
+            try {
+                const token = localStorage.getItem('monochrome_token');
+                
+                // Update both background and effect
+                const response = await fetch(SERVER_URL + '/api/user/update-customization', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ 
+                        effect: currentPreviewEffect,
+                        cardBg: currentPreviewBg
+                    })
+                });
+
+                if (response.ok) {
+                    currentUser.profile_effect = currentPreviewEffect;
+                    currentUser.profile_card_bg = currentPreviewBg;
+                    toggleHoverCardSettings(); // Close
+                } else {
+                    alert('Ошибка при сохранении настроек');
+                }
+            } catch (err) {
+                console.error('Ошибка сохранения кастомизации:', err);
+                alert('Не удалось сохранить изменения');
+            } finally {
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            }
+        };
 
         let effectInterval;
         function stopCurrentEffect() {
@@ -579,10 +665,8 @@ function postStory(input) {
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             
-            // Resize canvas to parent, or fallback to fixed size if parent hidden
-            const parent = canvas.parentElement;
-            canvas.width = parent.offsetWidth || 320;
-            canvas.height = parent.offsetHeight || 420;
+            canvas.width = 300; 
+            canvas.height = 420;
 
             if (type === 'snow') {
                 const flakes = Array.from({ length: 50 }, () => ({
