@@ -642,14 +642,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     <!-- МОДАЛКА ПРОФИЛЯ ПАРТНЕРА (DRAWER) -->
     <div class="tg-settings-panel drawer-right" id="profile-modal">
         <div class="tg-settings-inner">
-            <div class="tg-panel-header">
-                <button class="tg-back-btn" onclick="closeAllModals()">‹</button>
-                <h3 class="tg-header-title">Информация</h3>
+            <div class="tg-panel-header" style="background: transparent; border-bottom: none; position: absolute; top: 0; left: 0; right: 0; z-index: 100;">
+                <button class="tg-back-btn" onclick="closeAllModals()" style="background: rgba(0,0,0,0.3); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);">‹</button>
             </div>
-            <div class="tg-panel-content">
+            <div class="tg-panel-content" style="padding-top: 0;">
                 <div class="tg-profile-cover">
                     <div class="avatar-wrapper">
-                        <div id="pm-avatar" class="avatar">
+                        <div id="pm-avatar" class="avatar" style="width: 120px; height: 120px;">
                             <img id="pm-avatar-img" src="" class="avatar-img-actual" style="display:none;">
                             <span id="pm-avatar-text"></span>
                         </div>
@@ -660,26 +659,40 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                     </div>
                 </div>
 
+                <div class="tg-action-bar">
+                    <div class="tg-action-item" onclick="startCall(false)">
+                        <div class="tg-action-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
+                        <span>Звонок</span>
+                    </div>
+                    <div class="tg-action-item" onclick="startCall(true)">
+                        <div class="tg-action-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></div>
+                        <span>Видео</span>
+                    </div>
+                    <div class="tg-action-item" onclick="toggleMute()">
+                        <div class="tg-action-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
+                        <span>Увед.</span>
+                    </div>
+                </div>
+
                 <div class="tg-section">
-                    <div class="tg-section-title">О себе</div>
+                    <div class="tg-section-title">Информация</div>
                     <div class="tg-section-item">
-                        <div class="tg-item-text" id="pm-bio">Био пользователя...</div>
+                        <div class="tg-item-label">О себе</div>
+                        <div class="tg-item-value" id="pm-bio">Био пользователя...</div>
                     </div>
                     <div class="tg-section-item" id="pm-bdate-container">
-                        <div class="tg-item-text" id="pm-bdate">Дата рождения</div>
+                        <div class="tg-item-label">Дата рождения</div>
+                        <div class="tg-item-value" id="pm-bdate">Не указана</div>
                     </div>
                 </div>
 
                 <div class="tg-section" id="pm-music-section">
-                    <div class="tg-section-title">Музыка</div>
-                    <div class="music-widget pm-music" id="pm-music-widget">
-                        <div class="music-icon">
-                            <span class="eq-bar"></span>
-                            <span class="eq-bar"></span>
-                            <span class="eq-bar"></span>
-                        </div>
-                        <div class="music-info">
-                            <div class="music-text" id="pm-music-text">Ничего не слушает</div>
+                    <div class="tg-section-title">Слушает сейчас</div>
+                    <div class="tg-section-item clickable">
+                        <div class="music-widget pm-music" id="pm-music-widget" style="background: transparent; padding: 0; border: none; box-shadow: none;">
+                            <div class="music-info" style="margin: 0;">
+                                <div class="music-text" id="pm-music-text" style="color: var(--accent); font-weight: 600;">Ничего не слушает</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -695,51 +708,93 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 <h3 class="tg-header-title">Настройки</h3>
             </div>
             <div class="tg-panel-content">
-                <div class="tg-profile-cover">
-                    <div class="avatar-wrapper" onclick="document.getElementById('avatar-input').click()">
-                        <div id="my-avatar-display" class="avatar">
-                            <img id="my-avatar-img" src="" class="avatar-img-actual" style="display:none;">
-                            <span id="my-avatar-text"></span>
-                            <div class="avatar-edit-overlay">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                <!-- Legacy/Hidden structure for JS compatibility with groups.js -->
+                <div id="my-profile-view">
+                    <div class="tg-profile-cover">
+                        <div class="avatar-wrapper" onclick="document.getElementById('avatar-input').click()">
+                            <div id="my-avatar-display" class="avatar">
+                                <img id="my-profile-avatar-img" src="" class="avatar-img-actual" style="display:none;">
+                                <span id="my-profile-avatar-text"></span>
+                                <div class="avatar-edit-overlay">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="white"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                </div>
                             </div>
                         </div>
+                        <input type="file" id="avatar-input" hidden accept="image/*,video/*">
+                        <div class="tg-profile-names">
+                            <h2 id="my-profile-name-modal">My Name</h2>
+                            <p id="my-profile-username-modal">@myusername</p>
+                        </div>
                     </div>
-                    <input type="file" id="avatar-input" hidden accept="image/*,video/*">
-                    <div class="tg-profile-names">
-                        <h2 id="my-name-display">My Name</h2>
-                        <p id="my-username-display">@myusername</p>
+
+                    <div class="tg-section">
+                        <div class="tg-section-title">Аккаунт</div>
+                        <div class="tg-section-item clickable" onclick="enterEditProfileMode()">
+                            <div class="tg-item-label">Имя</div>
+                            <div class="tg-item-value" id="settings-display-name">Установить...</div>
+                        </div>
+                        <div class="tg-section-item clickable" onclick="enterEditProfileMode()">
+                            <div class="tg-item-label">О себе</div>
+                            <div class="tg-item-value" id="my-profile-bio">Добавить...</div>
+                        </div>
+                        <div class="tg-section-item" id="my-profile-bdate-container">
+                            <div class="tg-item-label">Дата рождения</div>
+                            <div class="tg-item-value" id="my-profile-bdate">Не указана</div>
+                        </div>
+                    </div>
+
+                    <div class="tg-section">
+                        <div class="tg-section-title">Настройки чата</div>
+                        <div class="tg-section-item">
+                            <div class="tg-item-label">Тема оформления</div>
+                            <select id="theme-select" class="tg-select" onchange="changeTheme(this.value)" style="width:100%; background:transparent; border:none; color:var(--text-main); font-size:15px; cursor:pointer;">
+                                <option value="default">Светлая</option>
+                                <option value="dark">Темная</option>
+                                <option value="ocean">Океан</option>
+                                <option value="oled">OLED (Black)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="tg-section" id="admin-tools-section" style="display:none;">
+                         <div class="tg-section-title">Администрирование</div>
+                         <button class="tg-menu-btn" onclick="openAdminPanel()">Панель управления</button>
+                    </div>
+
+                    <div class="tg-section">
+                        <button class="tg-menu-btn danger" onclick="logout()">Выйти из аккаунта</button>
                     </div>
                 </div>
 
-                <div class="tg-section">
-                    <div class="tg-section-title">Аккаунт</div>
-                    <div class="tg-section-item clickable" onclick="editDisplayName()">
-                        <div class="tg-item-label">Имя</div>
-                        <div class="tg-item-value" id="settings-display-name">Установить...</div>
+                <!-- EDIT MODE SECTION (Initially Hidden) -->
+                <div id="my-profile-edit" class="hidden" style="padding: 20px;">
+                    <div class="tg-section-title">Редактировать профиль</div>
+                    <div class="avatar-wrapper" style="margin: 0 auto 20px;" onclick="document.getElementById('avatar-input').click()">
+                         <div id="edit-profile-avatar-display" class="avatar">
+                              <img id="edit-profile-avatar-img" src="" class="avatar-img-actual" style="display:none;">
+                              <span id="edit-profile-avatar-text" class="avatar-text-actual"></span>
+                         </div>
                     </div>
-                    <div class="tg-section-item clickable" onclick="editBio()">
-                        <div class="tg-item-label">О себе</div>
-                        <div class="tg-item-value" id="settings-bio">Добавить...</div>
-                    </div>
-                </div>
-
-                <div class="tg-section">
-                    <div class="tg-section-title">Настройки чата</div>
+                    
                     <div class="tg-section-item">
-                        <div class="tg-item-label">Тема оформления</div>
-                        <select id="theme-select" class="tg-select" onchange="changeTheme(this.value)">
-                            <option value="default">Светлая</option>
-                            <option value="dark">Темная</option>
-                            <option value="ocean">Океан</option>
-                            <option value="oled">OLED (Black)</option>
-                        </select>
+                        <div class="tg-item-label">Отображаемое имя</div>
+                        <input type="text" id="edit-profile-name" class="tg-input" style="width:100%; background:transparent; border:none; color:white; font-size:16px;">
                     </div>
-                </div>
-
-                <div class="tg-section">
-                    <button class="tg-menu-btn danger" onclick="logout()">Выйти из аккаунта</button>
-                    <button class="tg-menu-btn danger" onclick="deleteAccount()" style="margin-top:8px; opacity:0.7;">Удалить аккаунт</button>
+                    <div class="tg-section-item">
+                        <div class="tg-item-label">О себе</div>
+                        <textarea id="edit-profile-bio" class="tg-input" style="width:100%; background:transparent; border:none; color:white; font-size:14px; min-height:80px;"></textarea>
+                    </div>
+                    <div class="tg-section-item">
+                        <div class="tg-item-label">Дата рождения</div>
+                        <input type="date" id="edit-profile-bdate" class="tg-input" style="width:100%; background:transparent; border:none; color:white;">
+                    </div>
+                    <!-- Legacy compatibility -->
+                    <input type="hidden" id="edit-profile-card-bg">
+                    
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button class="tg-menu-btn" onclick="saveProfile()" style="flex:1;">Сохранить</button>
+                        <button class="tg-menu-btn transparent" onclick="exitEditProfileMode()" style="flex:1;">Отмена</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -202,6 +202,18 @@
              document.getElementById('profile-modal').classList.add('active');
          }
 
+         function toggleMute() {
+             // Placeholder for mute logic - can be expanded with socket events
+             const btn = event.currentTarget;
+             const isMuted = btn.classList.toggle('muted');
+             btn.style.color = isMuted ? '#ef4444' : 'inherit';
+             alert(isMuted ? 'Уведомления выключены' : 'Уведомления включены');
+         }
+
+         function toggleNotifications() {
+             toggleMute();
+         }
+
         function openFullAvatar() {
             if (currentChatUser && currentChatUser.avatar) {
                 document.getElementById('full-avatar-img').src = getFullUrl(currentChatUser.avatar);
