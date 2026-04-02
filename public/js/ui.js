@@ -495,7 +495,6 @@ function postStory(input) {
                 const card = document.getElementById('profile-hover-card');
                 if (!card.matches(':hover')) {
                     card.classList.remove('active');
-                    document.getElementById('ph-settings-menu').classList.remove('active');
                     stopCurrentEffect();
                 }
             }, 300);
@@ -520,15 +519,31 @@ function postStory(input) {
 
         window.toggleHoverCardSettings = function(e) {
             e.stopPropagation();
-            const menu = document.getElementById('ph-settings-menu');
-            if (menu) menu.classList.toggle('active');
+            const backdrop = document.getElementById('ph-effects-backdrop');
+            if (!backdrop) return;
+            const isActive = backdrop.classList.contains('active');
+            if (isActive) {
+                backdrop.classList.remove('active');
+            } else {
+                // Mark current effect as selected
+                if (currentUser) {
+                    document.querySelectorAll('.ph-effect-item').forEach(item => {
+                        item.classList.toggle('selected', item.dataset.effect === (currentUser.profile_effect || 'none'));
+                    });
+                }
+                backdrop.classList.add('active');
+            }
         };
 
         window.setProfileEffect = async function(effect) {
             if (!currentUser) return;
             currentUser.profile_effect = effect;
-            const menu = document.getElementById('ph-settings-menu');
-            if (menu) menu.classList.remove('active');
+            const backdrop = document.getElementById('ph-effects-backdrop');
+            if (backdrop) backdrop.classList.remove('active');
+            // Update selected UI
+            document.querySelectorAll('.ph-effect-item').forEach(item => {
+                item.classList.toggle('selected', item.dataset.effect === effect);
+            });
             startEffect(effect);
             
             try {
@@ -539,7 +554,7 @@ function postStory(input) {
                     body: JSON.stringify({ effect })
                 });
             } catch (err) { console.error('Ошибка сохранения эффекта:', err); }
-        }
+        };
 
         // saveProfile() определена в groups.js — не дублировать здесь
 

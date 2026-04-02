@@ -560,11 +560,6 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
         <button class="ph-settings-btn" id="ph-settings-btn" onclick="toggleHoverCardSettings(event)">
             <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
         </button>
-        <div id="ph-settings-menu" class="ph-settings-menu">
-            <div class="ph-menu-item" onclick="setProfileEffect('none')">Без эффектов</div>
-            <div class="ph-menu-item" onclick="setProfileEffect('snow')">Эффект: Снег</div>
-            <div class="ph-menu-item" onclick="setProfileEffect('stars')">Эффект: Звезды</div>
-        </div>
         <div class="ph-info">
             <div class="ph-avatar-area">
                 <div id="ph-avatar" class="avatar"></div>
@@ -573,6 +568,44 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
                 <h2 id="ph-name">Name</h2>
                 <p id="ph-username">@username</p>
                 <p id="ph-bio" class="ph-bio">О себе...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE EFFECTS MODAL -->
+    <div id="ph-effects-backdrop" class="ph-effects-backdrop" onclick="toggleHoverCardSettings(event)">
+        <div class="ph-effects-modal" onclick="event.stopPropagation()">
+            <div class="ph-effects-header">
+                <div class="ph-effects-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <div>
+                    <h3>Эффект профиля</h3>
+                    <p>Выберите эффект для вашей карточки</p>
+                </div>
+                <button class="ph-effects-close" onclick="toggleHoverCardSettings(event)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="ph-effects-grid">
+                <div class="ph-effect-item" onclick="setProfileEffect('none')" data-effect="none">
+                    <div class="ph-effect-preview ph-effect-none">
+                        <span class="ph-effect-emoji">🚫</span>
+                    </div>
+                    <span>Без эффекта</span>
+                </div>
+                <div class="ph-effect-item" onclick="setProfileEffect('snow')" data-effect="snow">
+                    <div class="ph-effect-preview ph-effect-snow">
+                        <span class="ph-effect-emoji">❄️</span>
+                    </div>
+                    <span>Снег</span>
+                </div>
+                <div class="ph-effect-item" onclick="setProfileEffect('stars')" data-effect="stars">
+                    <div class="ph-effect-preview ph-effect-stars">
+                        <span class="ph-effect-emoji">✨</span>
+                    </div>
+                    <span>Звёзды</span>
+                </div>
             </div>
         </div>
     </div>

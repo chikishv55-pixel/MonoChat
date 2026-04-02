@@ -1008,39 +1008,195 @@ body.light-theme .profile-hover-card {
 .ph-settings-btn:hover { background: rgba(0,0,0,0.4); transform: rotate(90deg); }
 .ph-settings-btn svg { width: 20px; height: 20px; }
 
-.ph-settings-menu {
-    position: absolute;
-    top: 55px;
-    right: 15px;
-    left: auto;
+/* EFFECTS MODAL BACKDROP */
+.ph-effects-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.ph-effects-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* EFFECTS MODAL */
+.ph-effects-modal {
     background: var(--bg-card);
-    border-radius: 18px;
-    padding: 8px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-    display: none;
-    flex-direction: column;
-    z-index: 200;
-    border: 1px solid var(--border-light);
-    min-width: 160px;
-    animation: pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 28px;
+    padding: 28px;
+    width: 340px;
+    max-width: calc(100vw - 40px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.08);
+    transform: translateY(30px) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-@keyframes pop-in {
-    from { opacity: 0; transform: scale(0.8) translateY(-10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+.ph-effects-backdrop.active .ph-effects-modal {
+    transform: translateY(0) scale(1);
 }
 
-.ph-settings-menu.active { display: flex; }
-.ph-menu-item {
-    padding: 12px 16px;
-    font-size: 14px;
-    font-weight: 500;
+/* HEADER */
+.ph-effects-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.ph-effects-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(var(--accent-rgb, 99, 102, 241), 0.4);
+}
+
+.ph-effects-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.ph-effects-header > div:nth-child(2) {
+    flex: 1;
+}
+
+.ph-effects-header h3 {
+    font-size: 18px;
+    font-weight: 800;
     color: var(--text-main);
-    cursor: pointer;
-    border-radius: 12px;
-    transition: all 0.2s;
+    margin: 0 0 2px 0;
+    letter-spacing: -0.3px;
 }
-.ph-menu-item:hover { background: var(--accent); color: #fff; }
+
+.ph-effects-header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+    font-weight: 500;
+}
+
+.ph-effects-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    margin-left: auto;
+}
+
+.ph-effects-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-main);
+    transform: rotate(90deg);
+}
+
+.ph-effects-close svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* EFFECTS GRID */
+.ph-effects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.ph-effect-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ph-effect-item:hover {
+    transform: translateY(-3px);
+}
+
+.ph-effect-item span {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+    transition: color 0.2s;
+}
+
+.ph-effect-item:hover span {
+    color: var(--text-main);
+}
+
+.ph-effect-item.selected span {
+    color: var(--accent);
+}
+
+.ph-effect-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.08);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ph-effect-item:hover .ph-effect-preview {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.ph-effect-item.selected .ph-effect-preview {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.ph-effect-emoji {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.ph-effect-none {
+    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+}
+
+.ph-effect-snow {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+}
+
+.ph-effect-stars {
+    background: linear-gradient(135deg, #1a0533 0%, #4c1d95 100%);
+}
+
+/* Старые стили (сохраняю ph-settings-menu как id хук, теперь не используется) */
+#ph-settings-menu { display: none !important; }
+
 
 .ph-info {
     padding: 24px;
