@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, interactive-widget=resizes-content">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, interactive-widget=resizes-content">
     <title>Монохром</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div id="splash-screen">
         <div class="splash-logo">⚲ MONOCHROME</div>
@@ -17,8 +20,10 @@
         <div class="auth-container">
             <div class="card" id="login-card">
                 <h1>⚲ МОНОХРОМ</h1>
-                <div class="input-group"><input type="text" class="input-field" id="username-input" placeholder="юзернейм (например: ivan)"></div>
-                <div class="input-group"><input type="password" class="input-field" id="password-input" placeholder="пароль"></div>
+                <div class="input-group"><input type="text" class="input-field" id="username-input"
+                        placeholder="юзернейм (например: ivan)"></div>
+                <div class="input-group"><input type="password" class="input-field" id="password-input"
+                        placeholder="пароль"></div>
                 <button class="action-btn" onclick="login()">войти</button>
                 <div class="card-footer">
                     <button class="footer-btn" onclick="showRegister()">⏤ регистрация ⏤</button>
@@ -28,11 +33,16 @@
 
             <div class="card hidden" id="register-card">
                 <h1>⚲ РЕГИСТРАЦИЯ</h1>
-                <div class="input-group"><input type="text" class="input-field" id="reg-name" placeholder="Ваше Имя (видят все)"></div>
-                <div class="input-group"><input type="text" class="input-field" id="reg-username" placeholder="Уникальный юзернейм (без @)"></div>
-                <div class="input-group"><input type="email" class="input-field" id="reg-email" placeholder="Электронная почта (Gmail)"></div>
-                <div class="input-group"><input type="password" class="input-field" id="reg-password" placeholder="пароль"></div>
-                <div class="input-group"><input type="password" class="input-field" id="reg-password-confirm" placeholder="повторите пароль"></div>
+                <div class="input-group"><input type="text" class="input-field" id="reg-name"
+                        placeholder="Ваше Имя (видят все)"></div>
+                <div class="input-group"><input type="text" class="input-field" id="reg-username"
+                        placeholder="Уникальный юзернейм (без @)"></div>
+                <div class="input-group"><input type="email" class="input-field" id="reg-email"
+                        placeholder="Электронная почта (Gmail)"></div>
+                <div class="input-group"><input type="password" class="input-field" id="reg-password"
+                        placeholder="пароль"></div>
+                <div class="input-group"><input type="password" class="input-field" id="reg-password-confirm"
+                        placeholder="повторите пароль"></div>
                 <button class="action-btn" onclick="register()">регистрация</button>
                 <div class="card-footer">
                     <button class="footer-btn" onclick="showLogin()">⏤ вход ⏤</button>
@@ -42,13 +52,16 @@
 
             <div class="card hidden" id="verify-card">
                 <h1>⚲ ПОДТВЕРЖДЕНИЕ</h1>
-                <p style="font-size: 14px; margin-bottom: 20px; color: var(--text-muted);">Введите 6-значный код, отправленный на вашу почту.</p>
+                <p style="font-size: 14px; margin-bottom: 20px; color: var(--text-muted);">Введите 6-значный код,
+                    отправленный на вашу почту.</p>
                 <div class="input-group">
-                    <input type="text" class="input-field" id="verify-code-input" placeholder="000000" maxlength="6" style="text-align: center; letter-spacing: 12px; font-size: 24px; font-weight: bold;">
+                    <input type="text" class="input-field" id="verify-code-input" placeholder="000000" maxlength="6"
+                        style="text-align: center; letter-spacing: 12px; font-size: 24px; font-weight: bold;">
                 </div>
                 <button class="action-btn" onclick="verifyCode()">подтвердить</button>
                 <div class="card-footer" style="flex-direction: column; gap: 10px;">
-                    <button class="footer-btn" id="resend-code-btn" onclick="resendCode()">отправить код повторно</button>
+                    <button class="footer-btn" id="resend-code-btn" onclick="resendCode()">отправить код
+                        повторно</button>
                     <button class="footer-btn" onclick="showRegister()">⏤ назад к регистрации ⏤</button>
                 </div>
             </div>
@@ -60,10 +73,16 @@
             <div class="chats-column">
                 <div class="search-container">
                     <div class="search-box">
-                        <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="search-input" class="search-input" placeholder="Поиск" onkeydown="handleSearch(event)">
+                        <svg class="search-icon" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="search-input" class="search-input" placeholder="Поиск"
+                            onkeydown="handleSearch(event)">
                         <button class="fab-mini" onclick="openNewChatChoiceModal()" title="Создать чат">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -71,7 +90,7 @@
                 <div id="music-widget-container" class="hidden"></div>
                 <div class="stories-bar" id="stories-bar"></div>
                 <div class="chats-list" id="chats-list"></div>
-                
+
 
                 <!-- Profile Footer at the bottom -->
                 <div class="profile-footer" id="my-profile-footer">
@@ -85,7 +104,12 @@
                         <span class="profile-status">в сети</span>
                     </div>
                     <button class="profile-settings-btn" onclick="openMySettings()">
-                        <svg class="settings-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg class="settings-icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                            </path>
+                        </svg>
                     </button>
 
 
@@ -95,7 +119,7 @@
             <div class="messages-column">
                 <div class="messages-header">
                     <button class="mobile-back-btn" onclick="closeChatMobile()">‹</button>
-                    
+
                     <div class="chat-partner" onclick="openCurrentChatInfo()">
                         <div class="avatar-wrapper">
                             <div class="partner-avatar" id="current-chat-avatar-text">--</div>
@@ -108,15 +132,31 @@
                         </div>
                     </div>
                     <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
-                        <button id="add-contact-btn" class="upload-btn" style="display:none; margin-right: 10px;" onclick="addCurrentToContacts()">В контакты</button> 
-                        <button class="header-icon-btn" title="Поиск"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
-                        <button id="call-choice-btn" class="header-icon-btn" style="display:none;" title="Позвонить" onclick="showCallChoice()"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></button>
-                        <button class="header-icon-btn" title="Больше" onclick="openCurrentChatInfo()"><svg viewBox="0 0 24 24" stroke="none" fill="currentColor"><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg></button>
+                        <button id="add-contact-btn" class="upload-btn" style="display:none; margin-right: 10px;"
+                            onclick="addCurrentToContacts()">В контакты</button>
+                        <button class="header-icon-btn" title="Поиск"><svg viewBox="0 0 24 24" stroke="currentColor"
+                                stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg></button>
+                        <button id="call-choice-btn" class="header-icon-btn" style="display:none;" title="Позвонить"
+                            onclick="showCallChoice()"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                </path>
+                            </svg></button>
+                        <button class="header-icon-btn" title="Больше" onclick="openCurrentChatInfo()"><svg
+                                viewBox="0 0 24 24" stroke="none" fill="currentColor">
+                                <circle cx="12" cy="12" r="2"></circle>
+                                <circle cx="12" cy="5" r="2"></circle>
+                                <circle cx="12" cy="19" r="2"></circle>
+                            </svg></button>
                     </div>
                 </div>
-                
+
                 <div class="messages-area" id="messages-area"></div>
-                
+
                 <div id="reply-preview-area"></div>
 
                 <div class="emoji-picker-panel" id="emoji-picker">
@@ -129,24 +169,48 @@
                 </div>
 
                 <div class="input-area" id="message-input-area" style="display: none;">
-                    <input type="file" id="image-upload" accept="image/*" style="display:none" onchange="sendImage(this)" multiple>
+                    <input type="file" id="image-upload" accept="image/*" style="display:none"
+                        onchange="sendImage(this)" multiple>
                     <button class="media-btn" onclick="document.getElementById('image-upload').click()">
-                        <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+                        </svg>
                     </button>
-                    
-                    <button class="media-btn" id="emoji-picker-btn" onclick="toggleEmojiPicker()" title="Эмодзи и стикеры">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+
+                    <button class="media-btn" id="emoji-picker-btn" onclick="toggleEmojiPicker()"
+                        title="Эмодзи и стикеры">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                        </svg>
                     </button>
-                    
+
                     <input type="text" class="message-field" id="message-text" placeholder="сообщение...">
-                    
-                    <button class="media-btn" id="record-btn" ontouchstart="handleRecordStart(event)" ontouchend="handleRecordStop(event)" ontouchcancel="handleRecordLeave(event)" onmousedown="handleRecordStart(event)" onmouseup="handleRecordStop(event)" onmouseleave="handleRecordLeave(event)" oncontextmenu="return false;">
-                        <svg id="record-icon-voice" viewBox="0 0 24 24"><path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
-                        <svg id="record-icon-video" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+
+                    <button class="media-btn" id="record-btn" ontouchstart="handleRecordStart(event)"
+                        ontouchend="handleRecordStop(event)" ontouchcancel="handleRecordLeave(event)"
+                        onmousedown="handleRecordStart(event)" onmouseup="handleRecordStop(event)"
+                        onmouseleave="handleRecordLeave(event)" oncontextmenu="return false;">
+                        <svg id="record-icon-voice" viewBox="0 0 24 24">
+                            <path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3z" />
+                            <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" />
+                        </svg>
+                        <svg id="record-icon-video" style="display:none;" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 7l-7 5 7 5V7z"></path>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
                     </button>
 
                     <div class="send-btn" id="send-btn" onclick="sendTextMessage()">
-                        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <svg viewBox="0 0 24 24">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -161,17 +225,18 @@
             <h3 class="tg-header-title">Информация</h3>
             <div style="width: 24px;"></div>
         </div>
-        
+
         <div class="tg-panel-content">
             <div class="tg-profile-cover">
                 <div class="tg-avatar-wrapper" onclick="openFullAvatar()">
-                    <img class="tg-profile-avatar" id="pm-avatar-img" src="" style="display:none;" title="Нажмите, чтобы открыть фото">
+                    <img class="tg-profile-avatar" id="pm-avatar-img" src="" style="display:none;"
+                        title="Нажмите, чтобы открыть фото">
                     <div class="tg-profile-avatar" id="pm-avatar-text">--</div>
                 </div>
                 <div class="tg-profile-name" id="pm-name">Имя</div>
                 <div class="tg-profile-status">Был(а) недавно</div>
             </div>
-            
+
             <div class="tg-section">
                 <div class="tg-menu-item">
                     <div class="tg-menu-labeled">
@@ -193,7 +258,8 @@
                 </div>
                 <div class="tg-menu-item" id="pm-music-widget" style="display: none;">
                     <div class="tg-menu-labeled">
-                        <span class="tg-menu-label" id="pm-music-text" style="color:var(--accent); font-weight:500;">Музыка</span>
+                        <span class="tg-menu-label" id="pm-music-text"
+                            style="color:var(--accent); font-weight:500;">Музыка</span>
                         <span class="tg-menu-sublabel">Слушает сейчас</span>
                     </div>
                 </div>
@@ -203,182 +269,207 @@
 
     <div class="tg-settings-panel" id="my-profile-modal" onclick="closeAllModals()">
         <div class="tg-settings-inner" onclick="event.stopPropagation()">
-        <div class="tg-panel-header">
-            <button class="tg-back-btn" onclick="closeAllModals()">‹</button>
-            <h3 class="tg-header-title">Настройки</h3>
-            <div style="width: 36px;"></div> <!-- Spacer -->
-        </div>
-        
-        <div class="tg-panel-content">
-            <!-- Режим просмотра -->
-            <div id="my-profile-view" class="my-profile-view">
-                <div class="tg-profile-cover">
-                    <div class="tg-avatar-wrapper" onclick="openFullAvatar()">
-                        <img class="tg-profile-avatar" id="my-profile-avatar-img" src="" style="display:none;">
-                        <div class="tg-profile-avatar" id="my-profile-avatar-text">--</div>
-                    </div>
-                    <div class="tg-profile-name" id="my-profile-name-modal">Имя</div>
-                    <div class="tg-profile-status">В сети</div>
-                </div>
-                
-                <div class="tg-section">
-                    <div class="tg-menu-item">
-                        <div class="tg-menu-labeled">
-                            <span class="tg-menu-label" id="my-profile-username-modal">@username</span>
-                            <span class="tg-menu-sublabel">Имя пользователя</span>
-                        </div>
-                    </div>
-                    <div class="tg-menu-item">
-                        <div class="tg-menu-labeled">
-                            <span class="tg-menu-label" id="my-profile-bio">Здесь будет описание...</span>
-                            <span class="tg-menu-sublabel">О себе</span>
-                        </div>
-                    </div>
-                    <div class="tg-menu-item">
-                        <div class="tg-menu-labeled">
-                            <span class="tg-menu-label" id="my-profile-bdate">Дата рождения</span>
-                            <span class="tg-menu-sublabel">Дата рождения</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tg-section" id="premium-section">
-                    <div class="tg-menu-item" onclick="togglePremium()">
-                        <div class="tg-menu-icon-wrapper premium-icon">
-                            <span style="font-size: 18px;">★</span>
-                        </div>
-                        <div class="tg-menu-labeled" style="flex: 1;">
-                            <span class="tg-menu-label" id="premium-status-label">Monochrome Premium</span>
-                            <span class="tg-menu-sublabel" id="premium-status-sublabel">Разблокировать видео-аватарки</span>
-                        </div>
-                        <button class="tg-btn-link" id="premium-action-btn">Подключить</button>
-                    </div>
-                </div>
-
-                <div class="tg-section" id="admin-tools-section" style="display:none;">
-                    <div class="tg-menu-item" onclick="openAdminPanel()">
-                        <div class="tg-menu-icon-wrapper" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 4px 12px rgba(59,130,246,0.35);">
-                            <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-                        </div>
-                        <span class="tg-menu-text" style="color: var(--accent); font-weight: 600;">Модерация</span>
-                        <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                    </div>
-                </div>
-
-                <div class="tg-section">
-                    <div class="tg-menu-item" onclick="enterEditProfileMode()">
-                        <div class="tg-menu-icon-wrapper" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); box-shadow: 0 4px 12px rgba(99,102,241,0.35);">
-                            <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                        </div>
-                        <span class="tg-menu-text">Изменить профиль</span>
-                        <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                    </div>
-                    <div class="tg-menu-item" onclick="toggleTheme()">
-                        <div class="tg-menu-icon-wrapper" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 4px 12px rgba(139,92,246,0.35);">
-                            <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                        </div>
-                        <span class="tg-menu-text">Оформление</span>
-                        <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-                    </div>
-                    <div class="tg-menu-item text-danger" onclick="logout()">
-                        <div class="tg-menu-icon-wrapper" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); box-shadow: 0 4px 12px rgba(239,68,68,0.35);">
-                            <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                        </div>
-                        <span class="tg-menu-text text-danger">Выйти</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Режим редактирования -->
-            <div id="my-profile-edit" class="hidden">
-                <div class="tg-profile-cover">
-                    <div class="tg-avatar-wrapper edit-mode" onclick="document.getElementById('avatar-upload').click()">
-                        <img class="tg-profile-avatar" id="edit-profile-avatar-img" src="" style="display:none;">
-                        <div class="tg-profile-avatar" id="edit-profile-avatar-text">--</div>
-                        <div class="tg-avatar-camera-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
-                    </div>
-                </div>
-                
-                <div class="tg-section">
-                    <div class="tg-input-group">
-                        <label class="tg-input-label">Имя</label>
-                        <input type="text" class="tg-input-field" id="edit-profile-name" placeholder="Ваше имя">
-                    </div>
-                    <div class="tg-input-group">
-                        <label class="tg-input-label">О себе</label>
-                        <textarea class="tg-input-field" id="edit-profile-bio" placeholder="Расскажите о себе..." rows="2"></textarea>
-                    </div>
-                    <div class="tg-input-group">
-                        <label class="tg-input-label">Фон виджета (URL)</label>
-                        <input type="text" class="tg-input-field" id="edit-profile-card-bg" placeholder="URL картинки для карточки профиля">
-                    </div>
-                    <div class="tg-input-group">
-                        <label class="tg-input-label">Дата рождения</label>
-                        <input type="date" class="tg-input-field" id="edit-profile-bdate">
-                    </div>
-                </div>
-                <div style="padding: 16px 12px; display: flex; flex-direction: column; gap: 10px;">
-                    <button class="tg-btn primary" onclick="saveProfile()">Сохранить</button>
-                    <button class="tg-btn secondary" onclick="exitEditProfileMode()">Отмена</button>
-                </div>
-            </div>
-        </div>
-        </div> <!-- /tg-settings-inner -->
-    </div> <!-- /tg-settings-panel -->
-
-    <!-- ADMINISTRATION PANEL (MODERATION) -->
-    <div class="tg-settings-panel" id="admin-panel-modal" onclick="closeAllModals()">
-        <div class="tg-settings-inner" onclick="event.stopPropagation()">
             <div class="tg-panel-header">
                 <button class="tg-back-btn" onclick="closeAllModals()">‹</button>
-                <h3 class="tg-header-title">Админ-панель</h3>
+                <h3 class="tg-header-title">Настройки</h3>
                 <div style="width: 36px;"></div> <!-- Spacer -->
-            </div>
-            
-            <div class="admin-tabs-container">
-                <div class="admin-tab active" onclick="switchAdminTab('reports')">Жалобы</div>
-                <div class="admin-tab" onclick="switchAdminTab('users')">Пользователи</div>
             </div>
 
             <div class="tg-panel-content">
-                <div id="admin-section-reports" class="admin-content-section">
-                    <!-- Reports will be loaded here -->
+                <!-- Режим просмотра -->
+                <div id="my-profile-view" class="my-profile-view">
+                    <div class="tg-profile-cover">
+                        <div class="tg-avatar-wrapper" onclick="openFullAvatar()">
+                            <img class="tg-profile-avatar" id="my-profile-avatar-img" src="" style="display:none;">
+                            <div class="tg-profile-avatar" id="my-profile-avatar-text">--</div>
+                        </div>
+                        <div class="tg-profile-name" id="my-profile-name-modal">Имя</div>
+                        <div class="tg-profile-status">В сети</div>
+                    </div>
+
+                    <div class="tg-section">
+                        <div class="tg-menu-item">
+                            <div class="tg-menu-labeled">
+                                <span class="tg-menu-label" id="my-profile-username-modal">@username</span>
+                                <span class="tg-menu-sublabel">Имя пользователя</span>
+                            </div>
+                        </div>
+                        <div class="tg-menu-item">
+                            <div class="tg-menu-labeled">
+                                <span class="tg-menu-label" id="my-profile-bio">Здесь будет описание...</span>
+                                <span class="tg-menu-sublabel">О себе</span>
+                            </div>
+                        </div>
+                        <div class="tg-menu-item">
+                            <div class="tg-menu-labeled">
+                                <span class="tg-menu-label" id="my-profile-bdate">Дата рождения</span>
+                                <span class="tg-menu-sublabel">Дата рождения</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tg-section" id="premium-section">
+                        <div class="tg-menu-item" onclick="togglePremium()">
+                            <div class="tg-menu-icon-wrapper premium-icon">
+                                <span style="font-size: 18px;">★</span>
+                            </div>
+                            <div class="tg-menu-labeled" style="flex: 1;">
+                                <span class="tg-menu-label" id="premium-status-label">Monochrome Premium</span>
+                                <span class="tg-menu-sublabel" id="premium-status-sublabel">Разблокировать
+                                    видео-аватарки</span>
+                            </div>
+                            <button class="tg-btn-link" id="premium-action-btn">Подключить</button>
+                        </div>
+                    </div>
+
+                    <div class="tg-section" id="admin-tools-section" style="display:none;">
+                        <div class="tg-menu-item" onclick="openAdminPanel()">
+                            <div class="tg-menu-icon-wrapper"
+                                style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 4px 12px rgba(59,130,246,0.35);">
+                                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff"
+                                    stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    <path d="M12 8v4" />
+                                    <path d="M12 16h.01" />
+                                </svg>
+                            </div>
+                            <span class="tg-menu-text" style="color: var(--accent); font-weight: 600;">Модерация</span>
+                            <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="tg-section">
+                        <div class="tg-menu-item" onclick="enterEditProfileMode()">
+                            <div class="tg-menu-icon-wrapper"
+                                style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); box-shadow: 0 4px 12px rgba(99,102,241,0.35);">
+                                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff"
+                                    stroke-width="2">
+                                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                </svg>
+                            </div>
+                            <span class="tg-menu-text">Изменить профиль</span>
+                            <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
+                        </div>
+                        <div class="tg-menu-item" onclick="toggleTheme()">
+                            <div class="tg-menu-icon-wrapper"
+                                style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 4px 12px rgba(139,92,246,0.35);">
+                                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff"
+                                    stroke-width="2">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                                </svg>
+                            </div>
+                            <span class="tg-menu-text">Оформление</span>
+                            <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
+                        </div>
+                        <div class="tg-menu-item text-danger" onclick="logout()">
+                            <div class="tg-menu-icon-wrapper"
+                                style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); box-shadow: 0 4px 12px rgba(239,68,68,0.35);">
+                                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff"
+                                    stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                                </svg>
+                            </div>
+                            <span class="tg-menu-text text-danger">Выйти</span>
+                        </div>
+                    </div>
                 </div>
-                <div id="admin-section-users" class="admin-content-section" style="display:none;">
-                    <!-- Users list will be loaded here -->
+
+                <!-- Режим редактирования -->
+                <div id="my-profile-edit" class="hidden">
+                    <div class="tg-profile-cover">
+                        <div class="tg-avatar-wrapper edit-mode"
+                            onclick="document.getElementById('avatar-upload').click()">
+                            <img class="tg-profile-avatar" id="edit-profile-avatar-img" src="" style="display:none;">
+                            <div class="tg-profile-avatar" id="edit-profile-avatar-text">--</div>
+                            <div class="tg-avatar-camera-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"
+                                    stroke-width="2">
+                                    <path
+                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                    </path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg></div>
+                        </div>
+                    </div>
+
+                    <div class="tg-section">
+                        <div class="tg-input-group">
+                            <label class="tg-input-label">Имя</label>
+                            <input type="text" class="tg-input-field" id="edit-profile-name" placeholder="Ваше имя">
+                        </div>
+                        <div class="tg-input-group">
+                            <label class="tg-input-label">О себе</label>
+                            <textarea class="tg-input-field" id="edit-profile-bio" placeholder="Расскажите о себе..."
+                                rows="2"></textarea>
+                        </div>
+                        <div class="tg-input-group">
+                            <label class="tg-input-label">Фон виджета (URL)</label>
+                            <input type="text" class="tg-input-field" id="edit-profile-card-bg"
+                                placeholder="URL картинки для карточки профиля">
+                        </div>
+                        <div class="tg-input-group">
+                            <label class="tg-input-label">Дата рождения</label>
+                            <input type="date" class="tg-input-field" id="edit-profile-bdate">
+                        </div>
+                    </div>
+                    <div style="padding: 16px 12px; display: flex; flex-direction: column; gap: 10px;">
+                        <button class="tg-btn primary" onclick="saveProfile()">Сохранить</button>
+                        <button class="tg-btn secondary" onclick="exitEditProfileMode()">Отмена</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </div> <!-- /tg-settings-inner -->
+    </div> <!-- /tg-settings-panel -->
+
 
     <div id="avatar-viewer" class="story-overlay" onclick="closeFullAvatar()">
         <div class="story-content" onclick="event.stopPropagation()">
-            <img id="full-avatar-img" src="" style="width: 350px; height: 350px; border-radius: 50%; object-fit: cover; border: 2px solid var(--text-main);">
+            <img id="full-avatar-img" src=""
+                style="width: 350px; height: 350px; border-radius: 50%; object-fit: cover; border: 2px solid var(--text-main);">
         </div>
     </div>
 
     <div class="custom-modal" id="crop-modal" style="z-index: 2005; width: 95vw; max-width: 800px; height: 90vh;">
         <h3 style="margin-bottom: 0; font-weight: 400; flex-shrink: 0;">Обрезка (выберите круг)</h3>
-        <div id="crop-container" style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
+        <div id="crop-container"
+            style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
             <img id="crop-image" src="" style="display: block; max-width: 100%; max-height: 100%;">
-            <video id="crop-video" src="" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;" autoplay loop muted playsinline></video>
+            <video id="crop-video" src="" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;"
+                autoplay loop muted playsinline></video>
         </div>
-        <button class="settings-action-btn" onclick="saveCroppedAvatar()" style="width: 100%; border: none; padding: 12px; background: var(--text-main); color: var(--bg-main); cursor: pointer; text-transform: uppercase; flex-shrink: 0;">Сохранить аватар</button>
-        <button class="modal-btn" onclick="closeCropModal()" style="border-color: transparent; margin-top: 0; flex-shrink: 0;">Отмена</button>
+        <button class="settings-action-btn" onclick="saveCroppedAvatar()"
+            style="width: 100%; border: none; padding: 12px; background: var(--text-main); color: var(--bg-main); cursor: pointer; text-transform: uppercase; flex-shrink: 0;">Сохранить
+            аватар</button>
+        <button class="modal-btn" onclick="closeCropModal()"
+            style="border-color: transparent; margin-top: 0; flex-shrink: 0;">Отмена</button>
     </div>
 
-    <div class="custom-modal" id="message-crop-modal" style="z-index: 2005; width: 95vw; max-width: 800px; height: 90vh;">
+    <div class="custom-modal" id="message-crop-modal"
+        style="z-index: 2005; width: 95vw; max-width: 800px; height: 90vh;">
         <h3 style="margin-bottom: 0; font-weight: 400; flex-shrink: 0;">Предпросмотр фото</h3>
-        <div style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
+        <div
+            style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
             <img id="message-crop-image" src="" style="display: block; max-width: 100%; max-height: 100%;">
         </div>
-        <button class="settings-action-btn" onclick="sendCroppedMessageImage()" style="width: 100%; border: none; padding: 12px; background: var(--text-main); color: var(--bg-main); cursor: pointer; text-transform: uppercase; flex-shrink: 0;">Отправить фото</button>
-        <button class="modal-btn" onclick="closeMessageCropModal()" style="border-color: transparent; margin-top: 0; flex-shrink: 0;">Отмена</button>
+        <button class="settings-action-btn" onclick="sendCroppedMessageImage()"
+            style="width: 100%; border: none; padding: 12px; background: var(--text-main); color: var(--bg-main); cursor: pointer; text-transform: uppercase; flex-shrink: 0;">Отправить
+            фото</button>
+        <button class="modal-btn" onclick="closeMessageCropModal()"
+            style="border-color: transparent; margin-top: 0; flex-shrink: 0;">Отмена</button>
     </div>
 
     <div class="custom-modal" id="delete-modal">
         <h3 style="font-weight: 400; margin-bottom: 10px;">Удалить сообщение?</h3>
-        <button class="modal-btn danger" id="btn-delete-everyone" onclick="executeDelete('everyone')">Удалить у всех</button>
+        <button class="modal-btn danger" id="btn-delete-everyone" onclick="executeDelete('everyone')">Удалить у
+            всех</button>
         <button class="modal-btn" onclick="executeDelete('me')">Удалить у себя</button>
         <button class="modal-btn" onclick="closeAllModals()" style="border-color:transparent">Отмена</button>
     </div>
@@ -397,17 +488,25 @@
 
     <div class="custom-modal" id="edit-group-modal">
         <h3>Редактировать группу</h3>
-        <div class="input-group"><input type="text" class="input-field" id="edit-group-name" placeholder="Название группы"></div>
-        <div class="input-group"><input type="text" class="input-field" id="edit-group-public-id" placeholder="Публичный ID (необязательно)"></div>
-        <div class="input-group" style="text-align: left; font-size: 14px; color: var(--text-muted);">Видимость: <select id="edit-group-visibility" style="margin-left: 10px;"><option value="public">Публичная</option><option value="private">Частная</option></select></div>
+        <div class="input-group"><input type="text" class="input-field" id="edit-group-name"
+                placeholder="Название группы"></div>
+        <div class="input-group"><input type="text" class="input-field" id="edit-group-public-id"
+                placeholder="Публичный ID (необязательно)"></div>
+        <div class="input-group" style="text-align: left; font-size: 14px; color: var(--text-muted);">Видимость: <select
+                id="edit-group-visibility" style="margin-left: 10px;">
+                <option value="public">Публичная</option>
+                <option value="private">Частная</option>
+            </select></div>
         <button class="modal-btn" onclick="saveGroupSettings()">Сохранить</button>
         <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
     </div>
 
     <div class="custom-modal" id="create-chat-modal">
         <h3>Создать новую группу</h3>
-        <div class="input-group"><input type="text" class="input-field" id="new-group-name" placeholder="Название группы"></div>
-        <div class="input-group"><input type="text" class="input-field" id="new-group-member-search" placeholder="Добавить участников по @юзернейму"></div>
+        <div class="input-group"><input type="text" class="input-field" id="new-group-name"
+                placeholder="Название группы"></div>
+        <div class="input-group"><input type="text" class="input-field" id="new-group-member-search"
+                placeholder="Добавить участников по @юзернейму"></div>
         <div id="new-group-search-results" class="search-results-container"></div>
         <div class="members-list-label">Участники:</div>
         <div id="new-group-members-list" class="members-list"></div>
@@ -419,19 +518,23 @@
         <h3 style="font-weight: 500; margin-bottom: 15px;">Создать чат</h3>
         <button class="modal-btn" onclick="openCreateChatModal('group')">Группа</button>
         <button class="modal-btn" onclick="openCreateChatModal('channel')">Канал</button>
-        <button class="modal-btn transparent" onclick="closeAllModals()" style="border-color:transparent;">Отмена</button>
+        <button class="modal-btn transparent" onclick="closeAllModals()"
+            style="border-color:transparent;">Отмена</button>
     </div>
 
     <div class="custom-modal" id="story-preview-modal">
         <h3 style="font-weight: 500; margin-bottom: 10px;">Опубликовать историю?</h3>
-        <img id="story-preview-image" src="" style="width: 100%; border-radius: 12px; margin-bottom: 16px; max-height: 40vh; object-fit: contain; background: #000;">
+        <img id="story-preview-image" src=""
+            style="width: 100%; border-radius: 12px; margin-bottom: 16px; max-height: 40vh; object-fit: contain; background: #000;">
         <button class="modal-btn" onclick="confirmPostStory()">Опубликовать</button>
-        <button class="modal-btn transparent" onclick="closeAllModals()" style="border-color:transparent;">Отмена</button>
+        <button class="modal-btn transparent" onclick="closeAllModals()"
+            style="border-color:transparent;">Отмена</button>
     </div>
 
     <div class="custom-modal" id="music-modal">
         <h3 style="font-weight: 500; margin-bottom: 10px;">Музыкальный статус</h3>
-        <div class="input-group"><input type="text" class="input-field" id="music-input" placeholder="Исполнитель - Трек" maxlength="80"></div>
+        <div class="input-group"><input type="text" class="input-field" id="music-input"
+                placeholder="Исполнитель - Трек" maxlength="80"></div>
         <button class="modal-btn" onclick="saveMusicStatus()">Сохранить статус</button>
         <button class="modal-btn danger" onclick="clearMusicStatus()">Убрать музыку</button>
         <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
@@ -474,11 +577,19 @@
             </div>
             <div class="call-controls">
                 <div class="call-control-item">
-                    <button class="call-btn decline" onclick="rejectCall()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.41,12l4.3-4.29a1,1,0,1,0-1.42-1.42L12,10.59,7.71,6.29A1,1,0,0,0,6.29,7.71L10.59,12l-4.3,4.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l4.29,4.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z"/></svg></button>
+                    <button class="call-btn decline" onclick="rejectCall()"><svg viewBox="0 0 24 24"
+                            fill="currentColor">
+                            <path
+                                d="M13.41,12l4.3-4.29a1,1,0,1,0-1.42-1.42L12,10.59,7.71,6.29A1,1,0,0,0,6.29,7.71L10.59,12l-4.3,4.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l4.29,4.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42Z" />
+                        </svg></button>
                     <span>Отклонить</span>
                 </div>
                 <div class="call-control-item">
-                    <button class="call-btn accept" onclick="acceptCall()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.38,16.38l-2.24-2.24a1.26,1.26,0,0,0-1.78,0,10.33,10.33,0,0,1-3.53,2.3,10.53,10.53,0,0,1-4.2.94,10.2,10.2,0,0,1-4.14-.92,10.4,10.4,0,0,1-3.55-2.34,1.26,1.26,0,0,0-1.78,0L-0.12,16.38a1.26,1.26,0,0,0,0,1.78,15.1,15.1,0,0,0,5.2,3.8,15.3,15.3,0,0,0,6.26,1.42,15.73,15.73,0,0,0,12.24-5.22,1.26,1.26,0,0,0,0-1.78Z" transform="translate(1.13 -0.38)"/></svg></button>
+                    <button class="call-btn accept" onclick="acceptCall()"><svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M21.38,16.38l-2.24-2.24a1.26,1.26,0,0,0-1.78,0,10.33,10.33,0,0,1-3.53,2.3,10.53,10.53,0,0,1-4.2.94,10.2,10.2,0,0,1-4.14-.92,10.4,10.4,0,0,1-3.55-2.34,1.26,1.26,0,0,0-1.78,0L-0.12,16.38a1.26,1.26,0,0,0,0,1.78,15.1,15.1,0,0,0,5.2,3.8,15.3,15.3,0,0,0,6.26,1.42,15.73,15.73,0,0,0,12.24-5.22,1.26,1.26,0,0,0,0-1.78Z"
+                                transform="translate(1.13 -0.38)" />
+                        </svg></button>
                     <span>Принять</span>
                 </div>
             </div>
@@ -486,30 +597,47 @@
     </div>
     <!-- Рингтон теперь через Web Audio API в webrtc.js -->
     <audio id="ringtone" style="display:none"></audio>
-NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNPAAAAD/hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-"></audio>
+    NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNPAAAAD/hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-"></audio>
 
     <!-- Экран активного видеозвонка -->
-    <div id="video-call-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 7000; display: none; flex-direction: column;">
+    <div id="video-call-overlay"
+        style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 7000; display: none; flex-direction: column;">
         <video id="remote-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-        <video id="local-video" autoplay playsinline muted style="position: absolute; top: 40px; right: 20px; width: 100px; height: 140px; object-fit: cover; border-radius: 12px; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #222;"></video>
-        <div style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
-            <button onclick="toggleVideo()" id="toggle-video-btn" style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">📹</button>
-            <button onclick="toggleSpeaker()" id="toggle-speaker-btn" style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">🔊</button>
-            <button onclick="toggleAudio()" id="toggle-audio-btn" style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">🎤</button>
-            <button onclick="endCall()" style="width: 56px; height: 56px; border-radius: 50%; background: #e74c3c; border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(231,76,60,0.5);">📞</button>
+        <video id="local-video" autoplay playsinline muted
+            style="position: absolute; top: 40px; right: 20px; width: 100px; height: 140px; object-fit: cover; border-radius: 12px; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #222;"></video>
+        <div
+            style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
+            <button onclick="toggleVideo()" id="toggle-video-btn"
+                style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">📹</button>
+            <button onclick="toggleSpeaker()" id="toggle-speaker-btn"
+                style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">🔊</button>
+            <button onclick="toggleAudio()" id="toggle-audio-btn"
+                style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">🎤</button>
+            <button onclick="endCall()"
+                style="width: 56px; height: 56px; border-radius: 50%; background: #e74c3c; border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(231,76,60,0.5);">📞</button>
         </div>
     </div>
 
-    <div class="custom-modal" id="comments-modal" style="width: 95vw; max-width: 500px; height: 85vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; z-index: 3000;">
-        <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); z-index: 2;">
+    <div class="custom-modal" id="comments-modal"
+        style="width: 95vw; max-width: 500px; height: 85vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; z-index: 3000;">
+        <div
+            style="padding: 16px 20px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); z-index: 2;">
             <h3 style="margin: 0; font-weight: 500;">Комментарии</h3>
-            <button onclick="closeCommentsModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); line-height: 1;">×</button>
+            <button onclick="closeCommentsModal()"
+                style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); line-height: 1;">×</button>
         </div>
-        <div id="comments-list" style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; background-color: var(--bg-main); background-image: var(--chat-pattern);"></div>
-        <div class="input-area" style="padding: 12px 20px; border-top: 1px solid var(--border-light); display: flex; gap: 10px; align-items: center;">
-            <input type="text" class="message-field" id="comment-input" placeholder="Написать комментарий..." style="flex: 1;">
+        <div id="comments-list"
+            style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; background-color: var(--bg-main); background-image: var(--chat-pattern);">
+        </div>
+        <div class="input-area"
+            style="padding: 12px 20px; border-top: 1px solid var(--border-light); display: flex; gap: 10px; align-items: center;">
+            <input type="text" class="message-field" id="comment-input" placeholder="Написать комментарий..."
+                style="flex: 1;">
             <div class="send-btn" onclick="sendComment()">
-                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <svg viewBox="0 0 24 24">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
             </div>
         </div>
     </div>
@@ -540,27 +668,50 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
     </div>
 
     <!-- MODERN ADMIN PANEL MODAL (DASHBOARD STYLE) -->
-    <div class="custom-modal admin-dashboard-modal" id="admin-panel-modal" style="width: 90vw; max-width: 1000px; height: 85vh; padding: 0; display: none; overflow: hidden; border-radius: 28px;">
+    <div class="custom-modal admin-dashboard-modal" id="admin-panel-modal"
+        style="width: 95vw !important; max-width: 1400px; height: 90vh !important; padding: 0; display: none; overflow: hidden; border-radius: 28px;">
         <div class="admin-dashboard-container">
             <!-- Sidebar -->
             <div class="admin-sidebar">
                 <div class="admin-sidebar-header">
                     <div class="admin-logo">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path
+                                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+                        </svg>
                         <span>Monochrome Admin</span>
                     </div>
                 </div>
                 <div class="admin-sidebar-tabs">
                     <div class="admin-tab active" data-tab="reports" onclick="switchAdminTab('reports')">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
                         <span>Жалобы</span>
                     </div>
                     <div class="admin-tab" data-tab="users" onclick="switchAdminTab('users')">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
                         <span>Пользователи</span>
                     </div>
                     <div class="admin-tab" data-tab="logs" onclick="switchAdminTab('logs')">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                        </svg>
                         <span>Логи</span>
                     </div>
                 </div>
@@ -581,7 +732,13 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
                 <div id="admin-content" class="admin-content-viewport">
                     <div id="admin-section-reports" class="admin-content-section active">
                         <div style="text-align: center; padding: 60px; color: var(--text-muted); opacity: 0.6;">
-                            <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 16px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor"
+                                stroke-width="1.5" style="margin-bottom: 16px;">
+                                <path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                <line x1="12" y1="9" x2="12" y2="13" />
+                                <line x1="12" y1="17" x2="12.01" y2="17" />
+                            </svg>
                             <p style="font-size: 18px;">Жалоб пока нет. Всё спокойно.</p>
                         </div>
                     </div>
@@ -599,24 +756,40 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
     <!-- CONTEXT MENU FOR MESSAGES -->
     <div id="msg-context-menu" class="msg-context-menu">
         <div class="menu-item" id="menu-reply">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 0 1 5 5v2m0 0l-4-4m4 4l4-4"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 10h10a5 5 0 0 1 5 5v2m0 0l-4-4m4 4l4-4" />
+            </svg>
             Ответить
         </div>
         <div class="menu-item" id="menu-forward">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+            </svg>
             Переслать
         </div>
         <div class="menu-item" id="menu-copy">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
             Копировать текст
         </div>
         <div class="menu-item" id="menu-report">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+            </svg>
             Пожаловаться
         </div>
         <div class="menu-divider" style="height:1px; background:var(--border-light); margin:4px 0;"></div>
         <div class="menu-item danger" id="menu-delete">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
             Удалить
         </div>
     </div>
@@ -626,7 +799,11 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
         <canvas id="ph-effects-canvas"></canvas>
         <div class="ph-cover" id="ph-cover"></div>
         <button class="ph-settings-btn" id="ph-settings-btn" onclick="toggleHoverCardSettings(event)">
-            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="5" r="2" />
+                <circle cx="12" cy="12" r="2" />
+                <circle cx="12" cy="19" r="2" />
+            </svg>
         </button>
         <div class="ph-info">
             <div class="ph-avatar-area">
@@ -647,7 +824,7 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
                 <h3>Дизайн профиля</h3>
                 <button class="ph-editor-close" onclick="toggleHoverCardSettings(event)">×</button>
             </div>
-            
+
             <div class="ph-editor-layout">
                 <!-- Left Side: Live Preview -->
                 <div class="ph-preview-side">
@@ -663,14 +840,31 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
                     <div class="ph-control-group">
                         <label>Фон карточки</label>
                         <div class="ph-presets-grid">
-                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);" data-bg="linear-gradient(135deg, #0f172a 0%, #1e293b 100%)" onclick="previewBg(this)"></div>
-                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);" data-bg="linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)" onclick="previewBg(this)"></div>
-                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" data-bg="linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)" onclick="previewBg(this)"></div>
-                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" data-bg="linear-gradient(135deg, #10b981 0%, #059669 100%)" onclick="previewBg(this)"></div>
-                            <div class="ph-preset-item" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" data-bg="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)" onclick="previewBg(this)"></div>
-                            <div class="ph-preset-item" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.1);" data-bg="#ffffff" onclick="previewBg(this)"></div>
+                            <div class="ph-preset-item"
+                                style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);"
+                                data-bg="linear-gradient(135deg, #0f172a 0%, #1e293b 100%)" onclick="previewBg(this)">
+                            </div>
+                            <div class="ph-preset-item"
+                                style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);"
+                                data-bg="linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)" onclick="previewBg(this)">
+                            </div>
+                            <div class="ph-preset-item"
+                                style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);"
+                                data-bg="linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)" onclick="previewBg(this)">
+                            </div>
+                            <div class="ph-preset-item"
+                                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"
+                                data-bg="linear-gradient(135deg, #10b981 0%, #059669 100%)" onclick="previewBg(this)">
+                            </div>
+                            <div class="ph-preset-item"
+                                style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"
+                                data-bg="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)" onclick="previewBg(this)">
+                            </div>
+                            <div class="ph-preset-item" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.1);"
+                                data-bg="#ffffff" onclick="previewBg(this)"></div>
                         </div>
-                        <input type="text" id="ph-custom-bg" class="ph-input" placeholder="CSS Цвет или Градиент..." oninput="previewCustomBg(this.value)">
+                        <input type="text" id="ph-custom-bg" class="ph-input" placeholder="CSS Цвет или Градиент..."
+                            oninput="previewCustomBg(this.value)">
                     </div>
 
                     <!-- Effects Section -->
@@ -709,6 +903,7 @@ NVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVUNVVU
     <script src="/js/groups.js" defer></script>
     <script src="/js/webrtc.js" defer></script>
     <script src="/js/main.js" defer></script>
-    
+
 </body>
+
 </html>
