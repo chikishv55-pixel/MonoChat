@@ -256,22 +256,33 @@
 
                 <div class="tg-section" id="admin-tools-section" style="display:none;">
                     <div class="tg-menu-item" onclick="openAdminPanel()">
-                        <svg class="tg-menu-icon" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                        <div class="tg-menu-icon-wrapper" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 4px 12px rgba(59,130,246,0.35);">
+                            <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                        </div>
                         <span class="tg-menu-text" style="color: var(--accent); font-weight: 600;">Модерация</span>
+                        <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                     </div>
                 </div>
 
                 <div class="tg-section">
                     <div class="tg-menu-item" onclick="enterEditProfileMode()">
-                        <svg class="tg-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        <div class="tg-menu-icon-wrapper" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); box-shadow: 0 4px 12px rgba(99,102,241,0.35);">
+                            <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        </div>
                         <span class="tg-menu-text">Изменить профиль</span>
+                        <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                     </div>
                     <div class="tg-menu-item" onclick="toggleTheme()">
-                        <svg class="tg-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <div class="tg-menu-icon-wrapper" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 4px 12px rgba(139,92,246,0.35);">
+                            <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        </div>
                         <span class="tg-menu-text">Оформление</span>
+                        <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                     </div>
                     <div class="tg-menu-item text-danger" onclick="logout()">
-                        <svg class="tg-menu-icon text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                        <div class="tg-menu-icon-wrapper" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); box-shadow: 0 4px 12px rgba(239,68,68,0.35);">
+                            <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                        </div>
                         <span class="tg-menu-text text-danger">Выйти</span>
                     </div>
                 </div>
@@ -305,7 +316,7 @@
                         <input type="date" class="tg-input-field" id="edit-profile-bdate">
                     </div>
                 </div>
-                <div style="padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="padding: 16px 12px; display: flex; flex-direction: column; gap: 10px;">
                     <button class="tg-btn primary" onclick="saveProfile()">Сохранить</button>
                     <button class="tg-btn secondary" onclick="exitEditProfileMode()">Отмена</button>
                 </div>
