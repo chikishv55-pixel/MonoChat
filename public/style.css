@@ -1010,9 +1010,9 @@ body.light-theme .profile-hover-card {
 
 .ph-settings-menu {
     position: absolute;
-    top: 15px;
-    left: calc(100% + 10px);
-    right: auto;
+    top: 55px;
+    right: 15px;
+    left: auto;
     background: var(--bg-card);
     border-radius: 18px;
     padding: 8px;
@@ -1061,6 +1061,7 @@ body.light-theme .profile-hover-card {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding-right: 32px;
 }
 
 body.light-theme .ph-info {
@@ -1084,17 +1085,18 @@ body.light-theme .ph-info {
     border: none;
 }
 
-.ph-info h2 { font-size: 24px; font-weight: 700; margin-bottom: 2px; color: var(--text-main); letter-spacing: -0.5px; text-shadow: 0 1px 12px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6); }
-.ph-info p { font-size: 15px; color: var(--accent); font-weight: 600; margin-bottom: 16px; text-shadow: 0 1px 8px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6); }
+.ph-info h2 { font-size: 24px; font-weight: 800; margin-bottom: 2px; color: #ffffff; letter-spacing: -0.5px; text-shadow: 0 1px 12px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1); }
+#ph-username { font-size: 15px; color: rgba(255, 255, 255, 0.9); font-weight: 600; margin-bottom: 12px; text-shadow: 0 1px 8px rgba(0,0,0,0.9), 0 1px 3px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1); }
 .ph-bio { 
     font-size: 14px; 
-    color: var(--text-muted); 
+    color: #ffffff; 
     line-height: 1.6; 
     margin: 0; 
     max-height: 80px; 
     overflow-y: auto; 
     scrollbar-width: none;
-    text-shadow: 0 1px 8px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6);
+    text-shadow: 0 1px 8px rgba(0,0,0,0.9), 0 1px 3px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1);
+    font-weight: 500;
 }
 .ph-bio::-webkit-scrollbar { display: none; }
 

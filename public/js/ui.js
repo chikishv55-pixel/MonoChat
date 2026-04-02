@@ -518,15 +518,17 @@ function postStory(input) {
             }
         });
 
-        function toggleHoverCardSettings(e) {
+        window.toggleHoverCardSettings = function(e) {
             e.stopPropagation();
-            document.getElementById('ph-settings-menu').classList.toggle('active');
-        }
+            const menu = document.getElementById('ph-settings-menu');
+            if (menu) menu.classList.toggle('active');
+        };
 
-        async function setProfileEffect(effect) {
+        window.setProfileEffect = async function(effect) {
             if (!currentUser) return;
             currentUser.profile_effect = effect;
-            document.getElementById('ph-settings-menu').classList.remove('active');
+            const menu = document.getElementById('ph-settings-menu');
+            if (menu) menu.classList.remove('active');
             startEffect(effect);
             
             try {
