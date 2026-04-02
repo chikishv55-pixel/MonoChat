@@ -993,6 +993,53 @@
                 });
             } else if (tab === 'users') {
                 handleAdminUserSearch();
+            } else if (tab === 'logs') {
+                socket.emit('admin_get_logs', (logs) => {
+                    const container = document.getElementById('admin-logs-container');
+                    container.innerHTML = '<div style="margin-bottom:20px; opacity:0.7; font-size:14px;">История всех административных действий</div>';
+                    if (!logs || logs.length === 0) {
+                        container.innerHTML += '<div style="text-align: center; padding: 40px; opacity: 0.5;">Логов пока нет</div>';
+                        return;
+                    }
+                    
+                    const table = document.createElement('table');
+                    table.style = 'width:100%; border-collapse:collapse; font-size:14px;';
+                    table.innerHTML = `
+                        <thead>
+                            <tr style="text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); opacity:0.6;">
+                                <th style="padding:12px;">Время</th>
+                                <th style="padding:12px;">Админ</th>
+                                <th style="padding:12px;">Действие</th>
+                                <th style="padding:12px;">Цель</th>
+                                <th style="padding:12px;">Инфо</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-logs-tbody"></tbody>
+                    `;
+                    container.appendChild(table);
+                    const tbody = table.querySelector('#admin-logs-tbody');
+                    
+                    logs.forEach(l => {
+                        const tr = document.createElement('tr');
+                        tr.style = 'border-bottom:1px solid rgba(255,255,255,0.05);';
+                        
+                        let actionColor = '#fff';
+                        if (l.action.includes('BAN')) actionColor = '#ef4444';
+                        if (l.action.includes('ROLE')) actionColor = '#f59e0b';
+                        if (l.action.includes('RESOLVE')) actionColor = '#2ecc71';
+                        
+                        const time = new Date(l.timestamp).toLocaleString();
+                        
+                        tr.innerHTML = `
+                            <td style="padding:12px; opacity:0.6;">${time}</td>
+                            <td style="padding:12px;"><strong>@${l.admin_username}</strong></td>
+                            <td style="padding:12px;"><span style="background:${actionColor}22; color:${actionColor}; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:700;">${l.action}</span></td>
+                            <td style="padding:12px;">@${l.target}</td>
+                            <td style="padding:12px; opacity:0.8;">${escapeHTML(l.details || '')}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
             }
         }
 

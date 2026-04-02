@@ -146,6 +146,15 @@ async function initDB() {
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
 
+        await dbRun(`CREATE TABLE IF NOT EXISTS admin_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            admin_username TEXT,
+            action TEXT,
+            target TEXT,
+            details TEXT,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
+
         // Migrations for Roles & Permissions
         try { await dbRun("ALTER TABLE users ADD COLUMN is_moderator INTEGER DEFAULT 0"); } catch(e){}
         try { await dbRun("ALTER TABLE users ADD COLUMN custom_badge TEXT"); } catch(e){}

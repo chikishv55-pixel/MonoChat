@@ -51,6 +51,15 @@ module.exports = function(io, onlineUsers) {
         }
     });
 
+    // Helper to log administrative actions
+    const logAdminAction = async (adminUsername, action, target, details) => {
+        try {
+            await dbRun("INSERT INTO admin_logs (admin_username, action, target, details) VALUES (?, ?, ?, ?)", [adminUsername, action, target, details]);
+        } catch (e) {
+            console.error("Failed to log admin action:", e);
+        }
+    };
+
     async function sendPushNotification(targetUsername, title, body) {
         try {
             const targetUser = await dbGet(`SELECT fcm_token FROM users WHERE username = ?`, [targetUsername]);
@@ -269,8 +278,29 @@ module.exports = function(io, onlineUsers) {
             try {
                 if (!socket.user || (!socket.user.is_admin && !socket.user.is_moderator)) return callback({ success: false, message: 'Нет прав' });
                 await dbRun("DELETE FROM reports WHERE id = ?", [data.reportId]);
+                await logAdminAction(socket.username, 'REPORT_RESOLVE', `Report #${data.reportId}`, 'Report marked as resolved');
                 callback({ success: true });
             } catch (err) { console.error(err); callback({ success: false, message: err.message }); }
+        });
+
+        socket.on('admin_ban_user', async (data, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                if (!socket.user || !socket.user.is_admin) return callback({ success: false, message: 'Нет прав' });
+                await dbRun("UPDATE users SET is_banned = 1 WHERE username = ?", [data.username]);
+                await logAdminAction(socket.username, 'USER_BAN', data.username, 'User account suspended');
+                callback({ success: true });
+            } catch (err) { console.error(err); callback({ success: false }); }
+        });
+
+        socket.on('admin_unban_user', async (data, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                if (!socket.user || !socket.user.is_admin) return callback({ success: false, message: 'Нет прав' });
+                await dbRun("UPDATE users SET is_banned = 0 WHERE username = ?", [data.username]);
+                await logAdminAction(socket.username, 'USER_UNBAN', data.username, 'User account restored');
+                callback({ success: true });
+            } catch (err) { console.error(err); callback({ success: false }); }
         });
 
         socket.on('admin_get_users', async (callback) => {
@@ -287,6 +317,7 @@ module.exports = function(io, onlineUsers) {
             let is_admin = (role === 'admin' ? 1 : 0);
             let is_moderator = (role === 'moderator' ? 1 : 0);
             await dbRun("UPDATE users SET is_admin = ?, is_moderator = ? WHERE username = ?", [is_admin, is_moderator, username]);
+            await logAdminAction(socket.username, 'ROLE_CHANGE', username, `New role assigned: ${role.toUpperCase()}`);
             callback({ success: true });
         });
 
@@ -294,7 +325,17 @@ module.exports = function(io, onlineUsers) {
             if (typeof callback !== 'function') callback = () => {};
             if (!socket.user || !socket.user.is_admin) return callback({ success: false });
             await dbRun("UPDATE users SET custom_badge = ? WHERE username = ?", [data.badge, data.username]);
+            await logAdminAction(socket.username, 'BADGE_CHANGE', data.username, `Badge set to: ${data.badge || 'None'}`);
             callback({ success: true });
+        });
+
+        socket.on('admin_get_logs', async (callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                if (!socket.user || !socket.user.is_admin) return callback([]);
+                const logs = await dbAll("SELECT * FROM admin_logs ORDER BY id DESC LIMIT 200");
+                callback(logs);
+            } catch (err) { console.error(err); callback([]); }
         });
 
         socket.on('disconnect', () => {
