@@ -363,15 +363,16 @@ function openNewChatChoiceModal() {
 
         // --- Музыкальный статус ---
         function updateMyMusicUI(status) {
-            const widget = document.getElementById('my-music-widget');
-            const text = document.getElementById('my-music-text');
+            // pm-music-widget — в модалке просмотра чужого профиля
+            const widget = document.getElementById('pm-music-widget');
+            const text = document.getElementById('pm-music-text');
             if (widget && text) {
                 if (status) {
-                    widget.classList.add('playing');
+                    widget.style.display = 'block';
                     text.textContent = status;
                 } else {
-                    widget.classList.remove('playing');
-                    text.textContent = 'Установить музыку...';
+                    widget.style.display = 'none';
+                    text.textContent = 'Музыка';
                 }
             }
         }
@@ -427,6 +428,8 @@ function openNewChatChoiceModal() {
             setAvatarUI('pm-avatar-img', 'pm-avatar-text', avatarUrl, displayName);
             setAvatarUI('my-profile-avatar-img', 'my-profile-avatar-text', avatarUrl, displayName);
             setAvatarUI('edit-profile-avatar-img', 'edit-profile-avatar-text', avatarUrl, displayName);
+            // Обновляем аватар в виджете футера
+            setAvatarUI('my-avatar-footer', 'my-avatar-footer-text', avatarUrl, displayName);
         }
 
         function setAvatarUI(imgId, textId, data, name) {

@@ -539,20 +539,7 @@ function postStory(input) {
             } catch (err) { console.error('Ошибка сохранения эффекта:', err); }
         }
 
-        async function saveProfile() {
-            if (!currentUser) return;
-            socket.emit('update_profile', {
-                displayName: currentUser.display_name,
-                bio: currentUser.bio,
-                birthDate: currentUser.birth_date,
-                profileCardBg: currentUser.profile_card_bg,
-                profileEffect: effect
-            }, (res) => {
-                if (res.success) {
-                    startEffect(effect);
-                }
-            });
-        }
+        // saveProfile() определена в groups.js — не дублировать здесь
 
         let effectInterval;
         function stopCurrentEffect() {
@@ -662,7 +649,7 @@ function postStory(input) {
             
             if (avatar) {
                 const avatarHTML = renderAvatarHTML(user.avatar, user.display_name, 'avatar-img-actual');
-                const isOnline = user.isOnline || (onlineUsers && onlineUsers.has(user.username));
+                const isOnline = user.isOnline || (typeof window !== 'undefined' && window.onlineUsers && window.onlineUsers.has(user.username));
                 const statusDotHTML = `<div class="status-dot ${isOnline ? 'online' : 'offline'}" style="width:14px; height:14px; bottom:2px; right:2px; border:2px solid var(--bg-card);"></div>`;
                 avatar.innerHTML = avatarHTML + statusDotHTML;
             }
