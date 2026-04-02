@@ -464,13 +464,19 @@ body.dark-theme .message.mine .reply-block b { color: #fff; }
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     opacity: 0;
     visibility: hidden;
-    transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 20px;
+}
+
+/* Drawer Right Specific Styles */
+.tg-settings-panel.drawer-right {
+    justify-content: flex-end;
+    padding: 0;
 }
 
 .tg-settings-panel.active {
@@ -529,12 +535,29 @@ body.dark-theme .message.mine .reply-block b { color: #fff; }
     box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.07);
     border: 1px solid rgba(255,255,255,0.07);
     transform: translateY(24px) scale(0.95);
-    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+}
+
+.tg-settings-panel.drawer-right > .tg-settings-inner {
+    height: 100vh;
+    max-height: 100vh;
+    width: 400px;
+    max-width: 90vw;
+    border-radius: 0;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    transform: translateX(100%);
+    margin-right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
 }
 
 .tg-settings-panel.active > .tg-settings-inner {
     transform: translateY(0) scale(1);
+}
+
+.tg-settings-panel.active.drawer-right > .tg-settings-inner {
+    transform: translateX(0);
 }
 
 
