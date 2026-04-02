@@ -1010,8 +1010,9 @@ body.light-theme .profile-hover-card {
 
 .ph-settings-menu {
     position: absolute;
-    top: 60px;
-    right: 15px;
+    top: 15px;
+    left: calc(100% + 10px);
+    right: auto;
     background: var(--bg-card);
     border-radius: 18px;
     padding: 8px;
@@ -1083,8 +1084,8 @@ body.light-theme .ph-info {
     border: none;
 }
 
-.ph-info h2 { font-size: 24px; font-weight: 700; margin-bottom: 2px; color: var(--text-main); letter-spacing: -0.5px; }
-.ph-info p { font-size: 15px; color: var(--accent); font-weight: 600; margin-bottom: 16px; }
+.ph-info h2 { font-size: 24px; font-weight: 700; margin-bottom: 2px; color: var(--text-main); letter-spacing: -0.5px; text-shadow: 0 1px 12px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6); }
+.ph-info p { font-size: 15px; color: var(--accent); font-weight: 600; margin-bottom: 16px; text-shadow: 0 1px 8px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6); }
 .ph-bio { 
     font-size: 14px; 
     color: var(--text-muted); 
@@ -1093,6 +1094,7 @@ body.light-theme .ph-info {
     max-height: 80px; 
     overflow-y: auto; 
     scrollbar-width: none;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6);
 }
 .ph-bio::-webkit-scrollbar { display: none; }
 

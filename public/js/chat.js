@@ -744,12 +744,6 @@
         }
 
         // ADMIN MODERN PANEL LOGIC
-        function openAdminPanel() {
-            closeAllModals();
-            document.getElementById('main-overlay').classList.add('active');
-            document.getElementById('admin-panel-modal').classList.add('active');
-            switchAdminTab('reports'); // Open reports by default
-        }
 
         function switchAdminTab(tabName) {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
@@ -925,8 +919,13 @@
         }
 
         function openAdminPanel() {
+            closeAllModals();
             document.getElementById('main-overlay').classList.add('active');
-            document.getElementById('admin-panel-modal').classList.add('active');
+            const panel = document.getElementById('admin-panel-modal');
+            if (panel) {
+                panel.classList.add('active');
+                panel.style.display = 'flex';
+            }
             switchAdminTab('reports');
         }
 

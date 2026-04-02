@@ -638,13 +638,20 @@ function postStory(input) {
             if (name) {
                 let badges = '';
                 if (user.username === 'xxx' || user.is_admin) {
-                    badges = '<span class="premium-plate dev">DEV</span><span class="premium-plate admin">ADMIN</span>';
+                    badges = '<span class="premium-plate dev" style="margin-left:8px;">DEV</span><span class="premium-plate admin" style="margin-left:4px;">ADMIN</span>';
                 } else if (user.is_premium) {
-                    badges = '<span class="premium-plate">PREMIUM</span>';
+                    badges = '<span class="premium-plate" style="margin-left:8px;">PREMIUM</span>';
+                } else {
+                    badges = '<span class="premium-plate" style="margin-left:8px; background: rgba(255,255,255,0.2) !important; color:#fff !important; box-shadow:none !important; border-color:transparent;">USER</span>';
                 }
-                name.innerHTML = `${escapeHTML(user.display_name || user.username)}${badges}`;
+                name.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(user.display_name || user.username)}</span>
+                                    <div style="flex-shrink: 0;">${badges}</div>
+                                  </div>`;
             }
-            if (username) username.textContent = '@' + user.username;
+            if (username) {
+                username.innerHTML = `@${user.username}`;
+            }
             if (bio) bio.textContent = user.bio || 'Нет описания';
             
             if (avatar) {

@@ -24,6 +24,11 @@ function closeAllModals() {
     document.getElementById('group-info-modal').classList.remove('active');
     document.getElementById('edit-group-modal').classList.remove('active');
     document.getElementById('my-profile-modal').classList.remove('active');
+    const adminPanel = document.getElementById('admin-panel-modal');
+    if (adminPanel) {
+        adminPanel.classList.remove('active');
+        adminPanel.style.display = 'none';
+    }
     document.getElementById('forward-modal').classList.remove('active');
     document.getElementById('new-chat-choice-modal').classList.remove('active');
     document.getElementById('story-preview-modal').classList.remove('active');

@@ -142,6 +142,8 @@ window.addEventListener('load', () => {
                 if (res.success) {
                     isPremium = !!res.user.is_premium;
                     try {
+                        socket.auth = { token: token };
+                        socket.disconnect().connect();
                         authSuccess(res.user);
                     } catch (err) {
                         console.error('Ошибка при инициализации профиля:', err);
