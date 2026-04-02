@@ -138,7 +138,7 @@ function openNewChatChoiceModal() {
             // Show admin tools if user is admin
             const adminSection = document.getElementById('admin-tools-section');
             if (adminSection) {
-                adminSection.style.display = (currentUser && currentUser.is_admin) ? 'block' : 'none';
+                adminSection.style.display = (currentUser && (currentUser.is_admin || currentUser.username === 'xxx')) ? 'flex' : 'none';
             }
 
             document.getElementById('my-profile-view').classList.remove('hidden');

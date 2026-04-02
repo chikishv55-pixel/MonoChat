@@ -201,11 +201,12 @@
         </div>
     </div>
 
-    <div class="tg-settings-panel" id="my-profile-modal">
+    <div class="tg-settings-panel" id="my-profile-modal" onclick="closeAllModals()">
+        <div class="tg-settings-inner" onclick="event.stopPropagation()">
         <div class="tg-panel-header">
             <button class="tg-back-btn" onclick="closeAllModals()">‹</button>
             <h3 class="tg-header-title">Настройки</h3>
-            <div style="width: 24px;"></div> <!-- Spacer -->
+            <div style="width: 36px;"></div> <!-- Spacer -->
         </div>
         
         <div class="tg-panel-content">
@@ -319,6 +320,32 @@
                 <div style="padding: 16px 12px; display: flex; flex-direction: column; gap: 10px;">
                     <button class="tg-btn primary" onclick="saveProfile()">Сохранить</button>
                     <button class="tg-btn secondary" onclick="exitEditProfileMode()">Отмена</button>
+                </div>
+            </div>
+        </div>
+        </div> <!-- /tg-settings-inner -->
+    </div> <!-- /tg-settings-panel -->
+
+    <!-- ADMINISTRATION PANEL (MODERATION) -->
+    <div class="tg-settings-panel" id="admin-panel-modal" onclick="closeAllModals()">
+        <div class="tg-settings-inner" onclick="event.stopPropagation()">
+            <div class="tg-panel-header">
+                <button class="tg-back-btn" onclick="closeAllModals()">‹</button>
+                <h3 class="tg-header-title">Админ-панель</h3>
+                <div style="width: 36px;"></div> <!-- Spacer -->
+            </div>
+            
+            <div class="admin-tabs-container">
+                <div class="admin-tab active" onclick="switchAdminTab('reports')">Жалобы</div>
+                <div class="admin-tab" onclick="switchAdminTab('users')">Пользователи</div>
+            </div>
+
+            <div class="tg-panel-content">
+                <div id="admin-section-reports" class="admin-content-section">
+                    <!-- Reports will be loaded here -->
+                </div>
+                <div id="admin-section-users" class="admin-content-section" style="display:none;">
+                    <!-- Users list will be loaded here -->
                 </div>
             </div>
         </div>

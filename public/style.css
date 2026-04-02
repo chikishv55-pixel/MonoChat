@@ -456,32 +456,87 @@ body.dark-theme .message.mine .reply-block b { color: #fff; }
    SETTINGS PANEL - PREMIUM REDESIGN
    ===================================== */
 
+/* Settings panel as centered modal with backdrop */
 .tg-settings-panel {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    max-width: 420px;
-    height: 100vh;
-    background: var(--bg-main);
+    inset: 0;
     z-index: 2000;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+    padding: 20px;
+}
+
+.tg-settings-panel.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ADMIN PANEL TABS */
+.admin-tabs-container {
+    display: flex;
+    background: rgba(255,255,255,0.04);
+    padding: 5px;
+    margin: 0 20px 12px;
+    border-radius: 16px;
+    gap: 5px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.admin-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-muted);
+}
+
+.admin-tab:hover {
+    color: var(--text-main);
+    background: rgba(255,255,255,0.05);
+}
+
+.admin-tab.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(99,102,241,0.35);
+}
+
+.admin-content-section {
+    display: flex;
     flex-direction: column;
-    transform: translateX(-100%);
+}
+
+/* Inner scrollable card */
+.tg-settings-panel > .tg-settings-inner {
+    background: var(--bg-main);
+    border-radius: 28px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.07);
+    transform: translateY(24px) scale(0.95);
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-    box-shadow: 4px 0 40px rgba(0,0,0,0.3);
+    overflow: hidden;
 }
 
-@media (max-width: 767px) {
-    .tg-settings-panel {
-        max-width: 100%;
-        transform: translateX(100%);
-        left: auto;
-        right: 0;
-    }
+.tg-settings-panel.active > .tg-settings-inner {
+    transform: translateY(0) scale(1);
 }
 
-.tg-settings-panel.active { transform: translateX(0); }
 
 /* --- HEADER --- */
 .tg-panel-header {
