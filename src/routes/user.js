@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 // Note: In this project, JWT_SECRET is often imported or defined locally. 
 // I will use a safe way to get it or fallback to the one in auth.js if possible.
-const JWT_SECRET = 'monochrome_secret_key_2024'; 
+const JWT_SECRET = process.env.JWT_SECRET || 'monochrome-super-secret-key-123';
 
 // Middleware to verify token
 const authenticateToken = (req, res, next) => {

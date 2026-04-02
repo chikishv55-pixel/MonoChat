@@ -1495,7 +1495,18 @@ body.light-theme .profile-hover-card {
     width: 100%;
     display: flex;
     justify-content: center;
-    transform: scale(0.9);
+    align-items: center;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+#ph-live-preview-container .profile-hover-card {
+    margin: 0 auto;
+    position: relative !important;
+    bottom: auto !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .ph-controls-side {

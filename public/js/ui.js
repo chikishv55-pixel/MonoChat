@@ -535,9 +535,16 @@ function postStory(input) {
                     card.style.opacity = '';
                     card.style.visibility = '';
                     card.style.transform = '';
+                    card.style.top = '';
+                    card.style.left = '';
+                    card.style.right = '';
+                    card.style.bottom = '';
+                    card.style.width = '';
+                    card.classList.remove('active');
                     document.body.appendChild(card);
                 }
                 backdrop.classList.remove('active');
+                stopCurrentEffect();
             } else {
                 if (!currentUser) return;
                 
@@ -549,14 +556,25 @@ function postStory(input) {
                 const card = document.getElementById('profile-hover-card');
                 const container = document.getElementById('ph-live-preview-container');
                 if (card && container) {
+                    // Populate card first!
+                    updateHoverCardUI(currentUser);
+                    
                     container.innerHTML = '';
                     container.appendChild(card);
+                    
+                    // Force visibility and reset position
                     card.style.position = 'relative';
+                    card.style.top = '0';
+                    card.style.left = '0';
+                    card.style.bottom = 'auto';
+                    card.style.right = 'auto';
+                    card.style.width = '300px'; 
                     card.style.zIndex = '1';
                     card.style.opacity = '1';
                     card.style.visibility = 'visible';
                     card.style.transform = 'none';
-                    card.style.pointerEvents = 'none';
+                    card.style.pointerEvents = 'all';
+                    card.classList.add('active');
                 }
 
                 // Setup UI
@@ -665,8 +683,10 @@ function postStory(input) {
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             
-            canvas.width = 300; 
-            canvas.height = 420;
+            // Recalculate dimensions for the current parent
+            const parent = canvas.parentElement;
+            canvas.width = parent.offsetWidth || 300; 
+            canvas.height = parent.offsetHeight || 420;
 
             if (type === 'snow') {
                 const flakes = Array.from({ length: 50 }, () => ({
