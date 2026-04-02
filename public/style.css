@@ -1713,3 +1713,10 @@ body.light-theme .ph-info {
 .admin-tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); background: var(--hover-bg); }
 .admin-content-section { display: none; padding: 20px; animation: fade-in 0.3s; }
 .admin-content-section.active { display: block; }
+
+.admin-resolve-btn:hover {
+    background: #27ae60 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+.admin-resolve-btn:active { transform: translateY(0); }

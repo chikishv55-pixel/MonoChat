@@ -950,9 +950,14 @@
                         const div = document.createElement('div');
                         div.style = 'background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; margin-bottom:12px; border-left:4px solid #ef4444;';
                         div.innerHTML = `
-                            <div style="font-size:12px; margin-bottom:4px; opacity:0.7;">От: @${r.reporter} | На: @${r.message_sender}</div>
-                            <div style="font-weight:600; margin-bottom:6px;">Причина: ${escapeHTML(r.reason)}</div>
-                            <div style="font-style:italic; font-size:13px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">"${escapeHTML(r.message_text || '[Медиа]')}"</div>
+                            <div style="display:flex; justify-content:space-between; align-items:start;">
+                                <div style="flex:1;">
+                                    <div style="font-size:12px; margin-bottom:4px; opacity:0.7;">От: @${r.reporter} | На: @${r.message_sender}</div>
+                                    <div style="font-weight:600; margin-bottom:6px;">Причина: ${escapeHTML(r.reason)}</div>
+                                    <div style="font-style:italic; font-size:13px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">"${escapeHTML(r.message_text || '[Медиа]')}"</div>
+                                </div>
+                                <button onclick="adminResolveReport(${r.id})" class="admin-resolve-btn" style="margin-left:12px; background:#2ecc71; color:white; border:none; padding:8px 12px; border-radius:10px; font-weight:600; cursor:pointer; font-size:12px;">Закрыть</button>
+                            </div>
                         `;
                         container.appendChild(div);
                     });
@@ -993,3 +998,13 @@
                 setTimeout(handleAdminUserSearch, 300);
             }
         }
+
+        window.adminResolveReport = function(reportId) {
+            socket.emit('admin_resolve_report', { reportId }, (res) => {
+                if (res.success) {
+                    switchAdminTab('reports');
+                } else {
+                    alert('Ошибка: ' + (res.message || 'Не удалось закрыть жалобу'));
+                }
+            });
+        };

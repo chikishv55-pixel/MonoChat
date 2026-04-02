@@ -596,8 +596,38 @@ function postStory(input) {
             });
 
             // Apply to card
-            previewBgOnCard(currentPreviewBg);
+            const card = document.getElementById('profile-hover-card');
+            if (card) applyBackgroundToCard(card, currentPreviewBg);
             previewEffectOnCard(currentPreviewEffect);
+        }
+
+        function applyBackgroundToCard(card, bg) {
+            if (!card) return;
+            const cover = card.querySelector('#ph-cover');
+            
+            // Standardize bg: if it's an image/url, wrap in url()
+            let finalBg = bg || '';
+            if (finalBg.startsWith('/uploads/') || finalBg.startsWith('http') || finalBg.startsWith('data:')) {
+                finalBg = `url(${getFullUrl(finalBg)}) center/cover no-repeat`;
+            } else if (!finalBg) {
+                finalBg = 'linear-gradient(45deg, var(--accent), #0056b3)';
+            }
+
+            if (cover) {
+                cover.style.background = finalBg;
+                cover.style.backgroundSize = 'cover';
+                cover.style.backgroundPosition = 'center';
+            }
+            
+            // Apply background to the entire card as well for better look
+            if (bg && (bg.includes('gradient') || bg.startsWith('#') || bg.startsWith('rgba') || bg.startsWith('rgb'))) {
+                // For the card body, we use a darker or more transparent version if possible, 
+                // but for now let's just apply it to the whole card as a base.
+                card.style.background = bg;
+                card.style.backgroundBlendMode = 'overlay';
+            } else {
+                card.style.background = 'var(--glass-bg)';
+            }
         }
 
         window.previewBg = function(el) {
@@ -615,11 +645,6 @@ function postStory(input) {
             currentPreviewEffect = effect;
             updateEditorUI();
         };
-
-        function previewBgOnCard(bg) {
-            const cover = document.getElementById('ph-cover');
-            if (cover) cover.style.background = bg || 'linear-gradient(45deg, var(--accent), #0056b3)';
-        }
 
         function previewEffectOnCard(effect) {
             startEffect(effect);
@@ -783,14 +808,7 @@ function postStory(input) {
             }
 
             if (card) {
-                if (user.profile_card_bg) {
-                    const bgUrl = getFullUrl(user.profile_card_bg);
-                    card.style.backgroundImage = `url(${bgUrl})`;
-                    card.style.backgroundSize = 'cover';
-                    card.style.backgroundPosition = 'center';
-                } else {
-                    card.style.backgroundImage = '';
-                }
+                applyBackgroundToCard(card, user.profile_card_bg);
             }
 
             if (user.profile_effect && user.profile_effect !== 'none') {

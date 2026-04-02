@@ -367,6 +367,18 @@ module.exports = function(io, onlineUsers) {
             } catch (err) { console.error(err); callback([]); }
         });
 
+        socket.on('admin_resolve_report', async (data, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                if (!socket.user || !socket.user.is_admin) return callback({ success: false, message: 'Нет прав' });
+                await dbRun("DELETE FROM reports WHERE id = ?", [data.reportId]);
+                callback({ success: true });
+            } catch (err) {
+                console.error(err);
+                callback({ success: false, message: err.message });
+            }
+        });
+
         socket.on('admin_ban_user', async (data) => {
             if (!socket.user || !socket.user.is_admin) return;
             await dbRun("UPDATE users SET is_banned = 1 WHERE username = ?", [data.username]);
