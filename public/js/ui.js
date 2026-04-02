@@ -783,16 +783,23 @@ function postStory(input) {
 
             if (name) {
                 let badges = '';
-                if (user.username === 'xxx' || user.is_admin) {
-                    badges = '<span class="premium-plate dev" style="margin-left:8px;">DEV</span><span class="premium-plate admin" style="margin-left:4px;">ADMIN</span>';
-                } else if (user.is_premium) {
-                    badges = '<span class="premium-plate" style="margin-left:8px;">PREMIUM</span>';
-                } else {
-                    badges = '<span class="premium-plate" style="margin-left:8px; background: rgba(255,255,255,0.2) !important; color:#fff !important; box-shadow:none !important; border-color:transparent;">USER</span>';
+                if (user.is_admin) {
+                    badges += '<span class="premium-plate admin" style="margin-left:4px;">ADMIN</span>';
+                } else if (user.is_moderator) {
+                    badges += '<span class="premium-plate mod" style="margin-left:4px; background:#3498db;">MOD</span>';
                 }
+                
+                if (user.custom_badge) {
+                    badges += `<span class="premium-plate custom" style="margin-left:4px; background:rgba(var(--accent-rgb), 0.2); border:1px solid var(--accent); color:var(--accent);">${escapeHTML(user.custom_badge)}</span>`;
+                }
+
+                if (user.is_premium && !user.is_admin && !user.is_moderator) {
+                    badges += '<span class="premium-plate" style="margin-left:4px;">PREMIUM</span>';
+                }
+
                 name.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                     <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(user.display_name || user.username)}</span>
-                                    <div style="flex-shrink: 0;">${badges}</div>
+                                    <div style="display:flex; align-items:center; flex-shrink: 0;">${badges}</div>
                                   </div>`;
             }
             if (username) {

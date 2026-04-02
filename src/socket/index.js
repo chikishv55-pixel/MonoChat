@@ -141,7 +141,7 @@ module.exports = function(io, onlineUsers) {
             if (typeof callback !== 'function') callback = () => {};
             try {
                 if (!data.username) return callback(null);
-                const user = await dbGet(`SELECT username, display_name, avatar, bio, is_premium, profile_card_bg, profile_effect FROM users WHERE username = ?`, [data.username]);
+                const user = await dbGet(`SELECT username, display_name, avatar, bio, is_premium, is_admin, is_moderator, custom_badge, profile_card_bg, profile_effect FROM users WHERE username = ?`, [data.username]);
                 if (user) {
                     user.isOnline = onlineUsers.has(user.username);
                     callback(user);
@@ -194,7 +194,19 @@ module.exports = function(io, onlineUsers) {
             if (typeof callback !== 'function') callback = () => {};
             try {
                 const me = socket.user; if (!me) return callback([]);
-                let rows = chatWith.startsWith('g') ? await dbAll(`SELECT * FROM messages WHERE receiver = ? ORDER BY id ASC`, [chatWith]) : await dbAll(`SELECT * FROM messages WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY id ASC`, [me.username, chatWith, chatWith, me.username]);
+                let query = `
+                    SELECT m.*, u.is_admin as sender_is_admin, u.is_moderator as sender_is_moderator, u.custom_badge as sender_custom_badge 
+                    FROM messages m 
+                    LEFT JOIN users u ON m.sender = u.username 
+                    WHERE `;
+                
+                let rows;
+                if (chatWith.startsWith('g')) {
+                    rows = await dbAll(query + `receiver = ? ORDER BY m.id ASC`, [chatWith]);
+                } else {
+                    rows = await dbAll(query + `(sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY m.id ASC`, [me.username, chatWith, chatWith, me.username]);
+                }
+
                 const ids = rows.map(r => r.id);
                 if (ids.length > 0) {
                     const reactions = await dbAll(`SELECT * FROM message_reactions WHERE message_id IN (${ids.map(()=>'?').join(',')})`, ids);
@@ -228,7 +240,21 @@ module.exports = function(io, onlineUsers) {
                 }
 
                 const { lastID } = await dbRun("INSERT INTO messages (sender, receiver, text, type, time, duration, reply_to_message_id, reply_snippet) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [sender.username, to, text, type, time, duration || 0, replyTo ? replyTo.messageId : null, replySnippet]);
-                const msgObj = { id: lastID, sender: sender.username, text, receiver: to, type, time, duration, reply_to_message_id: replyTo ? replyTo.messageId : null, reply_snippet: replySnippet };
+                
+                const msgObj = { 
+                    id: lastID, 
+                    sender: sender.username, 
+                    text, 
+                    receiver: to, 
+                    type, 
+                    time, 
+                    duration, 
+                    reply_to_message_id: replyTo ? replyTo.messageId : null, 
+                    reply_snippet: replySnippet,
+                    sender_is_admin: sender.is_admin,
+                    sender_is_moderator: sender.is_moderator,
+                    sender_custom_badge: sender.custom_badge
+                };
                 
                 if (isGroup) io.to(to).emit('private message', msgObj);
                 else {
@@ -356,7 +382,7 @@ module.exports = function(io, onlineUsers) {
         socket.on('admin_get_reports', async (callback) => {
             if (typeof callback !== 'function') callback = () => {};
             try {
-                if (!socket.user || !socket.user.is_admin) return callback([]);
+                if (!socket.user || (!socket.user.is_admin && !socket.user.is_moderator)) return callback([]);
                 const reports = await dbAll(`
                     SELECT r.*, m.text as message_text, m.sender as message_sender, m.type as message_type 
                     FROM reports r 
@@ -370,7 +396,7 @@ module.exports = function(io, onlineUsers) {
         socket.on('admin_resolve_report', async (data, callback) => {
             if (typeof callback !== 'function') callback = () => {};
             try {
-                if (!socket.user || !socket.user.is_admin) return callback({ success: false, message: 'Нет прав' });
+                if (!socket.user || (!socket.user.is_admin && !socket.user.is_moderator)) return callback({ success: false, message: 'Нет прав' });
                 await dbRun("DELETE FROM reports WHERE id = ?", [data.reportId]);
                 callback({ success: true });
             } catch (err) {
@@ -392,8 +418,29 @@ module.exports = function(io, onlineUsers) {
         socket.on('admin_get_users', async (callback) => {
             if (typeof callback !== 'function') callback = () => {};
             if (!socket.user || !socket.user.is_admin) return callback([]);
-            const users = await dbAll("SELECT username, display_name, is_banned, is_admin FROM users LIMIT 100");
+            const users = await dbAll("SELECT username, display_name, is_banned, is_admin, is_moderator, custom_badge FROM users LIMIT 200");
             callback(users);
+        });
+
+        socket.on('admin_set_role', async (data, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            if (!socket.user || !socket.user.is_admin) return callback({ success: false });
+            
+            const { username, role } = data; // role: 'admin', 'moderator', 'user'
+            let is_admin = 0, is_moderator = 0;
+            if (role === 'admin') is_admin = 1;
+            if (role === 'moderator') is_moderator = 1;
+
+            await dbRun("UPDATE users SET is_admin = ?, is_moderator = ? WHERE username = ?", [is_admin, is_moderator, username]);
+            callback({ success: true });
+        });
+
+        socket.on('admin_set_badge', async (data, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            if (!socket.user || !socket.user.is_admin) return callback({ success: false });
+            
+            await dbRun("UPDATE users SET custom_badge = ? WHERE username = ?", [data.badge, data.username]);
+            callback({ success: true });
         });
 
         socket.on('disconnect', () => {

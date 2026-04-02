@@ -610,9 +610,16 @@
             let senderNameHTML = '';
             if (isGroup && !isMine) {
                 let badges = '';
-                if (msg.sender === 'xxx') {
-                    badges = '<span class="premium-plate dev">DEV</span><span class="premium-plate admin">ADMIN</span>';
+                if (msg.sender_is_admin) {
+                    badges += '<span class="premium-plate admin">ADMIN</span>';
+                } else if (msg.sender_is_moderator) {
+                    badges += '<span class="premium-plate mod" style="background:#3498db;">MOD</span>';
                 }
+                
+                if (msg.sender_custom_badge) {
+                    badges += `<span class="premium-plate custom" style="background:rgba(var(--accent-rgb), 0.2); border:1px solid var(--accent); color:var(--accent);">${escapeHTML(msg.sender_custom_badge)}</span>`;
+                }
+
                 senderNameHTML = `<div class="message-sender-name" onmouseenter="showUserProfileBadge('${msg.sender}', this)" onmouseleave="hideUserProfileBadge()">${escapeHTML(msg.sender_display_name || msg.sender)}${badges}</div>`;
             }
 
@@ -930,10 +937,30 @@
         }
 
         function switchAdminTab(tab) {
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            const tabBtn = document.querySelector(`.admin-tab[onclick*="${tab}"]`);
-            if (tabBtn) tabBtn.classList.add('active');
+            if (!currentUser) return;
+            const isModOnly = currentUser.is_moderator && !currentUser.is_admin;
             
+            // Check permissions for the tab
+            if (isModOnly && (tab === 'users' || tab === 'logs')) {
+                tab = 'reports'; // Force skip restricted tabs
+            }
+
+            document.querySelectorAll('.admin-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === tab);
+                // Hide restricted tabs for moderators
+                if (isModOnly && (t.dataset.tab === 'users' || t.dataset.tab === 'logs')) {
+                    t.style.display = 'none';
+                } else {
+                    t.style.display = 'flex';
+                }
+            });
+            
+            const titleEl = document.getElementById('admin-current-tab-title');
+            if (titleEl) {
+                const titles = { 'reports': 'Жалобы', 'users': 'Пользователи', 'logs': 'Логи' };
+                titleEl.textContent = titles[tab] || 'Админ-панель';
+            }
+
             document.querySelectorAll('.admin-content-section').forEach(s => s.style.display = 'none');
             const section = document.getElementById(`admin-section-${tab}`);
             if (section) section.style.display = 'block';
@@ -941,22 +968,24 @@
             if (tab === 'reports') {
                 socket.emit('admin_get_reports', (reports) => {
                     const container = document.getElementById('admin-section-reports');
-                    container.innerHTML = '<h3>Последние жалобы</h3>';
+                    container.innerHTML = '<div style="margin-bottom:20px; opacity:0.7; font-size:14px;">Список всех активных жалоб от пользователей</div>';
                     if (!reports || reports.length === 0) {
-                        container.innerHTML += '<p style="padding:20px; text-align:center; opacity:0.5;">Жалоб нет</p>';
+                        container.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-muted); opacity: 0.6;"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 16px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><p style="font-size: 18px;">Жалоб пока нет. Всё спокойно.</p></div>';
                         return;
                     }
                     reports.forEach(r => {
                         const div = document.createElement('div');
-                        div.style = 'background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; margin-bottom:12px; border-left:4px solid #ef4444;';
+                        div.className = 'admin-report-item';
+                        div.style = 'background:rgba(255,255,255,0.03); padding:20px; border-radius:18px; margin-bottom:16px; border-left:4px solid #ef4444;';
                         div.innerHTML = `
                             <div style="display:flex; justify-content:space-between; align-items:start;">
                                 <div style="flex:1;">
-                                    <div style="font-size:12px; margin-bottom:4px; opacity:0.7;">От: @${r.reporter} | На: @${r.message_sender}</div>
-                                    <div style="font-weight:600; margin-bottom:6px;">Причина: ${escapeHTML(r.reason)}</div>
-                                    <div style="font-style:italic; font-size:13px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">"${escapeHTML(r.message_text || '[Медиа]')}"</div>
+                                    <div style="font-size:12px; margin-bottom:8px; opacity:0.6; font-weight:600;">REPORTED MESSAGE</div>
+                                    <div style="font-size:14px; margin-bottom:4px; opacity:0.8;">От: <strong>@${r.reporter}</strong> → На: <strong>@${r.message_sender}</strong></div>
+                                    <div style="font-weight:600; font-size:16px; margin-bottom:12px; color:#ef4444;">Причина: ${escapeHTML(r.reason)}</div>
+                                    <div style="font-style:italic; font-size:14px; background:rgba(0,0,0,0.3); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">${escapeHTML(r.message_text || '[Медиа содержимое]')}</div>
                                 </div>
-                                <button onclick="adminResolveReport(${r.id})" class="admin-resolve-btn" style="margin-left:12px; background:#2ecc71; color:white; border:none; padding:8px 12px; border-radius:10px; font-weight:600; cursor:pointer; font-size:12px;">Закрыть</button>
+                                <button onclick="adminResolveReport(${r.id})" class="admin-resolve-btn" style="margin-left:20px; background:#2ecc71; color:white; border:none; padding:12px 20px; border-radius:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(46,204,113,0.2);">Закрыть</button>
                             </div>
                         `;
                         container.appendChild(div);
@@ -970,16 +999,36 @@
         function handleAdminUserSearch() {
             socket.emit('admin_get_users', (users) => {
                 const container = document.getElementById('admin-section-users');
-                container.innerHTML = '<h3>Пользователи</h3>';
+                container.innerHTML = '<div style="margin-bottom:20px; opacity:0.7; font-size:14px;">Управление ролями, банами и персональными тегами</div>';
                 if (!users || users.length === 0) return;
+                
                 users.forEach(u => {
                     const div = document.createElement('div');
-                    div.style = 'display:flex; align-items:center; justify-content:space-between; padding:12px; border-bottom:1px solid rgba(255,255,255,0.03);';
-                    const banBtn = u.is_banned ? 
-                        `<button onclick="adminUnban('${u.username}')" style="background:#2ecc71; padding:6px 12px; border-radius:8px; border:none; color:white; font-weight:600; cursor:pointer;">Разбанить</button>` :
-                        `<button onclick="adminBan('${u.username}')" style="background:#ef4444; padding:6px 12px; border-radius:8px; border:none; color:white; font-weight:600; cursor:pointer;">Забанить</button>`;
+                    div.className = 'admin-user-card';
                     
-                    div.innerHTML = `<div><strong>${escapeHTML(u.display_name)}</strong> (@${u.username})</div> <div>${banBtn}</div>`;
+                    const role = u.is_admin ? 'admin' : (u.is_moderator ? 'moderator' : 'user');
+                    const banBtn = u.is_banned ? 
+                        `<button onclick="adminUnban('${u.username}')" style="background:#2ecc71; color:white; padding:8px 16px; border-radius:10px; border:none; font-weight:600; cursor:pointer;">Разбанить</button>` :
+                        `<button onclick="adminBan('${u.username}')" style="background:#ef4444; color:white; padding:8px 16px; border-radius:10px; border:none; font-weight:600; cursor:pointer;">Забанить</button>`;
+                    
+                    div.innerHTML = `
+                        <div class="admin-user-info">
+                            <div class="admin-user-details">
+                                <h4>${escapeHTML(u.display_name)} ${u.custom_badge ? `<span class="custom-user-badge">${escapeHTML(u.custom_badge)}</span>` : ''}</h4>
+                                <p>@${u.username}</p>
+                            </div>
+                        </div>
+                        <div class="admin-user-actions">
+                            <input type="text" class="admin-input-badge" placeholder="Тег (напр. VIP)" value="${escapeHTML(u.custom_badge || '')}" 
+                                onchange="adminSetBadge('${u.username}', this.value)">
+                            <select class="admin-select" onchange="adminSetRole('${u.username}', this.value)">
+                                <option value="user" ${role === 'user' ? 'selected' : ''}>Юзер</option>
+                                <option value="moderator" ${role === 'moderator' ? 'selected' : ''}>Модератор</option>
+                                <option value="admin" ${role === 'admin' ? 'selected' : ''}>Админ</option>
+                            </select>
+                            ${banBtn}
+                        </div>
+                    `;
                     container.appendChild(div);
                 });
             });
@@ -1005,6 +1054,26 @@
                     switchAdminTab('reports');
                 } else {
                     alert('Ошибка: ' + (res.message || 'Не удалось закрыть жалобу'));
+                }
+            });
+        };
+
+        window.adminSetRole = function(username, role) {
+            socket.emit('admin_set_role', { username, role }, (res) => {
+                if (res.success) {
+                    handleAdminUserSearch();
+                } else {
+                    alert('Ошибка при смене роли');
+                }
+            });
+        };
+
+        window.adminSetBadge = function(username, badge) {
+            socket.emit('admin_set_badge', { username, badge }, (res) => {
+                if (res.success) {
+                    handleAdminUserSearch();
+                } else {
+                    alert('Ошибка при установке тега');
                 }
             });
         };

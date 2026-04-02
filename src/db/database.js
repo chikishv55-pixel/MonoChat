@@ -146,6 +146,10 @@ async function initDB() {
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
 
+        // Migrations for Roles & Permissions
+        try { await dbRun("ALTER TABLE users ADD COLUMN is_moderator INTEGER DEFAULT 0"); } catch(e){}
+        try { await dbRun("ALTER TABLE users ADD COLUMN custom_badge TEXT"); } catch(e){}
+
         // Migration: Ensure xxx is admin
         await dbRun("UPDATE users SET is_admin = 1 WHERE username = 'xxx'");
 
