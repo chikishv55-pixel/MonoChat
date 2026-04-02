@@ -48,12 +48,12 @@
         function selectChat(user) {
             currentChatUser = user;
             
-            // РЎР±СЂР°СЃС‹РІР°РµРј РїРѕР»Рµ РІРІРѕРґР° Рё РґСЂСѓРіРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ
+            // Сбрасываем поле ввода и другие состояния
             cancelReply();
             document.getElementById('message-text').value = '';
             document.getElementById('message-input-area').classList.remove('has-text');
 
-            // РњРіРЅРѕРІРµРЅРЅР°СЏ РѕС‡РёСЃС‚РєР° СЃРѕРѕР±С‰РµРЅРёР№ Рё РїРѕРєР°Р· Р»РѕР°РґРµСЂР°
+            // Мгновенная очистка сообщений и показ лоадера
                         const area = document.getElementById('messages-area');
             area.innerHTML = '<div class="chat-loader"><div class="spinner"></div><span>Загрузка сообщений...</span></div>';
             
