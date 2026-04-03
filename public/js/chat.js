@@ -130,8 +130,8 @@
             currentChatUser = null;
         }
 
-        function addCurrentToContacts() {
-            const alias = prompt("РРјСЏ РґР»СЏ РєРѕРЅС‚Р°РєС‚Р°:", currentChatUser.display_name);
+        async function addCurrentToContacts() {
+            const alias = await showPrompt("Имя для контакта:", currentChatUser.display_name);
             if (alias) {
                 socket.emit('add contact', { username: currentChatUser.username, alias }, () => {
                     myContacts[currentChatUser.username] = alias;
@@ -207,7 +207,7 @@
              const btn = event.currentTarget;
              const isMuted = btn.classList.toggle('muted');
              btn.style.color = isMuted ? '#ef4444' : 'inherit';
-             alert(isMuted ? 'Уведомления выключены' : 'Уведомления включены');
+             showAlert(isMuted ? 'Уведомления выключены' : 'Уведомления включены');
          }
 
          function toggleNotifications() {
@@ -260,7 +260,7 @@
                     .then(images => {
                         images.forEach((img, index) => setTimeout(() => emitMessage(img, 'image'), index * 300));
                     })
-                    .catch(err => alert("Не удалось загрузить изображения."));
+                    .catch(err => showAlert("Не удалось загрузить изображения."));
             }
             input.value = '';
         }
@@ -272,7 +272,7 @@
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.start(); 
                 document.getElementById('record-btn').classList.add('recording');
-            } catch (err) { alert('Нет доступа к микрофону!'); }
+            } catch (err) { showAlert('Нет доступа к микрофону!'); }
         }
 
         function stopVoice() {
@@ -315,7 +315,7 @@
                 circleMediaRecorder.start();
                                 document.getElementById('record-btn').classList.add('recording');
             } catch (err) { 
-                alert('Нет доступа к камере или микрофону!'); 
+                showAlert('Нет доступа к камере или микрофону!'); 
                 if (circleStream) {
                     circleStream.getTracks().forEach(t => t.stop());
                     circleStream = null;
@@ -441,9 +441,9 @@
                     if (data.success) {
                         finalContent = data.path;
                     } else {
-                        return alert('Ошибка загрузки медиа');
+                        return showAlert('Ошибка загрузки медиа');
                     }
-                } catch(e) { return alert('Network error during upload'); }
+                } catch(e) { return showAlert('Network error during upload'); }
             }
 
             const payload = { 
@@ -542,7 +542,7 @@
         });
 
         socket.on('message failed', ({ time, error }) => {
-            alert(`Не удалось отправить сообщение: ${error}`);
+            showAlert(`Не удалось отправить сообщение: ${error}`);
         });
 
         socket.on('new story', () => { if(typeof loadStories === 'function') loadStories(); });
@@ -550,7 +550,7 @@
         socket.on('group_member_removed', ({ groupId, removedUsername, removerUsername }) => {
                         const groupUsername = `g${groupId}`;
             if (removedUsername === currentUser.username) {
-                alert(`Вы были удалены из группы.`);
+                showAlert(`Вы были удалены из группы.`);
                 // Если текущий чат - эта группа, закрываем его
                 if (currentChatUser && currentChatUser.username === groupUsername) {
                     closeChatMobile();
@@ -814,15 +814,15 @@
             });
         });
 
-                function adminBan(username) {
-            if (confirm(`Забанить ${username}?`)) {
+                async function adminBan(username) {
+            if (await showConfirm(`Забанить ${username}?`)) {
                 socket.emit('admin_ban_user', { username });
                 handleAdminUserSearch();
             }
         }
 
-        function adminUnban(username) {
-            if (confirm(`Разбанить ${username}?`)) {
+        async function adminUnban(username) {
+            if (await showConfirm(`Разбанить ${username}?`)) {
                 socket.emit('admin_unban_user', { username });
                 handleAdminUserSearch();
             }
@@ -899,7 +899,7 @@
                 closeMessageMenu();
                 if (text) {
                     navigator.clipboard.writeText(text);
-                    alert('Текст скопирован');
+                    showAlert('Текст скопирован');
                 }
             };
             
@@ -921,12 +921,12 @@
             menu.style.display = 'none';
         }
 
-        function reportMessage(msgId) {
-            const reason = prompt('Введите причину жалобы:');
+        async function reportMessage(msgId) {
+            const reason = await showPrompt('Введите причину жалобы:');
             if (reason) {
                 socket.emit('report_message', { messageId: msgId, reason: reason }, (res) => {
-                    if (res && res.success) alert('Жалоба отправлена. Спасибо!');
-                    else alert('Ошибка при отправке жалобы.');
+                    if (res && res.success) showAlert('Жалоба отправлена. Спасибо!');
+                    else showAlert('Ошибка при отправке жалобы.');
                 });
             }
         }
@@ -1093,15 +1093,15 @@
             });
         }
         
-        function adminBan(username) {
-            if (confirm(`Забанить @${username}?`)) {
+        async function adminBan(username) {
+            if (await showConfirm(`Забанить @${username}?`)) {
                 socket.emit('admin_ban_user', { username });
                 setTimeout(handleAdminUserSearch, 300);
             }
         }
 
-        function adminUnban(username) {
-            if (confirm(`Разбанить @${username}?`)) {
+        async function adminUnban(username) {
+            if (await showConfirm(`Разбанить @${username}?`)) {
                 socket.emit('admin_unban_user', { username });
                 setTimeout(handleAdminUserSearch, 300);
             }
@@ -1112,7 +1112,7 @@
                 if (res.success) {
                     switchAdminTab('reports');
                 } else {
-                    alert('Ошибка: ' + (res.message || 'Не удалось закрыть жалобу'));
+                    showAlert('Ошибка: ' + (res.message || 'Не удалось закрыть жалобу'));
                 }
             });
         };
@@ -1122,7 +1122,7 @@
                 if (res.success) {
                     handleAdminUserSearch();
                 } else {
-                    alert('Ошибка при смене роли');
+                    showAlert('Ошибка при смене роли');
                 }
             });
         };
@@ -1132,7 +1132,7 @@
                 if (res.success) {
                     handleAdminUserSearch();
                 } else {
-                    alert('Ошибка при установке тега');
+                    showAlert('Ошибка при установке тега');
                 }
             });
         };

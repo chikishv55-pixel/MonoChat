@@ -219,215 +219,7 @@
 
     <div class="settings-overlay" id="main-overlay" onclick="closeAllModals()"></div>
 
-    <div class="tg-settings-panel" id="profile-modal">
-        <div class="tg-panel-header">
-            <button class="tg-back-btn" onclick="closeAllModals()">‹</button>
-            <h3 class="tg-header-title">Информация</h3>
-            <div style="width: 24px;"></div>
-        </div>
 
-        <div class="tg-panel-content">
-            <div class="tg-profile-cover">
-                <div class="tg-avatar-wrapper" onclick="openFullAvatar()">
-                    <img class="tg-profile-avatar" id="pm-avatar-img" src="" style="display:none;"
-                        title="Нажмите, чтобы открыть фото">
-                    <div class="tg-profile-avatar" id="pm-avatar-text">--</div>
-                </div>
-                <div class="tg-profile-name" id="pm-name">Имя</div>
-                <div class="tg-profile-status">Был(а) недавно</div>
-            </div>
-
-            <div class="tg-section">
-                <div class="tg-menu-item">
-                    <div class="tg-menu-labeled">
-                        <span class="tg-menu-label" id="pm-username">@username</span>
-                        <span class="tg-menu-sublabel">Имя пользователя</span>
-                    </div>
-                </div>
-                <div class="tg-menu-item">
-                    <div class="tg-menu-labeled">
-                        <span class="tg-menu-label" id="pm-bio"></span>
-                        <span class="tg-menu-sublabel">О себе</span>
-                    </div>
-                </div>
-                <div class="tg-menu-item">
-                    <div class="tg-menu-labeled">
-                        <span class="tg-menu-label" id="pm-bdate"></span>
-                        <span class="tg-menu-sublabel">Дата рождения</span>
-                    </div>
-                </div>
-                <div class="tg-menu-item" id="pm-music-widget" style="display: none;">
-                    <div class="tg-menu-labeled">
-                        <span class="tg-menu-label" id="pm-music-text"
-                            style="color:var(--accent); font-weight:500;">Музыка</span>
-                        <span class="tg-menu-sublabel">Слушает сейчас</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="tg-settings-panel" id="my-profile-modal" onclick="closeAllModals()">
-        <div class="tg-settings-inner" onclick="event.stopPropagation()">
-            <div class="tg-panel-header">
-                <button class="tg-back-btn" onclick="closeAllModals()">‹</button>
-                <h3 class="tg-header-title">Настройки</h3>
-                <div style="width: 36px;"></div> <!-- Spacer -->
-            </div>
-
-            <div class="tg-panel-content">
-                <!-- Режим просмотра -->
-                <div id="my-profile-view" class="my-profile-view">
-                    <div class="tg-profile-cover">
-                        <div class="tg-avatar-wrapper" onclick="openFullAvatar()">
-                            <img class="tg-profile-avatar" id="my-profile-avatar-img" src="" style="display:none;">
-                            <div class="tg-profile-avatar" id="my-profile-avatar-text">--</div>
-                        </div>
-                        <div class="tg-profile-name" id="my-profile-name-modal">Имя</div>
-                        <div class="tg-profile-status">В сети</div>
-                    </div>
-
-                    <div class="tg-section">
-                        <div class="tg-menu-item">
-                            <div class="tg-menu-labeled">
-                                <span class="tg-menu-label" id="my-profile-username-modal">@username</span>
-                                <span class="tg-menu-sublabel">Имя пользователя</span>
-                            </div>
-                        </div>
-                        <div class="tg-menu-item">
-                            <div class="tg-menu-labeled">
-                                <span class="tg-menu-label" id="my-profile-bio">Здесь будет описание...</span>
-                                <span class="tg-menu-sublabel">О себе</span>
-                            </div>
-                        </div>
-                        <div class="tg-menu-item">
-                            <div class="tg-menu-labeled">
-                                <span class="tg-menu-label" id="my-profile-bdate">Дата рождения</span>
-                                <span class="tg-menu-sublabel">Дата рождения</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tg-section" id="premium-section">
-                        <div class="tg-menu-item" onclick="togglePremium()">
-                            <div class="tg-menu-icon-wrapper premium-icon">
-                                <span style="font-size: 18px;">★</span>
-                            </div>
-                            <div class="tg-menu-labeled" style="flex: 1;">
-                                <span class="tg-menu-label" id="premium-status-label">Monochrome Premium</span>
-                                <span class="tg-menu-sublabel" id="premium-status-sublabel">Разблокировать
-                                    видео-аватарки</span>
-                            </div>
-                            <button class="tg-btn-link" id="premium-action-btn">Подключить</button>
-                        </div>
-                    </div>
-
-                    <div class="tg-section" id="admin-tools-section" style="display:none;">
-                        <div class="tg-menu-item" onclick="openAdminPanel()">
-                            <div class="tg-menu-icon-wrapper"
-                                style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 4px 12px rgba(59,130,246,0.35);">
-                                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff"
-                                    stroke-width="2">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                    <path d="M12 8v4" />
-                                    <path d="M12 16h.01" />
-                                </svg>
-                            </div>
-                            <span class="tg-menu-text" style="color: var(--accent); font-weight: 600;">Модерация</span>
-                            <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6" />
-                            </svg>
-                        </div>
-                    </div>
-
-                    <div class="tg-section">
-                        <div class="tg-menu-item" onclick="enterEditProfileMode()">
-                            <div class="tg-menu-icon-wrapper"
-                                style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); box-shadow: 0 4px 12px rgba(99,102,241,0.35);">
-                                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff"
-                                    stroke-width="2">
-                                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-                                </svg>
-                            </div>
-                            <span class="tg-menu-text">Изменить профиль</span>
-                            <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6" />
-                            </svg>
-                        </div>
-                        <div class="tg-menu-item" onclick="toggleTheme()">
-                            <div class="tg-menu-icon-wrapper"
-                                style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 4px 12px rgba(139,92,246,0.35);">
-                                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff"
-                                    stroke-width="2">
-                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                                </svg>
-                            </div>
-                            <span class="tg-menu-text">Оформление</span>
-                            <svg style="width:16px;height:16px;color:var(--text-muted);flex-shrink:0;"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6" />
-                            </svg>
-                        </div>
-                        <div class="tg-menu-item text-danger" onclick="logout()">
-                            <div class="tg-menu-icon-wrapper"
-                                style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); box-shadow: 0 4px 12px rgba(239,68,68,0.35);">
-                                <svg style="width:20px;height:20px;" viewBox="0 0 24 24" fill="none" stroke="#fff"
-                                    stroke-width="2">
-                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
-                                </svg>
-                            </div>
-                            <span class="tg-menu-text text-danger">Выйти</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Режим редактирования -->
-                <div id="my-profile-edit" class="hidden">
-                    <div class="tg-profile-cover">
-                        <div class="tg-avatar-wrapper edit-mode"
-                            onclick="document.getElementById('avatar-upload').click()">
-                            <img class="tg-profile-avatar" id="edit-profile-avatar-img" src="" style="display:none;">
-                            <div class="tg-profile-avatar" id="edit-profile-avatar-text">--</div>
-                            <div class="tg-avatar-camera-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="#fff"
-                                    stroke-width="2">
-                                    <path
-                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
-                                    </path>
-                                    <circle cx="12" cy="13" r="4"></circle>
-                                </svg></div>
-                        </div>
-                    </div>
-
-                    <div class="tg-section">
-                        <div class="tg-input-group">
-                            <label class="tg-input-label">Имя</label>
-                            <input type="text" class="tg-input-field" id="edit-profile-name" placeholder="Ваше имя">
-                        </div>
-                        <div class="tg-input-group">
-                            <label class="tg-input-label">О себе</label>
-                            <textarea class="tg-input-field" id="edit-profile-bio" placeholder="Расскажите о себе..."
-                                rows="2"></textarea>
-                        </div>
-                        <div class="tg-input-group">
-                            <label class="tg-input-label">Фон виджета (URL)</label>
-                            <input type="text" class="tg-input-field" id="edit-profile-card-bg"
-                                placeholder="URL картинки для карточки профиля">
-                        </div>
-                        <div class="tg-input-group">
-                            <label class="tg-input-label">Дата рождения</label>
-                            <input type="date" class="tg-input-field" id="edit-profile-bdate">
-                        </div>
-                    </div>
-                    <div style="padding: 16px 12px; display: flex; flex-direction: column; gap: 10px;">
-                        <button class="tg-btn primary" onclick="saveProfile()">Сохранить</button>
-                        <button class="tg-btn secondary" onclick="exitEditProfileMode()">Отмена</button>
-                    </div>
-                </div>
-            </div>
-        </div> <!-- /tg-settings-inner -->
-    </div> <!-- /tg-settings-panel -->
 
 
     <div id="avatar-viewer" class="story-overlay" onclick="closeFullAvatar()">
@@ -546,38 +338,17 @@
         <span class="reaction-picker-emoji" onclick="toggleReaction(this, '😂')">😂</span>
         <span class="reaction-picker-emoji" onclick="toggleReaction(this, '😮')">😮</span>
         <span class="reaction-picker-emoji" onclick="toggleReaction(this, '😢')">😢</span>
-        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '🔥')">🔥</span>
-        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '🎉')">🎉</span>
-    </div>
-
-    <div class="custom-modal" id="forward-modal">
-        <h3>Переслать сообщение</h3>
-        <div class="modal-content" id="forward-chats-list">
-            <!-- Chat list will be rendered here -->
-        </div>
-        <button class="modal-btn" onclick="executeForward()">Переслать</button>
-        <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
-    </div>
-
-    <!-- Preview for Circle Video Recording -->
-    <div id="circle-preview-overlay" style="display: none;">
-        <video id="circle-preview-video" autoplay muted playsinline></video>
-    </div>
-
-
-    <!-- Экран входящего звонка (Telegram-style) -->
-    <div id="incoming-call-overlay" class="call-overlay">
-        <div class="call-background"></div>
-        <div class="call-content">
-            <div class="caller-info">
-                <div class="profile-modal-avatar" id="ic-avatar-text">--</div>
-                <img class="profile-modal-avatar" id="ic-avatar-img" src="" style="display:none;">
-                <h2 id="ic-caller-name">Имя</h2>
-                <p id="ic-call-type">Входящий звонок...</p>
+        <span class="reaction-picker-emoji" onclick=            <div class="call-controls">
+                <button class="call-btn accept" onclick="acceptCall()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>
+                </button>
+                <button class="call-btn reject" onclick="rejectCall()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+                </button>
             </div>
-            <div class="call-controls">
-                <div class="cal    <audio id="ringtone" style="display:none"></audio>
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-"></audio>
+        </div>
+        <audio id="ringtone" style="display:none"></audio>
+    </div>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-"></audio>
 
     <!-- Экран активного видеозвонка -->
     <div id="video-call-overlay"
@@ -799,6 +570,77 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             </div>
         </div>
     </div>
+
+    <!-- Modals & Overlays Restoration -->
+    <div id="avatar-viewer" class="story-overlay" onclick="closeFullAvatar()">
+        <img id="full-avatar-img" src="">
+    </div>
+
+    <div class="custom-modal" id="crop-modal">
+        <h3>Обрезка фото</h3>
+        <div class="cropper-container">
+            <img id="crop-image" src="">
+        </div>
+        <button class="modal-btn" onclick="executeCrop()">Обрезать и сохранить</button>
+        <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
+    </div>
+
+    <div class="custom-modal" id="message-crop-modal">
+        <h3>Обрезка изображения</h3>
+        <div class="cropper-container">
+            <img id="message-crop-image" src="">
+        </div>
+        <button class="modal-btn" onclick="executeMessageCrop()">Применить</button>
+        <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
+    </div>
+
+    <div class="custom-modal" id="forward-modal">
+        <h3>Переслать сообщение</h3>
+        <div class="modal-content" id="forward-chats-list">
+            <!-- Chat list will be rendered here -->
+        </div>
+        <button class="modal-btn" onclick="executeForward()">Переслать</button>
+        <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
+    </div>
+
+    <div id="circle-preview-overlay" style="display: none;">
+        <video id="circle-preview-video" autoplay muted playsinline></video>
+    </div>
+
+    <div id="incoming-call-overlay" class="call-overlay">
+        <div class="call-background"></div>
+        <div class="call-content">
+            <div class="caller-info">
+                <div class="profile-modal-avatar" id="ic-avatar-text">--</div>
+                <img class="profile-modal-avatar" id="ic-avatar-img" src="" style="display:none;">
+                <h2 id="ic-caller-name">Имя</h2>
+                <p id="ic-call-type">Входящий звонок...</p>
+            </div>
+            <div class="call-controls">
+                <button class="call-btn accept" onclick="acceptCall()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>
+                </button>
+                <button class="call-btn reject" onclick="rejectCall()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+                </button>
+            </div>
+        </div>
+        <audio id="ringtone" style="display:none"></audio>
+    </div>
+
+    <div id="video-call-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 7000; display: none; flex-direction: column;">
+        <video id="remote-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <video id="local-video" autoplay playsinline muted style="position: absolute; top: 40px; right: 20px; width: 100px; height: 140px; object-fit: cover; border-radius: 12px; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #222;"></video>
+        <div style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
+            <button onclick="toggleVideo()" id="toggle-video-btn" style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">📹</button>
+            <button onclick="toggleSpeaker()" id="toggle-speaker-btn" style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">🔊</button>
+            <button onclick="toggleAudio()" id="toggle-audio-btn" style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">🎤</button>
+            <button onclick="endCall()" style="width: 56px; height: 56px; border-radius: 50%; background: #e74c3c; border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(231,76,60,0.5);">📞</button>
+        </div>
+    </div>
+
+    <div id="image-viewer" class="iv-overlay" style="display: none;">
+        <div class="iv-background" onclick="closeImageViewer()"></div>
         <button class="iv-close-btn" onclick="closeImageViewer()">×</button>
         <button class="iv-nav-btn iv-prev" onclick="prevImage()">‹</button>
         <div class="iv-content">
@@ -958,6 +800,23 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         </div>
     </div>
 
+    <!-- PROFILE HOVER CARD (WIDGET-STYLE) -->
+    <div id="profile-hover-card" class="profile-hover-card">
+        <canvas id="ph-effects-canvas"></canvas>
+        <div class="ph-cover" id="ph-cover"></div>
+        <div class="ph-top">
+            <div id="ph-avatar" class="ph-avatar"></div>
+            <div class="ph-names">
+                <div id="ph-name" class="ph-name-actual">Name</div>
+                <div id="ph-username" class="ph-username-actual">@username</div>
+            </div>
+            <button class="ph-settings-btn" id="ph-settings-btn" onclick="toggleHoverCardSettings(event)" title="Настроить дизайн">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.91,7.62,6.29L5.23,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.72,8.87 c-0.11,0.21-0.06,0.47,0.12,0.61l2.03,1.58C4.84,11.36,4.82,11.68,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.21,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.5c-1.93,0-3.5-1.57-3.5-3.5 s1.57-3.5,3.5-3.5s3.5,1.57,3.5,3.5S13.93,15.5,12,15.5z"/></svg>
+            </button>
+        </div>
+        <div id="ph-bio" class="ph-bio-actual">Нет описания</div>
+    </div>
+
     <!-- PROFILE CUSTOMIZATION EDITOR -->
     <div id="ph-effects-backdrop" class="ph-effects-backdrop" onclick="toggleHoverCardSettings(event)">
         <div class="ph-editor-modal" onclick="event.stopPropagation()">
@@ -1031,6 +890,20 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
             <div class="ph-editor-footer">
                 <button class="ph-save-btn" onclick="saveProfileCustomization()">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM MODAL SYSTEM (ALERT/CONFIRM/PROMPT) -->
+    <div id="custom-alert-overlay" class="cm-overlay">
+        <div class="cm-box">
+            <div id="cm-icon" class="cm-icon">💡</div>
+            <div id="cm-title" class="cm-title">Уведомление</div>
+            <div id="cm-text" class="cm-text">Сообщение</div>
+            <input type="text" id="cm-prompt-input" class="cm-prompt-input" style="display:none;">
+            <div class="cm-actions">
+                <button id="cm-cancel-btn" class="cm-btn cancel" style="display:none;">Отмена</button>
+                <button id="cm-confirm-btn" class="cm-btn confirm">OK</button>
             </div>
         </div>
     </div>

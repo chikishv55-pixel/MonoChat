@@ -53,12 +53,14 @@ function authSuccess(user) {
     
     // Update IDs that actually exist in index.html
     const nameFooter = document.getElementById('my-name-footer');
-    const namePanel = document.getElementById('pm-name');
-    const usernamePanel = document.getElementById('pm-username');
+    const namePanel = document.getElementById('my-profile-name-modal');
+    const usernamePanel = document.getElementById('my-profile-username-modal');
+    const settingsDisplayName = document.getElementById('settings-display-name');
 
     if (nameFooter) nameFooter.textContent = user.display_name;
     if (namePanel) namePanel.textContent = user.display_name;
     if (usernamePanel) usernamePanel.textContent = '@' + user.username;
+    if (settingsDisplayName) settingsDisplayName.textContent = user.display_name;
 
     updateAllMyAvatars(user.avatar, user.display_name);
     updateMyMusicUI(user.music_status);

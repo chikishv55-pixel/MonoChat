@@ -158,6 +158,14 @@ async function initDB() {
         // Migrations for Roles & Permissions
         try { await dbRun("ALTER TABLE users ADD COLUMN is_moderator INTEGER DEFAULT 0"); } catch(e){}
         try { await dbRun("ALTER TABLE users ADD COLUMN custom_badge TEXT"); } catch(e){}
+        
+        // Migration for reports: add message_id if missing
+        try {
+            const columnsInReports = await dbAll(`PRAGMA table_info(reports)`);
+            if (!columnsInReports.some(c => c.name === 'message_id')) {
+                await dbRun(`ALTER TABLE reports ADD COLUMN message_id INTEGER`);
+            }
+        } catch(e){}
 
         // Migration: Ensure xxx is admin
         await dbRun("UPDATE users SET is_admin = 1 WHERE username = 'xxx'");

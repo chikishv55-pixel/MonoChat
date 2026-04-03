@@ -144,7 +144,7 @@ let localStream;
                 
                 document.getElementById('video-call-overlay').style.display = 'flex';
                 socket.emit('start_call', { to: callPeerUsername, isVideo: videoEnabled });
-            } catch (err) { alert('Не удалось получить доступ к камере или микрофону. Проверьте разрешения.'); callPeerUsername = null; }
+            } catch (err) { showAlert('Не удалось получить доступ к камере или микрофону. Проверьте разрешения.'); callPeerUsername = null; }
         }
 
         socket.on('incoming_call', (data) => {
@@ -192,7 +192,7 @@ let localStream;
                 socket.emit('accept_call', { to: callPeerUsername, isVideo: isCurrentCallVideo });
                 setupPeerConnection();
             } catch (err) {
-                alert('Ошибка доступа к камере/микрофону');
+                showAlert('Ошибка доступа к камере/микрофону');
                 rejectCall();
             }
         }
@@ -217,7 +217,7 @@ let localStream;
         });
 
         socket.on('call_rejected', () => { 
-            alert('Абонент отклонил вызов'); 
+            showAlert('Абонент отклонил вызов'); 
             cleanupCall(); 
         });
         socket.on('call_ended', () => {

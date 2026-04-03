@@ -38,7 +38,7 @@ function postStory(input) {
             
             const isVideo = file.type.startsWith('video/');
             if (isVideo && !isPremium) {
-                alert('Видео-аватарки доступны только Premium пользователям');
+                showAlert('Видео-аватарки доступны только Premium пользователям');
                 input.value = '';
                 return;
             }
@@ -104,7 +104,7 @@ function postStory(input) {
                     localStorage.setItem('monochrome_user', JSON.stringify(currentUser));
                     updateAllMyAvatars(currentUser.avatar, currentUser.display_name);
                 } else {
-                    alert('Ошибка обновления аватара: ' + (res.message || ''));
+                    showAlert('Ошибка обновления аватара: ' + (res.message || ''));
                     currentUser.avatar = oldAvatar;
                     updateAllMyAvatars(oldAvatar, currentUser.display_name);
                 }
@@ -213,7 +213,7 @@ function postStory(input) {
                     msgEl.style.backgroundColor = '';
                 }, 1500);
             } else {
-                alert('Исходное сообщение не найдено (возможно, оно в непрогруженной части истории).');
+                showAlert('Исходное сообщение не найдено (возможно, оно в непрогруженной части истории).');
             }
         }
 
@@ -237,11 +237,11 @@ function postStory(input) {
 
         function executeForward() {
             const selected = document.querySelectorAll('input[name="forward-target"]:checked');
-            if (selected.length === 0) return alert('Выберите хотя бы один чат для пересылки.');
+            if (selected.length === 0) return showAlert('Выберите хотя бы один чат для пересылки.');
             
             const targets = Array.from(selected).map(el => el.value);
             socket.emit('forward_message', { messageId: forwardMessageId, targets }, (res) => {
-                if (res.success) { alert('Сообщение переслано.'); } else { alert('Ошибка: ' + (res.message || 'Не удалось переслать сообщение.')); }
+                if (res.success) { showAlert('Сообщение переслано.'); } else { showAlert('Ошибка: ' + (res.message || 'Не удалось переслать сообщение.')); }
                 closeAllModals();
             });
         }
@@ -288,7 +288,7 @@ function postStory(input) {
             const now = new Date(); const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
             
             socket.emit('post_comment', { messageId: currentCommentMessageId, text, time }, (res) => {
-                if (res.success) input.value = ''; else alert('Ошибка при отправке комментария.');
+                if (res.success) input.value = ''; else showAlert('Ошибка при отправке комментария.');
             });
         }
 
@@ -397,10 +397,10 @@ function postStory(input) {
                     isPremium = !!res.is_premium;
                     currentUser.is_premium = res.is_premium;
                     localStorage.setItem('monochrome_user', JSON.stringify(currentUser));
-                    alert(isPremium ? 'Поздравляем! Теперь у вас есть Premium.' : 'Подписка Premium отменена.');
+                    showAlert(isPremium ? 'Поздравляем! Теперь у вас есть Premium.' : 'Подписка Premium отменена.');
                     location.reload(); // Перезагружаем для обновления UI
                 } else {
-                    alert('Ошибка при обновлении подписки.');
+                    showAlert('Ошибка при обновлении подписки.');
                 }
             });
         }
@@ -449,7 +449,9 @@ function postStory(input) {
                     if (settingsBtn) settingsBtn.style.display = 'flex';
                     
                     card.classList.add('active');
-                    let top = rect.top - card.offsetHeight - 15;
+                    // Force a reflow to get actual height if it was hidden
+                    const cardHeight = card.offsetHeight || 300; 
+                    let top = rect.top - cardHeight - 15;
                     let left = rect.left + (rect.width / 2) - (card.offsetWidth / 2);
                     if (left < 10) left = 10;
                     if (left + card.offsetWidth > window.innerWidth - 10) left = window.innerWidth - card.offsetWidth - 10;

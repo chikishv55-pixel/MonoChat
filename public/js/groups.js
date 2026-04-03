@@ -113,10 +113,10 @@ function openNewChatChoiceModal() {
             };
         }
 
-        function createChat(type) {
+        async function createChat(type) {
             const groupName = document.getElementById('new-group-name').value.trim();
-            if (!groupName) return alert('Введите название.');
-            if (newGroupMembers.size === 0 && type === 'group') return alert('Добавьте хотя бы одного участника в группу.');
+            if (!groupName) return showAlert('Введите название.');
+            if (newGroupMembers.size === 0 && type === 'group') return showAlert('Добавьте хотя бы одного участника в группу.');
 
             const membersArray = Array.from(newGroupMembers);
             socket.emit('create_chat', { name: groupName, type: type, members: membersArray }, (res) => {
@@ -126,13 +126,17 @@ function openNewChatChoiceModal() {
                     const newChatObject = { username: `g${res.chat.id}`, display_name: res.chat.name, avatar: res.chat.avatar, isGroup: true, isOnline: false, type: res.chat.type };
                     setTimeout(() => selectChat(newChatObject), 200); // Небольшая задержка для рендера списка
                 } else {
-                    alert(`Ошибка: ${res.message}`);
+                    showAlert(`Ошибка: ${res.message}`);
                 }
             });
         }
 
         // --- Функции своего профиля ---
         function openMySettings() {
+            if (!currentUser) {
+                console.error('currentUser is null, cannot open settings');
+                return;
+            }
             closeAllModals(); // Ensure other modals are closed
             
             // Show admin tools if user is admin
@@ -176,14 +180,14 @@ function openNewChatChoiceModal() {
             document.getElementById('my-profile-edit').classList.add('hidden');
         }
 
-        function saveProfile() {
+        async function saveProfile() {
             const data = {
                 displayName: document.getElementById('edit-profile-name').value.trim(),
                 bio: document.getElementById('edit-profile-bio').value.trim(),
                 profileCardBg: document.getElementById('edit-profile-card-bg').value.trim(),
                 birthDate: document.getElementById('edit-profile-bdate').value,
             };
-            if (!data.displayName) return alert('Имя не может быть пустым.');
+            if (!data.displayName) return showAlert('Имя не может быть пустым.');
 
             socket.emit('update_profile', data, (res) => {
                 if (res.success) {
@@ -193,7 +197,7 @@ function openNewChatChoiceModal() {
                     document.getElementById('profile-name').textContent = res.user.display_name;
                     updateAllMyAvatars(res.user.avatar, res.user.display_name);
                     openMySettings(); // Переоткрываем модалку с обновленными данными
-                } else { alert('Ошибка: ' + (res.message || 'Не удалось сохранить профиль.')); }
+                } else { showAlert('Ошибка: ' + (res.message || 'Не удалось сохранить профиль.')); }
             });
         }
 
@@ -246,7 +250,7 @@ function openNewChatChoiceModal() {
             const groupId = currentChatUser.username; // e.g. "g123"
 
             socket.emit('get_group_details', groupId, (res) => {
-                if (!res.success) return alert(res.message);
+                if (!res.success) return showAlert(res.message);
                 
                 const { group, members, myRole } = res;
                 currentChatUser.groupData = group; // Cache group data
@@ -286,26 +290,26 @@ function openNewChatChoiceModal() {
             });
         }
 
-        function removeGroupMember(usernameToRemove) {
-            if (!confirm(`Вы уверены, что хотите удалить @${usernameToRemove} из группы?`)) return;
+        async function removeGroupMember(usernameToRemove) {
+            if (!await showConfirm(`Вы уверены, что хотите удалить @${usernameToRemove} из группы?`)) return;
             const groupId = currentChatUser.username.substring(1);
             socket.emit('remove_group_member', { groupId, usernameToRemove }, (res) => {
                 if (res.success) {
                     openGroupInfoModal(); // Refresh the list
                 } else {
-                    alert(`Ошибка: ${res.message}`);
+                    showAlert(`Ошибка: ${res.message}`);
                 }
             });
         }
 
-        function leaveGroup() {
-            if (!confirm('Вы уверены, что хотите покинуть эту группу?')) return;
+        async function leaveGroup() {
+            if (!await showConfirm('Вы уверены, что хотите покинуть эту группу?')) return;
             const groupId = currentChatUser.username.substring(1);
             socket.emit('remove_group_member', { groupId, usernameToRemove: currentUser.username }, (res) => {
                 if (res.success) {
                     closeAllModals();
                 } else {
-                    alert(`Ошибка: ${res.message}`);
+                    showAlert(`Ошибка: ${res.message}`);
                 }
             });
         }
@@ -320,8 +324,8 @@ function openNewChatChoiceModal() {
             addBtn.onclick = addMembersToGroup;
         }
 
-        function addMembersToGroup() {
-            if (newGroupMembers.size === 0) return alert('Выберите участников для добавления.');
+        async function addMembersToGroup() {
+            if (newGroupMembers.size === 0) return showAlert('Выберите участников для добавления.');
             const groupId = currentChatUser.username.substring(1);
             const membersArray = Array.from(newGroupMembers);
             socket.emit('add_group_members', { groupId, members: membersArray }, (res) => {
@@ -329,34 +333,34 @@ function openNewChatChoiceModal() {
                     closeAllModals();
                     openGroupInfoModal(); // Refresh list
                 } else {
-                    alert(`Ошибка: ${res.message}`);
+                    showAlert(`Ошибка: ${res.message}`);
                 }
             });
         }
 
         function openEditGroupModal() {
             const groupData = currentChatUser.groupData;
-            if (!groupData) return alert('Сначала откройте информацию о группе.');
+            if (!groupData) return showAlert('Сначала откройте информацию о группе.');
             document.getElementById('edit-group-name').value = groupData.name;
             document.getElementById('edit-group-public-id').value = groupData.public_id || '';
             document.getElementById('edit-group-visibility').value = groupData.visibility;
             document.getElementById('edit-group-modal').classList.add('active');
         }
 
-        function saveGroupSettings() {
+        async function saveGroupSettings() {
             const groupId = currentChatUser.username.substring(1);
             const settings = {
                 name: document.getElementById('edit-group-name').value.trim(),
                 public_id: document.getElementById('edit-group-public-id').value.trim(),
                 visibility: document.getElementById('edit-group-visibility').value
             };
-            if (!settings.name) return alert('Название группы не может быть пустым.');
+            if (!settings.name) return showAlert('Название группы не может быть пустым.');
 
             socket.emit('update_group_settings', { groupId, settings }, (res) => {
                 if (res.success) {
                     closeAllModals();
                 } else {
-                    alert(`Ошибка: ${res.message}`);
+                    showAlert(`Ошибка: ${res.message}`);
                 }
             });
         }
@@ -425,10 +429,10 @@ function openNewChatChoiceModal() {
         }
 
         function updateAllMyAvatars(avatarUrl, displayName) {
-            setAvatarUI('pm-avatar-img', 'pm-avatar-text', avatarUrl, displayName);
+            // Мой профиль (просмотр и редактирование)
             setAvatarUI('my-profile-avatar-img', 'my-profile-avatar-text', avatarUrl, displayName);
             setAvatarUI('edit-profile-avatar-img', 'edit-profile-avatar-text', avatarUrl, displayName);
-            // Обновляем аватар в виджете футера
+            // Виджет футера
             setAvatarUI('my-avatar-footer', 'my-avatar-footer-text', avatarUrl, displayName);
         }
 
