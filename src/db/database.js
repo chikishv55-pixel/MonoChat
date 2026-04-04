@@ -156,8 +156,13 @@ async function initDB() {
         )`);
 
         // Migrations for Roles & Permissions
-        try { await dbRun("ALTER TABLE users ADD COLUMN is_moderator INTEGER DEFAULT 0"); } catch(e){}
-        try { await dbRun("ALTER TABLE users ADD COLUMN custom_badge TEXT"); } catch(e){}
+        const columnsInUsersCheck = await dbAll(`PRAGMA table_info(users)`);
+        if (!columnsInUsersCheck.some(c => c.name === 'is_moderator')) {
+            try { await dbRun("ALTER TABLE users ADD COLUMN is_moderator INTEGER DEFAULT 0"); } catch(e){}
+        }
+        if (!columnsInUsersCheck.some(c => c.name === 'custom_badge')) {
+            try { await dbRun("ALTER TABLE users ADD COLUMN custom_badge TEXT"); } catch(e){}
+        }
         
         // Migration for reports: add message_id if missing
         try {
