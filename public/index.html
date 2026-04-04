@@ -222,191 +222,8 @@
 
 
 
-    <div id="avatar-viewer" class="story-overlay" onclick="closeFullAvatar()">
-        <div class="story-content" onclick="event.stopPropagation()">
-            <img id="full-avatar-img" src=""
-                style="width: 350px; height: 350px; border-radius: 50%; object-fit: cover; border: 2px solid var(--text-main);">
-        </div>
-    </div>
+    <!-- ALL MODALS CONSOLIDATED BELOW AFTER DRAWERS -->
 
-    <div class="custom-modal" id="crop-modal" style="z-index: 2005; width: 95vw; max-width: 800px; height: 90vh;">
-        <h3 style="margin-bottom: 0; font-weight: 400; flex-shrink: 0;">Обрезка (выберите круг)</h3>
-        <div id="crop-container"
-            style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
-            <img id="crop-image" src="" style="display: block; max-width: 100%; max-height: 100%;">
-            <video id="crop-video" src="" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;"
-                autoplay loop muted playsinline></video>
-        </div>
-        <button class="settings-action-btn" onclick="saveCroppedAvatar()"
-            style="width: 100%; border: none; padding: 12px; background: var(--text-main); color: var(--bg-main); cursor: pointer; text-transform: uppercase; flex-shrink: 0;">Сохранить
-            аватар</button>
-        <button class="modal-btn" onclick="closeCropModal()"
-            style="border-color: transparent; margin-top: 0; flex-shrink: 0;">Отмена</button>
-    </div>
-
-    <div class="custom-modal" id="message-crop-modal"
-        style="z-index: 2005; width: 95vw; max-width: 800px; height: 90vh;">
-        <h3 style="margin-bottom: 0; font-weight: 400; flex-shrink: 0;">Предпросмотр фото</h3>
-        <div
-            style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
-            <img id="message-crop-image" src="" style="display: block; max-width: 100%; max-height: 100%;">
-        </div>
-        <button class="settings-action-btn" onclick="sendCroppedMessageImage()"
-            style="width: 100%; border: none; padding: 12px; background: var(--text-main); color: var(--bg-main); cursor: pointer; text-transform: uppercase; flex-shrink: 0;">Отправить
-            фото</button>
-        <button class="modal-btn" onclick="closeMessageCropModal()"
-            style="border-color: transparent; margin-top: 0; flex-shrink: 0;">Отмена</button>
-    </div>
-
-    <div class="custom-modal" id="delete-modal">
-        <h3 style="font-weight: 400; margin-bottom: 10px;">Удалить сообщение?</h3>
-        <button class="modal-btn danger" id="btn-delete-everyone" onclick="executeDelete('everyone')">Удалить у
-            всех</button>
-        <button class="modal-btn" onclick="executeDelete('me')">Удалить у себя</button>
-        <button class="modal-btn" onclick="closeAllModals()" style="border-color:transparent">Отмена</button>
-    </div>
-
-    <div class="custom-modal" id="group-info-modal">
-        <img class="profile-modal-avatar" id="gi-avatar-img" src="" style="display:none;">
-        <div class="profile-modal-avatar" id="gi-avatar-text">--</div>
-        <div class="profile-modal-name" id="gi-name">Название группы</div>
-        <div class="profile-modal-user" id="gi-id">@public_id</div>
-        <div class="group-member-list" id="gi-members-list"></div>
-        <button class="modal-btn" id="gi-add-member-btn" onclick="openAddMembersModal()">+ Добавить участника</button>
-        <button class="modal-btn" id="gi-edit-btn" onclick="openEditGroupModal()">Редактировать</button>
-        <button class="modal-btn danger" id="gi-leave-btn" onclick="leaveGroup()">Покинуть группу</button>
-        <button class="modal-btn transparent" onclick="closeAllModals()">Закрыть</button>
-    </div>
-
-    <div class="custom-modal" id="edit-group-modal">
-        <h3>Редактировать группу</h3>
-        <div class="input-group"><input type="text" class="input-field" id="edit-group-name"
-                placeholder="Название группы"></div>
-        <div class="input-group"><input type="text" class="input-field" id="edit-group-public-id"
-                placeholder="Публичный ID (необязательно)"></div>
-        <div class="input-group" style="text-align: left; font-size: 14px; color: var(--text-muted);">Видимость: <select
-                id="edit-group-visibility" style="margin-left: 10px;">
-                <option value="public">Публичная</option>
-                <option value="private">Частная</option>
-            </select></div>
-        <button class="modal-btn" onclick="saveGroupSettings()">Сохранить</button>
-        <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
-    </div>
-
-    <div class="custom-modal" id="create-chat-modal">
-        <h3>Создать новую группу</h3>
-        <div class="input-group"><input type="text" class="input-field" id="new-group-name"
-                placeholder="Название группы"></div>
-        <div class="input-group"><input type="text" class="input-field" id="new-group-member-search"
-                placeholder="Добавить участников по @юзернейму"></div>
-        <div id="new-group-search-results" class="search-results-container"></div>
-        <div class="members-list-label">Участники:</div>
-        <div id="new-group-members-list" class="members-list"></div>
-        <button class="modal-btn">Создать группу</button>
-        <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
-    </div>
-
-    <div class="custom-modal" id="new-chat-choice-modal">
-        <h3 style="font-weight: 500; margin-bottom: 15px;">Создать чат</h3>
-        <button class="modal-btn" onclick="openCreateChatModal('group')">Группа</button>
-        <button class="modal-btn" onclick="openCreateChatModal('channel')">Канал</button>
-        <button class="modal-btn transparent" onclick="closeAllModals()"
-            style="border-color:transparent;">Отмена</button>
-    </div>
-
-    <div class="custom-modal" id="story-preview-modal">
-        <h3 style="font-weight: 500; margin-bottom: 10px;">Опубликовать историю?</h3>
-        <img id="story-preview-image" src=""
-            style="width: 100%; border-radius: 12px; margin-bottom: 16px; max-height: 40vh; object-fit: contain; background: #000;">
-        <button class="modal-btn" onclick="confirmPostStory()">Опубликовать</button>
-        <button class="modal-btn transparent" onclick="closeAllModals()"
-            style="border-color:transparent;">Отмена</button>
-    </div>
-
-    <div class="custom-modal" id="music-modal">
-        <h3 style="font-weight: 500; margin-bottom: 10px;">Музыкальный статус</h3>
-        <div class="input-group"><input type="text" class="input-field" id="music-input"
-                placeholder="Исполнитель - Трек" maxlength="80"></div>
-        <button class="modal-btn" onclick="saveMusicStatus()">Сохранить статус</button>
-        <button class="modal-btn danger" onclick="clearMusicStatus()">Убрать музыку</button>
-        <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
-    </div>
-
-    <div id="reaction-picker" class="reaction-picker">
-        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '👍')">👍</span>
-        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '❤️')">❤️</span>
-        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '😂')">😂</span>
-        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '😮')">😮</span>
-        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '😢')">😢</span>
-        <span class="reaction-picker-emoji" onclick=            <div class="call-controls">
-                <button class="call-btn accept" onclick="acceptCall()">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>
-                </button>
-                <button class="call-btn reject" onclick="rejectCall()">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
-                </button>
-            </div>
-        </div>
-        <audio id="ringtone" style="display:none"></audio>
-    </div>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-"></audio>
-
-    <!-- Экран активного видеозвонка -->
-    <div id="video-call-overlay"
-        style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 7000; display: none; flex-direction: column;">
-        <video id="remote-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-        <video id="local-video" autoplay playsinline muted
-            style="position: absolute; top: 40px; right: 20px; width: 100px; height: 140px; object-fit: cover; border-radius: 12px; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 4px 12px rgba(0,0,0,0.5); background: #222;"></video>
-        <div
-            style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
-            <button onclick="toggleVideo()" id="toggle-video-btn"
-                style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">📹</button>
-            <button onclick="toggleSpeaker()" id="toggle-speaker-btn"
-                style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">🔊</button>
-            <button onclick="toggleAudio()" id="toggle-audio-btn"
-                style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px);">🎤</button>
-            <button onclick="endCall()"
-                style="width: 56px; height: 56px; border-radius: 50%; background: #e74c3c; border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(231,76,60,0.5);">📞</button>
-        </div>
-    </div>
-
-    <div class="custom-modal" id="comments-modal"
-        style="width: 95vw; max-width: 500px; height: 85vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; z-index: 3000;">
-        <div
-            style="padding: 16px 20px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); z-index: 2;">
-            <h3 style="margin: 0; font-weight: 500;">Комментарии</h3>
-            <button onclick="closeCommentsModal()"
-                style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); line-height: 1;">×</button>
-        </div>
-        <div id="comments-list"
-            style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; background-color: var(--bg-main); background-image: var(--chat-pattern);">
-        </div>
-        <div class="input-area"
-            style="padding: 12px 20px; border-top: 1px solid var(--border-light); display: flex; gap: 10px; align-items: center;">
-            <input type="text" class="message-field" id="comment-input" placeholder="Написать комментарий..."
-                style="flex: 1;">
-            <div class="send-btn" onclick="sendComment()">
-                <svg viewBox="0 0 24 24">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <div id="story-viewer" class="story-overlay" onclick="closeStory()">
-        <div class="story-content">
-            <img id="story-img" src="">
-            <div id="story-caption"></div>
-        </div>
-    </div>
-
-    <!-- Модалка выбора типа звонка -->
-    <div id="call-choice-modal" class="custom-modal">
-        <h3>Выберите тип звонка</h3>
-        <button class="modal-btn" onclick="startCall(false); closeCallChoice();">Аудиозвонок</button>
-        <button class="modal-btn" onclick="startCall(true); closeCallChoice();">Видеозвонок</button>
-        <button class="modal-btn transparent" onclick="closeCallChoice()">Отмена</button>
-    </div>
 
     </div>
 
@@ -571,41 +388,131 @@
         </div>
     </div>
 
-    <!-- Modals & Overlays Restoration -->
+    <!-- CONSOLIDATED MODALS SECTION -->
     <div id="avatar-viewer" class="story-overlay" onclick="closeFullAvatar()">
-        <img id="full-avatar-img" src="">
+        <div class="story-content" onclick="event.stopPropagation()">
+            <img id="full-avatar-img" src="" style="width: 350px; height: 350px; border-radius: 50%; object-fit: cover; border: 2px solid var(--text-main);">
+        </div>
     </div>
 
-    <div class="custom-modal" id="crop-modal">
-        <h3>Обрезка фото</h3>
-        <div class="cropper-container">
-            <img id="crop-image" src="">
+    <div class="custom-modal" id="crop-modal" style="z-index: 2005; width: 95vw; max-width: 800px; height: 90vh;">
+        <h3 style="margin-bottom: 0; font-weight: 400; flex-shrink: 0;">Обрезка аватара</h3>
+        <div id="crop-container" style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
+            <img id="crop-image" src="" style="display: block; max-width: 100%; max-height: 100%;">
+            <video id="crop-video" src="" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;" autoplay loop muted playsinline></video>
         </div>
-        <button class="modal-btn" onclick="executeCrop()">Обрезать и сохранить</button>
+        <button class="settings-action-btn" onclick="saveCroppedAvatar()" style="width: 100%; border: none; padding: 12px; background: var(--text-main); color: var(--bg-main); cursor: pointer; text-transform: uppercase; flex-shrink: 0;">Сохранить аватаку</button>
+        <button class="modal-btn" onclick="closeCropModal()" style="border-color: transparent; margin-top: 0; flex-shrink: 0;">Отмена</button>
+    </div>
+
+    <div class="custom-modal" id="message-crop-modal" style="z-index: 2005; width: 95vw; max-width: 800px; height: 90vh;">
+        <h3 style="margin-bottom: 0; font-weight: 400; flex-shrink: 0;">Предпросмотр фото</h3>
+        <div style="width: 100%; flex-grow: 1; min-height: 0; overflow: hidden; background: #000; display: flex; justify-content: center; align-items: center;">
+            <img id="message-crop-image" src="" style="display: block; max-width: 100%; max-height: 100%;">
+        </div>
+        <button class="settings-action-btn" onclick="sendCroppedMessageImage()" style="width: 100%; border: none; padding: 12px; background: var(--text-main); color: var(--bg-main); cursor: pointer; text-transform: uppercase; flex-shrink: 0;">Отправить фото</button>
+        <button class="modal-btn" onclick="closeMessageCropModal()" style="border-color: transparent; margin-top: 0; flex-shrink: 0;">Отмена</button>
+    </div>
+
+    <div class="custom-modal" id="delete-modal">
+        <h3 style="font-weight: 400; margin-bottom: 10px;">Удалить сообщение?</h3>
+        <button class="modal-btn danger" id="btn-delete-everyone" onclick="executeDelete('everyone')">Удалить у всех</button>
+        <button class="modal-btn" onclick="executeDelete('me')">Удалить у себя</button>
+        <button class="modal-btn" onclick="closeAllModals()" style="border-color:transparent">Отмена</button>
+    </div>
+
+    <div class="custom-modal" id="group-info-modal">
+        <img class="profile-modal-avatar" id="gi-avatar-img" src="" style="display:none;">
+        <div class="profile-modal-avatar" id="gi-avatar-text">--</div>
+        <div class="profile-modal-name" id="gi-name">Название группы</div>
+        <div class="profile-modal-user" id="gi-id">@public_id</div>
+        <div class="group-member-list" id="gi-members-list"></div>
+        <button class="modal-btn" id="gi-add-member-btn" onclick="openAddMembersModal()">+ Добавить участника</button>
+        <button class="modal-btn" id="gi-edit-btn" onclick="openEditGroupModal()">Редактировать</button>
+        <button class="modal-btn danger" id="gi-leave-btn" onclick="leaveGroup()">Покинуть группу</button>
+        <button class="modal-btn transparent" onclick="closeAllModals()">Закрыть</button>
+    </div>
+
+    <div class="custom-modal" id="edit-group-modal">
+        <h3>Редактировать группу</h3>
+        <div class="input-group"><input type="text" class="input-field" id="edit-group-name" placeholder="Название группы"></div>
+        <div class="input-group"><input type="text" class="input-field" id="edit-group-public-id" placeholder="Публичный ID (необязательно)"></div>
+        <div class="input-group" style="text-align: left; font-size: 14px; color: var(--text-muted);">Видимость: <select id="edit-group-visibility" style="margin-left: 10px;"><option value="public">Публичная</option><option value="private">Частная</option></select></div>
+        <button class="modal-btn" onclick="saveGroupSettings()">Сохранить</button>
         <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
     </div>
 
-    <div class="custom-modal" id="message-crop-modal">
-        <h3>Обрезка изображения</h3>
-        <div class="cropper-container">
-            <img id="message-crop-image" src="">
-        </div>
-        <button class="modal-btn" onclick="executeMessageCrop()">Применить</button>
+    <div class="custom-modal" id="create-chat-modal">
+        <h3>Создать новую группу</h3>
+        <div class="input-group"><input type="text" class="input-field" id="new-group-name" placeholder="Название группы"></div>
+        <div class="input-group"><input type="text" class="input-field" id="new-group-member-search" placeholder="Добавить участников по @юзернейму"></div>
+        <div id="new-group-search-results" class="search-results-container"></div>
+        <div class="members-list-label">Участники:</div>
+        <div id="new-group-members-list" class="members-list"></div>
+        <button class="modal-btn">Создать группу</button>
         <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
     </div>
 
+    <div class="custom-modal" id="new-chat-choice-modal">
+        <h3 style="font-weight: 500; margin-bottom: 15px;">Создать чат</h3>
+        <button class="modal-btn" onclick="openCreateChatModal('group')">Группа</button>
+        <button class="modal-btn" onclick="openCreateChatModal('channel')">Канал</button>
+        <button class="modal-btn transparent" onclick="closeAllModals()" style="border-color:transparent;">Отмена</button>
+    </div>
+
+    <div class="custom-modal" id="story-preview-modal">
+        <h3 style="font-weight: 500; margin-bottom: 10px;">Опубликовать историю?</h3>
+        <img id="story-preview-image" src="" style="width: 100%; border-radius: 12px; margin-bottom: 16px; max-height: 40vh; object-fit: contain; background: #000;">
+        <button class="modal-btn" onclick="confirmPostStory()">Опубликовать</button>
+        <button class="modal-btn transparent" onclick="closeAllModals()" style="border-color:transparent;">Отмена</button>
+    </div>
+
+    <div class="custom-modal" id="music-modal">
+        <h3 style="font-weight: 500; margin-bottom: 10px;">Музыкальный статус</h3>
+        <div class="input-group"><input type="text" class="input-field" id="music-input" placeholder="Исполнитель - Трек" maxlength="80"></div>
+        <button class="modal-btn" onclick="saveMusicStatus()">Сохранить статус</button>
+        <button class="modal-btn danger" onclick="clearMusicStatus()">Убрать музыку</button>
+        <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
+    </div>
+
+    <div id="reaction-picker" class="reaction-picker">
+        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '👍')">👍</span>
+        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '❤️')">❤️</span>
+        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '😂')">😂</span>
+        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '😮')">😮</span>
+        <span class="reaction-picker-emoji" onclick="toggleReaction(this, '😢')">😢</span>
+    </div>
+
+    <div class="custom-modal" id="comments-modal" style="width: 95vw; max-width: 500px; height: 85vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; z-index: 3000;">
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); z-index: 2;">
+            <h3 style="margin: 0; font-weight: 500;">Комментарии</h3>
+            <button onclick="closeCommentsModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); line-height: 1;">×</button>
+        </div>
+        <div id="comments-list" style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; background-color: var(--bg-main); background-image: var(--chat-pattern);"></div>
+        <div class="input-area" style="padding: 12px 20px; border-top: 1px solid var(--border-light); display: flex; gap: 10px; align-items: center;">
+            <input type="text" class="message-field" id="comment-input" placeholder="Написать комментарий..." style="flex: 1;">
+            <div class="send-btn" onclick="sendComment()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></div>
+        </div>
+    </div>
+
+    <div id="story-viewer" class="story-overlay" onclick="closeStory()"><div class="story-content"><img id="story-img" src=""><div id="story-caption"></div></div></div>
+
+    <div id="call-choice-modal" class="custom-modal">
+        <h3>Выберите тип звонка</h3>
+        <button class="modal-btn" onclick="startCall(false); closeCallChoice();">Аудиозвонок</button>
+        <button class="modal-btn" onclick="startCall(true); closeCallChoice();">Видеозвонок</button>
+        <button class="modal-btn transparent" onclick="closeCallChoice()">Отмена</button>
+    </div>
+
+    <!-- NEW/RESTORED MODALS -->
     <div class="custom-modal" id="forward-modal">
         <h3>Переслать сообщение</h3>
-        <div class="modal-content" id="forward-chats-list">
-            <!-- Chat list will be rendered here -->
-        </div>
+        <div class="modal-content" id="forward-chats-list"></div>
         <button class="modal-btn" onclick="executeForward()">Переслать</button>
         <button class="modal-btn transparent" onclick="closeAllModals()">Отмена</button>
     </div>
 
-    <div id="circle-preview-overlay" style="display: none;">
-        <video id="circle-preview-video" autoplay muted playsinline></video>
-    </div>
+    <div id="circle-preview-overlay" style="display: none;"><video id="circle-preview-video" autoplay muted playsinline></video></div>
 
     <div id="incoming-call-overlay" class="call-overlay">
         <div class="call-background"></div>
@@ -617,12 +524,8 @@
                 <p id="ic-call-type">Входящий звонок...</p>
             </div>
             <div class="call-controls">
-                <button class="call-btn accept" onclick="acceptCall()">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>
-                </button>
-                <button class="call-btn reject" onclick="rejectCall()">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
-                </button>
+                <button class="call-btn accept" onclick="acceptCall()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg></button>
+                <button class="call-btn reject" onclick="rejectCall()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></button>
             </div>
         </div>
         <audio id="ringtone" style="display:none"></audio>
@@ -643,12 +546,11 @@
         <div class="iv-background" onclick="closeImageViewer()"></div>
         <button class="iv-close-btn" onclick="closeImageViewer()">×</button>
         <button class="iv-nav-btn iv-prev" onclick="prevImage()">‹</button>
-        <div class="iv-content">
-            <img id="iv-image" src="">
-        </div>
+        <div class="iv-content"><img id="iv-image" src=""></div>
         <button class="iv-nav-btn iv-next" onclick="nextImage()">›</button>
         <div class="iv-counter" id="iv-counter"></div>
     </div>
+
 
     <!-- MODERN ADMIN PANEL MODAL (DASHBOARD STYLE) -->
     <div class="custom-modal admin-dashboard-modal" id="admin-panel-modal"
@@ -777,28 +679,8 @@
         </div>
     </div>
 
-    <!-- GLOBAL PROFILE HOVER CARD -->
-    <div id="profile-hover-card" class="profile-hover-card">
-        <canvas id="ph-effects-canvas"></canvas>
-        <div class="ph-cover" id="ph-cover"></div>
-        <button class="ph-settings-btn" id="ph-settings-btn" onclick="toggleHoverCardSettings(event)">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="5" r="2" />
-                <circle cx="12" cy="12" r="2" />
-                <circle cx="12" cy="19" r="2" />
-            </svg>
-        </button>
-        <div class="ph-info">
-            <div class="ph-avatar-area">
-                <div id="ph-avatar" class="avatar"></div>
-            </div>
-            <div class="ph-text-content">
-                <h2 id="ph-name">Name</h2>
-                <p id="ph-username">@username</p>
-                <p id="ph-bio" class="ph-bio">О себе...</p>
-            </div>
-        </div>
-    </div>
+    <!-- GLOBAL PROFILE HOVER CARD (DASHBOARD-STRICT) -->
+
 
     <!-- PROFILE HOVER CARD (WIDGET-STYLE) -->
     <div id="profile-hover-card" class="profile-hover-card">
