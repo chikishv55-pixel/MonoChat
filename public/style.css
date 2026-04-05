@@ -1247,28 +1247,7 @@ body.dark-theme .message.mine .reply-block b { color: #fff; }
     text-align: center;
 }
 
-.ph-avatar-area {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 12px;
-    position: relative;
-}
-
-.avatar-ph {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 4px solid var(--bg-card);
-    background: var(--avatar-bg);
-    object-fit: cover;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    font-weight: 600;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
+/* Consolidated to .ph-avatar below */
 
 #ph-name {
     font-size: 18px;
@@ -1815,21 +1794,26 @@ body.light-theme .ph-info {
     background: rgba(255, 255, 255, 0.4);
 }
 
-.ph-avatar-area {
-    width: 90px;
-    height: 90px;
+.ph-avatar {
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     background: var(--bg-card);
     padding: 3px;
     position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.ph-avatar-area .avatar {
-    width: 100%;
-    height: 100%;
-    border: none;
+.ph-avatar img, .ph-avatar video, .ph-avatar .avatar-img-actual {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
 }
 
 .ph-info h2 { font-size: 24px; font-weight: 800; margin-bottom: 2px; color: #ffffff; letter-spacing: -0.5px; text-shadow: 0 1px 12px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1); }

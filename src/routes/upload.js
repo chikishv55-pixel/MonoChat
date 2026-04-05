@@ -32,7 +32,7 @@ async function saveMediaDataUrl(dataUrl, username, folder) {
         extension = mimeType.split('/')[1].split(';')[0];
     }
     
-    const allowedExts = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'webm', 'weba', 'mp4', 'mp3', 'ogg', 'wav', 'webm', 'ogg'];
+    const allowedExts = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'webm', 'weba', 'mp4', 'mp3', 'ogg', 'wav'];
     if (!extension || !allowedExts.includes(extension.toLowerCase())) throw new Error(`Неподдерживаемый тип файла: ${extension}`);
 
     const filename = `${username}-${Date.now()}.${extension}`;

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { dbRun, dbGet } = require('../db/database');
-const jwt = require('jsonwebtoken');
+const jwt = require('../utils/jwt');
 
 // Note: In this project, JWT_SECRET is often imported or defined locally. 
 // I will use a safe way to get it or fallback to the one in auth.js if possible.

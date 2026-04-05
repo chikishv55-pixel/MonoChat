@@ -232,6 +232,9 @@ router.post('/resend-code', async (req, res) => {
 router.post('/premium', async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, message: 'Нет токена доступа' });
+        }
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, JWT_SECRET);
         

@@ -21,7 +21,7 @@ module.exports = function(io, onlineUsers) {
     };
 
     const saveMediaDataUrl = async (dataUrl, username) => {
-        const matches = dataUrl.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+        const matches = dataUrl.match(/^data:([A-Za-z0-9.+\-/]+);base64,(.+)$/);
         if (!matches || matches.length !== 3) throw new Error('Invalid data URL');
         const buffer = Buffer.from(matches[2], 'base64');
         const ext = mime.extension(matches[1]) || 'bin';
