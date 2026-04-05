@@ -827,15 +827,3 @@ function postStory(input) {
             }
         }
 
-        function renderAvatarHTML(avatar, name, className) {
-            const finalData = avatar && avatar.startsWith('/uploads/') ? getFullUrl(avatar) : avatar;
-            if (finalData) {
-                if (isVideoPath(avatar)) {
-                    return `<video src="${finalData}" autoplay loop muted playsinline class="${className}" style="object-fit:cover;"></video>`;
-                } else {
-                    return `<img src="${finalData}" class="${className}">`;
-                }
-            } else {
-                return `<div class="${className}">${name ? name.substring(0,2).toUpperCase() : '??'}</div>`;
-            }
-        }

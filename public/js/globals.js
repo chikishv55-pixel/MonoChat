@@ -54,22 +54,18 @@ function isVideoPath(path) {
     return ['mp4', 'webm', 'ogg', 'mov'].includes(ext);
 }
 
-function renderAvatarHTML(avatar, displayName, className = 'avatar', isPremiumUser = false) {
-    const safeName = escapeHTML(displayName);
-    const firstChars = safeName.substring(0, 2).toUpperCase();
-    let html = '';
-    
-    if (!avatar) {
-        html = `<div class="${className}">${firstChars}</div>`;
-    } else {
-        const url = escapeHTML(getFullUrl(avatar));
+function renderAvatarHTML(avatar, name, className = 'avatar') {
+    const finalData = avatar && avatar.startsWith('/uploads/') ? getFullUrl(avatar) : avatar;
+    if (finalData) {
         if (isVideoPath(avatar)) {
-            html = `<video class="${className}" src="${url}" autoplay loop muted playsinline></video>`;
+            return `<video src="${finalData}" autoplay loop muted playsinline class="${className}" style="object-fit:cover; border-radius:50%;"></video>`;
         } else {
-            html = `<img class="${className}" src="${url}">`;
+            return `<img src="${finalData}" class="${className}" style="border-radius:50%; object-fit:cover;">`;
         }
+    } else {
+        const text = name ? name.substring(0, 2).toUpperCase() : '??';
+        return `<div class="${className}">${text}</div>`;
     }
-    return html;
 }
 
 function escapeHTML(str) {
