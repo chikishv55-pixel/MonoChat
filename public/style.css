@@ -192,10 +192,66 @@ button:hover:not(:disabled), .action-btn:hover, .tg-btn:hover, .modal-btn:hover 
     z-index: 10;
     position: relative; /* For hover card */
 }
-.profile-footer .avatar-wrapper { width: 40px; height: 40px; }
-.profile-footer .status-dot { width: 10px; height: 10px; bottom: 1px; right: 1px; border-width: 2px; }
-.profile-footer .profile-info h3 { font-size: 14px; }
-.profile-footer .profile-status { font-size: 12px; }
+.profile-footer .avatar-wrapper { 
+    width: 42px; 
+    height: 42px; 
+    transition: transform 0.2s;
+}
+.profile-footer .avatar-wrapper:hover {
+    transform: scale(1.05);
+}
+.profile-footer .status-dot { width: 12px; height: 12px; bottom: 1px; right: 1px; border: 2.5px solid var(--bg-card); }
+
+.profile-footer .profile-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+}
+
+.profile-footer .profile-name { 
+    font-size: 15px; 
+    font-weight: 600; 
+    color: var(--text-main);
+    line-height: 1.2;
+}
+.profile-footer .profile-status { 
+    font-size: 12px; 
+    color: #2ecc71; /* Show 'online' color for footer status */
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.profile-actions {
+    display: flex;
+    align-items: center;
+}
+
+.action-btn-mini {
+    background: var(--hover-bg);
+    border: none;
+    color: var(--text-muted);
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn-mini:hover {
+    background: var(--active-bg);
+    color: var(--text-main);
+    transform: rotate(30deg);
+}
+
+.action-btn-mini svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
 
 .search-container {
     padding: 16px 16px 8px 16px;
@@ -225,8 +281,22 @@ button:hover:not(:disabled), .action-btn:hover, .tg-btn:hover, .modal-btn:hover 
 .fab-mini:hover {
     transform: scale(1.05) rotate(5deg);
     box-shadow: 0 6px 14px rgba(0, 122, 255, 0.3);
+}.premium-badge-mini { 
+    background: linear-gradient(135deg, #ffd700, #ffa500); 
+    color: #000; 
+    font-size: 8px; 
+    padding: 2px 5px; 
+    border-radius: 4px; 
+    font-weight: 800; 
+    margin-left: 5px; 
+    text-transform: uppercase;
+    box-shadow: 0 0 5px rgba(255,215,0,0.3);
 }
-.fab-mini svg { width: 18px; height: 18px; stroke: currentColor; }
+
+.premium-badge-mini.admin {
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    color: #fff;
+}
 
 /* MUSIC WIDGET */
 .music-widget { display: flex; align-items: center; gap: 12px; padding: 10px 16px; margin: 12px 16px; background: var(--hover-bg); border-radius: 16px; cursor: pointer; transition: transform 0.2s, background 0.2s; border: none; }

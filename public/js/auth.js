@@ -53,11 +53,24 @@ function authSuccess(user) {
     
     // Update IDs that actually exist in index.html
     const nameFooter = document.getElementById('my-name-footer');
+    const footerStatus = document.querySelector('.profile-footer .profile-status');
     const namePanel = document.getElementById('my-profile-name-modal');
     const usernamePanel = document.getElementById('my-profile-username-modal');
     const settingsDisplayName = document.getElementById('settings-display-name');
 
-    if (nameFooter) nameFooter.textContent = user.display_name;
+    if (nameFooter) {
+        let badgesHTML = '';
+        if (user.is_admin) badgesHTML += '<span class="premium-badge-mini admin">ADMIN</span>';
+        else if (user.is_premium) badgesHTML += '<span class="premium-badge-mini">★</span>';
+        
+        nameFooter.innerHTML = `<div style="display:flex; align-items:center; gap:6px;">
+            ${escapeHTML(user.display_name)} ${badgesHTML}
+        </div>`;
+    }
+    if (footerStatus) {
+        footerStatus.textContent = 'в сети';
+        footerStatus.style.color = '#2ecc71';
+    }
     if (namePanel) namePanel.textContent = user.display_name;
     if (usernamePanel) usernamePanel.textContent = '@' + user.username;
     if (settingsDisplayName) settingsDisplayName.textContent = user.display_name;
