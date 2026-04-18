@@ -20,17 +20,24 @@ module.exports = function(io, onlineUsers) {
         }
     };
 
-    const saveMediaDataUrl = async (dataUrl, username) => {
+    const isMember = async (groupId, username) => {
+        if (!groupId.startsWith('g')) return true; // Private chat
+        const id = parseInt(groupId.substring(1));
+        const membership = await dbGet('SELECT 1 FROM group_members WHERE group_id = ? AND user_username = ?', [id, username]);
+        return !!membership;
+    };
+
+    const saveMediaDataUrl = async (dataUrl, username, folder = 'media') => {
         const matches = dataUrl.match(/^data:([A-Za-z0-9.+\-/]+);base64,(.+)$/);
         if (!matches || matches.length !== 3) throw new Error('Invalid data URL');
         const buffer = Buffer.from(matches[2], 'base64');
         const ext = mime.extension(matches[1]) || 'bin';
-        const filename = `${username}_${Date.now()}.${ext}`;
-        const uploadDir = path.join(__dirname, '../../public/uploads');
+        const filename = `${username}_${Date.now()}_${Math.floor(Math.random() * 1000)}.${ext}`;
+        const uploadDir = path.join(__dirname, '../../public/uploads', folder);
         await fs.mkdir(uploadDir, { recursive: true });
         const filePath = path.join(uploadDir, filename);
         await fs.writeFile(filePath, buffer);
-        return `/uploads/${filename}`;
+        return `/uploads/${folder}/${filename}`;
     };
 
     io.use(async (socket, next) => {
@@ -147,17 +154,30 @@ module.exports = function(io, onlineUsers) {
             try {
                 const me = socket.user;
                 if (!me) return callback([]);
-                const privateChatsRows = await dbAll(`SELECT DISTINCT u.username, u.display_name, u.avatar, u.bio, u.birth_date, u.music_status, u.is_premium, u.is_admin, u.is_moderator, u.custom_badge, u.profile_card_bg, u.profile_effect FROM users u LEFT JOIN messages m ON (u.username = m.sender OR u.username = m.receiver) LEFT JOIN contacts c ON u.username = c.contact_username AND c.owner = ? WHERE (m.sender = ? OR m.receiver = ? OR c.owner = ?) AND u.username != ?`, [me.username, me.username, me.username, me.username, me.username]);
-                const privateChats = privateChatsRows.map(u => ({ ...u, isOnline: onlineUsers.has(u.username), isGroup: false }));
-                const groupChatsRows = await dbAll(`SELECT g.id, g.name, g.avatar, g.type, gm.role as my_role, (SELECT COUNT(*) FROM group_members WHERE group_id = g.id) as member_count FROM groups g JOIN group_members gm ON g.id = gm.group_id WHERE gm.user_username = ?`, [me.username]);
-                const groupChats = groupChatsRows.map(g => ({ username: `g${g.id}`, display_name: g.name, avatar: g.avatar, type: g.type, isGroup: true, my_role: g.my_role, member_count: g.member_count }));
-                const allChats = [...groupChats, ...privateChats];
-                for (const chat of allChats) {
-                    chat.lastMessage = chat.isGroup ? await dbGet(`SELECT id, sender, text, type, time FROM messages WHERE receiver = ? ORDER BY id DESC LIMIT 1`, [chat.username]) : await dbGet(`SELECT id, sender, text, type, time FROM messages WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY id DESC LIMIT 1`, [me.username, chat.username, chat.username, me.username]);
+                
+                // 1. Get all private chat partners and groups
+                const privateChatsRows = await dbAll(`SELECT DISTINCT u.username, u.display_name, u.avatar, u.is_premium FROM users u LEFT JOIN messages m ON (u.username = m.sender OR u.username = m.receiver) LEFT JOIN contacts c ON u.username = c.contact_username AND c.owner = ? WHERE (m.sender = ? OR m.receiver = ? OR c.owner = ?) AND u.username != ?`, [me.username, me.username, me.username, me.username, me.username]);
+                const groupChatsRows = await dbAll(`SELECT g.id, g.name, g.avatar, g.type FROM groups g JOIN group_members gm ON g.id = gm.group_id WHERE gm.user_username = ?`, [me.username]);
+                
+                const chats = [
+                    ...groupChatsRows.map(g => ({ username: `g${g.id}`, display_name: g.name, avatar: g.avatar, type: g.type, isGroup: true })),
+                    ...privateChatsRows.map(u => ({ ...u, isGroup: false, isOnline: onlineUsers.has(u.username) }))
+                ];
+
+                // 2. Fetch last messages in batch (or at least more efficiently)
+                // For SQL.js we still might need to loop, but we can do it faster
+                for (const chat of chats) {
+                    if (chat.isGroup) {
+                        chat.lastMessage = await dbGet(`SELECT id, sender, text, type, time FROM messages WHERE receiver = ? ORDER BY id DESC LIMIT 1`, [chat.username]);
+                    } else {
+                        chat.lastMessage = await dbGet(`SELECT id, sender, text, type, time FROM messages WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY id DESC LIMIT 1`, [me.username, chat.username, chat.username, me.username]);
+                    }
                 }
-                allChats.sort((a, b) => (b.lastMessage ? b.lastMessage.id : 0) - (a.lastMessage ? a.lastMessage.id : 0));
-                callback(allChats);
-            } catch (err) { callback([]); }
+
+                // 3. Sort by last message ID
+                chats.sort((a, b) => (b.lastMessage ? b.lastMessage.id : 0) - (a.lastMessage ? a.lastMessage.id : 0));
+                callback(chats);
+            } catch (err) { console.error('Recent chats error:', err); callback([]); }
         });
 
         socket.on('update_profile', async (data, callback) => {
@@ -175,6 +195,11 @@ module.exports = function(io, onlineUsers) {
             if (typeof callback !== 'function') callback = () => {};
             try {
                 const me = socket.user;
+                
+                // Security check
+                if (!(await isMember(chatWith, me.username))) {
+                    return callback([]);
+                }
                 let query = `
                     SELECT m.*, u.is_admin as sender_is_admin, u.is_moderator as sender_is_moderator, u.custom_badge as sender_custom_badge 
                     FROM messages m 
@@ -200,23 +225,39 @@ module.exports = function(io, onlineUsers) {
             try {
                 const sender = socket.user;
                 let { to, text, type, time, duration, replyTo } = data;
+                
+                // Security check: must be a member to send message
+                if (!(await isMember(to, sender.username))) {
+                    console.warn(`Unauthorized message attempt by ${sender.username} to ${to}`);
+                    return;
+                }
+
                 const isGroup = to.startsWith('g');
                 let replySnippet = null;
                 if (replyTo && replyTo.messageId) {
                     const orig = await dbGet('SELECT text, type, sender FROM messages WHERE id = ?', [replyTo.messageId]);
                     if (orig) replySnippet = `${orig.sender}: ${orig.type === 'text' ? orig.text.substring(0, 50) : orig.type}`;
                 }
-                if ((type==='image' || type==='audio' || type==='circle_video') && text && text.startsWith('data:')) text = await saveMediaDataUrl(text, sender.username);
+                
+                if ((type==='image' || type==='audio' || type==='circle_video') && text && text.startsWith('data:')) {
+                    text = await saveMediaDataUrl(text, sender.username, 'media');
+                }
                 else if (type==='gallery' && Array.isArray(text)) {
-                    let paths = []; for(let d of text) if(d.startsWith('data:')) paths.push(await saveMediaDataUrl(d, sender.username));
+                    let paths = []; 
+                    for(let d of text) {
+                        if(d.startsWith('data:')) paths.push(await saveMediaDataUrl(d, sender.username, 'media'));
+                    }
                     text = JSON.stringify(paths);
                 }
+                
                 const { lastID } = await dbRun("INSERT INTO messages (sender, receiver, text, type, time, duration, reply_to_message_id, reply_snippet) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [sender.username, to, text, type, time, duration || 0, replyTo ? replyTo.messageId : null, replySnippet]);
+                
                 const msgObj = { 
                     id: lastID, sender: sender.username, text, receiver: to, type, time, duration, 
                     reply_to_message_id: replyTo ? replyTo.messageId : null, reply_snippet: replySnippet,
                     sender_is_admin: sender.is_admin, sender_is_moderator: sender.is_moderator, sender_custom_badge: sender.custom_badge
                 };
+                
                 if (isGroup) io.to(to).emit('private message', msgObj);
                 else {
                     const rec = onlineUsers.get(to);
@@ -226,6 +267,110 @@ module.exports = function(io, onlineUsers) {
                     if (sen) io.to(Array.from(sen)).emit('private message', msgObj);
                 }
             } catch (err) { console.error(err); }
+        });
+
+        socket.on('toggle reaction', async (data) => {
+            try {
+                const me = socket.user;
+                const { messageId, emoji } = data;
+                const existing = await dbGet('SELECT 1 FROM message_reactions WHERE message_id = ? AND reactor_username = ? AND emoji = ?', [messageId, me.username, emoji]);
+                
+                if (existing) {
+                    await dbRun('DELETE FROM message_reactions WHERE message_id = ? AND reactor_username = ? AND emoji = ?', [messageId, me.username, emoji]);
+                } else {
+                    await dbRun('INSERT INTO message_reactions (message_id, reactor_username, emoji) VALUES (?, ?, ?)', [messageId, me.username, emoji]);
+                }
+                
+                const msg = await dbGet('SELECT receiver FROM messages WHERE id = ?', [messageId]);
+                if (msg) {
+                    if (msg.receiver.startsWith('g')) io.to(msg.receiver).emit('reaction toggled', { messageId, emoji, reactor: me.username, added: !existing });
+                    else {
+                        const rec = onlineUsers.get(msg.receiver); if (rec) io.to(Array.from(rec)).emit('reaction toggled', { messageId, emoji, reactor: me.username, added: !existing });
+                        const sen = onlineUsers.get(me.username); if (sen) io.to(Array.from(sen)).emit('reaction toggled', { messageId, emoji, reactor: me.username, added: !existing });
+                    }
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        socket.on('forward_message', async (data, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                const me = socket.user;
+                const { messageId, targets } = data;
+                const orig = await dbGet('SELECT text, type FROM messages WHERE id = ?', [messageId]);
+                if (!orig) return callback({ success: false, message: 'Сообщение не найдено' });
+
+                for (const to of targets) {
+                    if (!(await isMember(to, me.username))) continue;
+                    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const { lastID } = await dbRun("INSERT INTO messages (sender, receiver, text, type, time, forwarded_from_username) VALUES (?, ?, ?, ?, ?, ?)", [me.username, to, orig.text, orig.type, time, me.username]);
+                    const msgObj = { id: lastID, sender: me.username, text: orig.text, receiver: to, type: orig.type, time, forwarded_from_username: me.username, sender_is_admin: me.is_admin, sender_is_moderator: me.is_moderator, sender_custom_badge: me.custom_badge };
+                    
+                    if (to.startsWith('g')) io.to(to).emit('private message', msgObj);
+                    else {
+                        const rec = onlineUsers.get(to); if (rec) io.to(Array.from(rec)).emit('private message', msgObj);
+                        const sen = onlineUsers.get(me.username); if (sen) io.to(Array.from(sen)).emit('private message', msgObj);
+                    }
+                }
+                callback({ success: true });
+            } catch (e) { console.error(e); callback({ success: false }); }
+        });
+
+        socket.on('get_comments', async (messageId, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                const comments = await dbAll(`
+                    SELECT c.*, u.display_name, u.avatar, u.is_premium 
+                    FROM message_comments c 
+                    JOIN users u ON c.sender = u.username 
+                    WHERE c.message_id = ? 
+                    ORDER BY c.id ASC`, [messageId]);
+                callback(comments);
+            } catch (e) { console.error(e); callback([]); }
+        });
+
+        socket.on('post_comment', async (data, callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                const me = socket.user;
+                const { messageId, text, time } = data;
+                const { lastID } = await dbRun("INSERT INTO message_comments (message_id, sender, text, time) VALUES (?, ?, ?, ?)", [messageId, me.username, text, time]);
+                const commentObj = { id: lastID, message_id: messageId, sender: me.username, text, time, display_name: me.display_name, avatar: me.avatar, is_premium: me.is_premium };
+                
+                const msg = await dbGet('SELECT receiver FROM messages WHERE id = ?', [messageId]);
+                if (msg) {
+                    if (msg.receiver.startsWith('g')) io.to(msg.receiver).emit('new_comment', commentObj);
+                    else {
+                        const rec = onlineUsers.get(msg.receiver); if (rec) io.to(Array.from(rec)).emit('new_comment', commentObj);
+                        const sen = onlineUsers.get(me.username); if (sen) io.to(Array.from(sen)).emit('new_comment', commentObj);
+                    }
+                }
+                callback({ success: true, comment: commentObj });
+            } catch (e) { console.error(e); callback({ success: false }); }
+        });
+
+        socket.on('post story', async (data) => {
+            try {
+                const me = socket.user;
+                const storiesPath = await saveMediaDataUrl(data.image, me.username, 'stories');
+                const expires = Date.now() + (24 * 60 * 60 * 1000);
+                await dbRun("INSERT INTO stories (username, image, time, expires) VALUES (?, ?, ?, ?)", [me.username, storiesPath, data.time, expires]);
+                io.emit('story_posted', { username: me.username, avatar: me.avatar, image: storiesPath, time: data.time });
+            } catch (e) { console.error(e); }
+        });
+
+        socket.on('get stories', async (callback) => {
+            if (typeof callback !== 'function') callback = () => {};
+            try {
+                const now = Date.now();
+                const stories = await dbAll(`
+                    SELECT s.*, u.display_name, u.avatar 
+                    FROM stories s 
+                    JOIN users u ON s.username = u.username 
+                    WHERE s.expires > ? 
+                    ORDER BY s.id DESC`, [now]);
+                callback(stories);
+            } catch (e) { console.error(e); callback([]); }
         });
 
         socket.on('delete message', async (data) => {

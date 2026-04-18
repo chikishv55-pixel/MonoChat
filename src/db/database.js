@@ -1,4 +1,4 @@
-const initSqlJs = require('sql.js');
+const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs').promises;
 
@@ -8,63 +8,26 @@ const dbPath = path.join(__dirname, '../../chat.db');
 let dbInstance = null;
 
 /**
- * Saves the current in-memory database to the filesystem.
- */
-let saveTimeout = null;
-/**
- * Saves the current in-memory database to the filesystem with debouncing.
+ * better-sqlite3 handles disk persistence automatically.
+ * These functions are kept for compatibility with existing code.
  */
 async function saveDB() {
-    if (!dbInstance) return;
-    
-    // Если уже запланировано сохранение, отменяем старое
-    if (saveTimeout) {
-        clearTimeout(saveTimeout);
-    }
-
-    // Планируем новое сохранение через 500мс
-    saveTimeout = setTimeout(async () => {
-        try {
-            const data = dbInstance.export();
-            const buffer = Buffer.from(data);
-            await fs.writeFile(dbPath, buffer);
-            saveTimeout = null;
-            // console.log('sql.js: БД успешно синхронизирована с диском.');
-        } catch (err) {
-            console.error('Ошибка сохранения БД на диск:', err);
-        }
-    }, 500); 
+    // No-op for better-sqlite3
+    return Promise.resolve();
 }
 
-// Позволяет форсированно сохранить БД (например при выходе)
 async function saveDBImmediate() {
-    if (!dbInstance) return;
-    if (saveTimeout) {
-        clearTimeout(saveTimeout);
-        saveTimeout = null;
-    }
-    try {
-        const data = dbInstance.export();
-        const buffer = Buffer.from(data);
-        await fs.writeFile(dbPath, buffer);
-    } catch (err) {
-        console.error('Ошибка немедленного сохранения БД:', err);
-    }
+    // No-op or sync closing if needed, but not required for graceful shutdown in simple cases
+    return Promise.resolve();
 }
 
-// --- Обертки для работы с базой данных через async/await ---
+// --- Wrappers for DB operations using better-sqlite3 (keeping async for compatibility) ---
 const dbRun = async (sql, params = []) => {
     if (!dbInstance) throw new Error('БД не инициализирована');
     try {
-        dbInstance.run(sql, params);
-        
-        const lastIDRes = dbInstance.exec("SELECT last_insert_rowid() as id");
-        const lastID = lastIDRes[0].values[0][0];
-        
-        // Отложенное сохранение вместо немедленного
-        saveDB();
-        
-        return { lastID, changes: 1 }; 
+        const stmt = dbInstance.prepare(sql);
+        const info = stmt.run(params);
+        return { lastID: info.lastInsertRowid, changes: info.changes };
     } catch (err) {
         if (err.message && !err.message.includes('UNIQUE constraint failed')) {
             console.error('Ошибка выполнения запроса:', sql, params, err.message);
@@ -73,23 +36,12 @@ const dbRun = async (sql, params = []) => {
     }
 };
 
-
 const dbGet = async (sql, params = []) => {
     if (!dbInstance) throw new Error('БД не инициализирована');
     try {
-        const res = dbInstance.exec(sql, params);
-        if (res.length === 0) return null;
-        
-        // Convert sql.js format to standard object format
-        const columns = res[0].columns;
-        const values = res[0].values[0];
-        if (!values) return null;
-        
-        const row = {};
-        columns.forEach((col, i) => {
-            row[col] = values[i];
-        });
-        return row;
+        const stmt = dbInstance.prepare(sql);
+        const row = stmt.get(params);
+        return row || null;
     } catch (err) {
         console.error('Ошибка получения записи:', sql, params, err.message);
         throw err;
@@ -99,39 +51,25 @@ const dbGet = async (sql, params = []) => {
 const dbAll = async (sql, params = []) => {
     if (!dbInstance) throw new Error('БД не инициализирована');
     try {
-        const res = dbInstance.exec(sql, params);
-        if (res.length === 0) return [];
-        
-        const columns = res[0].columns;
-        const rows = res[0].values.map(values => {
-            const row = {};
-            columns.forEach((col, i) => {
-                row[col] = values[i];
-            });
-            return row;
-        });
-        return rows;
+        const stmt = dbInstance.prepare(sql);
+        return stmt.all(params);
     } catch (err) {
         console.error('Ошибка получения записей:', sql, params, err.message);
         throw err;
     }
 };
 
-// --- Инициализация таблиц в БД ---
+/**
+ * Initializes the database and creates tables.
+ */
 async function initDB() {
     try {
-        const SQL = await initSqlJs();
+        // Initialize better-sqlite3
+        dbInstance = new Database(dbPath);
         
-        let fileBuffer;
-        try {
-            fileBuffer = await fs.readFile(dbPath);
-            console.log('Загрузка существующей базы данных...');
-        } catch (e) {
-            console.log('Создание новой базы данных...');
-            fileBuffer = Buffer.alloc(0);
-        }
-
-        dbInstance = new SQL.Database(fileBuffer);
+        // Optimize performance
+        dbInstance.pragma('journal_mode = WAL');
+        dbInstance.pragma('synchronous = NORMAL');
 
         // --- Создание таблиц ---
         await dbRun(`CREATE TABLE IF NOT EXISTS messages (
@@ -164,8 +102,11 @@ async function initDB() {
             verification_token TEXT,
             email TEXT,
             profile_card_bg TEXT,
-            profile_effect TEXT DEFAULT 'none'
+            profile_effect TEXT DEFAULT 'none',
+            is_moderator INTEGER DEFAULT 0,
+            custom_badge TEXT
         )`);
+
         await dbRun(`CREATE TABLE IF NOT EXISTS reports (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             message_id INTEGER,
@@ -182,26 +123,6 @@ async function initDB() {
             details TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
-
-        // Migrations for Roles & Permissions
-        const columnsInUsersCheck = await dbAll(`PRAGMA table_info(users)`);
-        if (!columnsInUsersCheck.some(c => c.name === 'is_moderator')) {
-            try { await dbRun("ALTER TABLE users ADD COLUMN is_moderator INTEGER DEFAULT 0"); } catch(e){}
-        }
-        if (!columnsInUsersCheck.some(c => c.name === 'custom_badge')) {
-            try { await dbRun("ALTER TABLE users ADD COLUMN custom_badge TEXT"); } catch(e){}
-        }
-        
-        // Migration for reports: add message_id if missing
-        try {
-            const columnsInReports = await dbAll(`PRAGMA table_info(reports)`);
-            if (!columnsInReports.some(c => c.name === 'message_id')) {
-                await dbRun(`ALTER TABLE reports ADD COLUMN message_id INTEGER`);
-            }
-        } catch(e){}
-
-        // Migration: Ensure xxx is admin
-        await dbRun("UPDATE users SET is_admin = 1 WHERE username = 'xxx'");
 
         await dbRun(`CREATE TABLE IF NOT EXISTS contacts (
             owner TEXT,
@@ -250,40 +171,8 @@ async function initDB() {
             time TEXT NOT NULL
         )`);
 
-        // --- Миграции ---
-        const columnsInUsers = await dbAll(`PRAGMA table_info(users)`);
-        const hasIsAdmin = columnsInUsers.some(c => c.name === 'is_admin');
-        if (!hasIsAdmin) {
-            // addColumnIfNotExists logic
-            await dbRun(`ALTER TABLE users ADD COLUMN bio TEXT`);
-            await dbRun(`ALTER TABLE users ADD COLUMN birth_date TEXT`);
-            await dbRun(`ALTER TABLE users ADD COLUMN music_status TEXT`);
-            await dbRun(`ALTER TABLE users ADD COLUMN fcm_token TEXT`);
-            await dbRun(`ALTER TABLE users ADD COLUMN is_premium INTEGER DEFAULT 0`);
-            await dbRun(`ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0`);
-            await dbRun(`ALTER TABLE users ADD COLUMN is_banned INTEGER DEFAULT 0`);
-            await dbRun(`ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0`);
-            await dbRun(`ALTER TABLE users ADD COLUMN verification_token TEXT`);
-            await dbRun(`ALTER TABLE users ADD COLUMN email TEXT`);
-        }
-        
-        // Ensure profile_card_bg exists
-        if (!columnsInUsers.some(c => c.name === 'profile_card_bg')) {
-            await dbRun(`ALTER TABLE users ADD COLUMN profile_card_bg TEXT`);
-        }
-
-        // Ensure profile_effect exists
-        if (!columnsInUsers.some(c => c.name === 'profile_effect')) {
-            await dbRun(`ALTER TABLE users ADD COLUMN profile_effect TEXT DEFAULT 'none'`);
-        }
-        
-        // Ensure other columns exist too (for existing DBs)
-        const columnsInMessages = await dbAll(`PRAGMA table_info(messages)`);
-        if (!columnsInMessages.some(c => c.name === 'reply_to_message_id')) {
-            await dbRun(`ALTER TABLE messages ADD COLUMN reply_to_message_id INTEGER`);
-            await dbRun(`ALTER TABLE messages ADD COLUMN reply_snippet TEXT`);
-            await dbRun(`ALTER TABLE messages ADD COLUMN forwarded_from_username TEXT`);
-        }
+        // Migration: Ensure xxx is admin
+        await dbRun("UPDATE users SET is_admin = 1 WHERE username = 'xxx'");
 
         // Создаем папки для загрузок, если их нет
         const uploadsDir = path.join(__dirname, '../../public/uploads');
@@ -291,11 +180,11 @@ async function initDB() {
         await fs.mkdir(path.join(uploadsDir, 'stories'), { recursive: true });
         await fs.mkdir(path.join(uploadsDir, 'media'), { recursive: true });
         
-        console.log('sql.js: БД инициализирована и синхронизирована с диском.');
+        console.log('better-sqlite3: БД инициализирована и готова к работе.');
         
         return true;
     } catch (err) {
-        console.error('Ошибка инициализации БД (sql.js):', err);
+        console.error('Ошибка инициализации БД (better-sqlite3):', err);
         throw err;
     }
 }

@@ -15,6 +15,18 @@ const registerAttempts = new Map();
 const AUTH_ATTEMPTS_LIMIT = 5;
 const AUTH_ATTEMPTS_WINDOW = 5 * 60 * 1000;
 
+// Cleanup old entries every window to prevent memory leaks
+setInterval(() => {
+    const now = Date.now();
+    [loginAttempts, registerAttempts].forEach(map => {
+        for (const [ip, data] of map.entries()) {
+            if (now - data.firstAttempt > AUTH_ATTEMPTS_WINDOW) {
+                map.delete(ip);
+            }
+        }
+    });
+}, AUTH_ATTEMPTS_WINDOW);
+
 router.post('/register', async (req, res) => {
     try {
         const ip = req.ip || req.connection.remoteAddress;
@@ -238,12 +250,21 @@ router.post('/premium', async (req, res) => {
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, JWT_SECRET);
         
-        const { isPremium } = req.body;
+        // BUG FIX: Prevent users from upgrading themselves to premium.
+        // In a real app, this should only happen after a payment or by an admin.
+        const user = await dbGet('SELECT is_admin FROM users WHERE username = ?', [decoded.username]);
+        if (!user || !user.is_admin) {
+            return res.status(403).json({ success: false, message: 'У вас нет прав для изменения статуса Premium.' });
+        }
+
+        const { isPremium, targetUsername } = req.body;
         const value = isPremium ? 1 : 0;
+        const target = targetUsername || decoded.username;
         
-        await dbRun(`UPDATE users SET is_premium = ? WHERE username = ?`, [value, decoded.username]);
-        res.json({ success: true, is_premium: value });
+        await dbRun(`UPDATE users SET is_premium = ? WHERE username = ?`, [value, target]);
+        res.json({ success: true, is_premium: value, target: target });
     } catch(e) {
+        console.error('Premium update error:', e);
         res.status(500).json({ success: false, message: 'Ошибка при обновлении статуса' });
     }
 });
