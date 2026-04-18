@@ -58,15 +58,17 @@ function renderAvatarHTML(avatar, name, className = 'avatar') {
     const finalData = avatar && avatar.startsWith('/uploads/') ? getFullUrl(avatar) : avatar;
     if (finalData) {
         if (isVideoPath(avatar)) {
-            return `<video src="${finalData}" autoplay loop muted playsinline class="${className}" style="object-fit:cover; border-radius:50%;"></video>`;
+            // display:block — критично, иначе браузер ставит inline и видео не отображается в flex-контейнере
+            return `<video src="${finalData}" autoplay loop muted playsinline class="${className}" style="object-fit:cover; border-radius:50%; display:block; width:100%; height:100%;"></video>`;
         } else {
-            return `<img src="${finalData}" class="${className}" style="border-radius:50%; object-fit:cover;">`;
+            return `<img src="${finalData}" class="${className}" style="border-radius:50%; object-fit:cover; display:block;">`;
         }
     } else {
-        const text = name ? name.substring(0, 2).toUpperCase() : '??';
+        const text = (name && name.length > 0) ? name.substring(0, 2).toUpperCase() : '??';
         return `<div class="${className}">${text}</div>`;
     }
 }
+
 
 function escapeHTML(str) {
     if (str === null || str === undefined) return '';

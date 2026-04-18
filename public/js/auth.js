@@ -1,3 +1,5 @@
+let resendTimer = 0;
+
 function showLogin() { 
     document.getElementById('login-card').classList.remove('hidden'); 
     document.getElementById('register-card').classList.add('hidden'); 
@@ -14,7 +16,7 @@ function showVerify() {
     document.getElementById('verify-card').classList.remove('hidden');
 }
 
-function showHelp() { alert("МОНОХРОМ - приватный чат."); }
+function showHelp() { showAlert('МОНОХРОМ — приватный, быстрый мессенджер с шифрованием.', 'О приложении', 'ℹ️'); }
 
 function closeAllModals() {
     document.getElementById('main-overlay').classList.remove('active');
@@ -97,7 +99,7 @@ function authSuccess(user) {
 async function login() {
     const username = document.getElementById('username-input').value.trim();
     const password = document.getElementById('password-input').value;
-    if(!username || !password) return alert('Введите данные');
+    if (!username || !password) return showAlert('Введите имя пользователя и пароль.', 'Внимание', '⚠️');
     try {
         const response = await fetch(SERVER_URL + '/api/auth/login', {
             method: 'POST',
@@ -111,16 +113,16 @@ async function login() {
             socket.disconnect().connect();
             authSuccess(res.user);
         } else {
-            alert(res.message);
+            showAlert(res.message || 'Ошибка входа.', 'Ошибка', '❌');
             // Если аккаунт не подтвержден, показываем поле ввода кода (бэкенд вернет 403)
             if (response.status === 403) {
-                document.getElementById('reg-username').value = username; // Сохраняем имя для верификации
+                document.getElementById('reg-username').value = username;
                 showVerify();
             }
         }
     } catch (err) { 
         console.error('Login error:', err);
-        alert('Ошибка при входе. Проверьте соединение с сервером или консоль браузера.'); 
+        showAlert('Ошибка соединения. Проверьте подключение к серверу.', 'Ошибка сети', '🔌');
     }
 }
 
@@ -133,11 +135,11 @@ async function register() {
         const passwordCheck = document.getElementById('reg-password-confirm').value;
 
         if (!email.includes('@')) {
-            alert('Введите корректный Gmail');
+            showAlert('Введите корректный email адрес.', 'Ошибка', '❌');
             return;
         }
         if (password !== passwordCheck) {
-            alert('Пароли не совпадают!');
+            showAlert('Пароли не совпадают!', 'Ошибка', '❌');
             return;
         }
 
@@ -148,21 +150,21 @@ async function register() {
         });
         const data = await response.json();
         if (data.success) {
-            alert('Регистрация успешна! Введите код подтверждения из вашей почты.');
+            showAlert('Регистрация успешна! Введите код подтверждения из вашей почты.', 'Готово', '✅');
             showVerify();
         } else {
-            alert(data.message || 'Ошибка регистрации');
+            showAlert(data.message || 'Ошибка регистрации.', 'Ошибка', '❌');
         }
     } catch (err) {
         console.error(err);
-        alert('Ошибка соединения с сервером');
+        showAlert('Ошибка соединения с сервером.', 'Ошибка сети', '🔌');
     }
 }
 
 async function verifyCode() {
     const username = document.getElementById('reg-username').value.trim();
     const code = document.getElementById('verify-code-input').value.trim();
-    if (code.length !== 6) return alert('Введите 6-значный код');
+    if (code.length !== 6) return showAlert('Введите 6-значный код.', 'Внимание', '⚠️');
 
     try {
         const response = await fetch(SERVER_URL + '/api/auth/verify-code', {
@@ -172,14 +174,14 @@ async function verifyCode() {
         });
         const data = await response.json();
         if (data.success) {
-            alert(data.message);
+            showAlert(data.message, 'Успех', '✅');
             showLogin();
         } else {
-            alert(data.message);
+            showAlert(data.message || 'Неверный код.', 'Ошибка', '❌');
         }
     } catch (err) { 
         console.error('Verify code error:', err);
-        alert('Ошибка при проверке кода'); 
+        showAlert('Ошибка при проверке кода.', 'Ошибка сети', '🔌');
     }
 }
 
@@ -187,7 +189,7 @@ async function resendCode() {
     if (resendTimer > 0) return;
     
     const username = document.getElementById('reg-username').value.trim();
-    if (!username) return alert('Ошибка: сначала введите ваш юзернейм в поле регистрации');
+    if (!username) return showAlert('Сначала введите ваш юзернейм в поле регистрации.', 'Внимание', '⚠️');
 
     try {
         const response = await fetch(SERVER_URL + '/api/auth/resend-code', {
@@ -196,13 +198,13 @@ async function resendCode() {
             body: JSON.stringify({ username })
         });
         const data = await response.json();
-        alert(data.message);
+        showAlert(data.message, data.success ? 'Готово' : 'Ошибка', data.success ? '✅' : '❌');
         
         if (data.success) {
             startResendTimer(60);
         }
     } catch (err) {
-        alert('Ошибка при повторной отправке');
+        showAlert('Ошибка при повторной отправке.', 'Ошибка сети', '🔌');
     }
 }
 
@@ -226,6 +228,21 @@ function startResendTimer(seconds) {
 // Banned Notification
 if (typeof socket !== 'undefined') {
     socket.on('banned_notification', () => {
-        document.getElementById('banned-overlay').classList.remove('hidden');
+        // Скрываем весь интерфейс чата
+        const chatScreen = document.getElementById('chat-screen');
+        if (chatScreen) chatScreen.classList.remove('active');
+
+        // Показываем banned overlay
+        const overlay = document.getElementById('banned-overlay');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+        } else {
+            // Fallback: показываем красивый алёрт и разлогиниваем
+            showAlert('Ваш аккаунт заблокирован администратором.', 'Аккаунт заблокирован', '🚫').then(() => {
+                localStorage.removeItem('monochrome_token');
+                localStorage.removeItem('monochrome_user');
+                window.location.reload();
+            });
+        }
     });
 }

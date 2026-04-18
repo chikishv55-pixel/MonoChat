@@ -10,14 +10,45 @@ let dbInstance = null;
 /**
  * Saves the current in-memory database to the filesystem.
  */
+let saveTimeout = null;
+/**
+ * Saves the current in-memory database to the filesystem with debouncing.
+ */
 async function saveDB() {
     if (!dbInstance) return;
+    
+    // Если уже запланировано сохранение, отменяем старое
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+    }
+
+    // Планируем новое сохранение через 500мс
+    saveTimeout = setTimeout(async () => {
+        try {
+            const data = dbInstance.export();
+            const buffer = Buffer.from(data);
+            await fs.writeFile(dbPath, buffer);
+            saveTimeout = null;
+            // console.log('sql.js: БД успешно синхронизирована с диском.');
+        } catch (err) {
+            console.error('Ошибка сохранения БД на диск:', err);
+        }
+    }, 500); 
+}
+
+// Позволяет форсированно сохранить БД (например при выходе)
+async function saveDBImmediate() {
+    if (!dbInstance) return;
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+        saveTimeout = null;
+    }
     try {
         const data = dbInstance.export();
         const buffer = Buffer.from(data);
         await fs.writeFile(dbPath, buffer);
     } catch (err) {
-        console.error('Ошибка сохранения БД на диск:', err);
+        console.error('Ошибка немедленного сохранения БД:', err);
     }
 }
 
@@ -25,17 +56,13 @@ async function saveDB() {
 const dbRun = async (sql, params = []) => {
     if (!dbInstance) throw new Error('БД не инициализирована');
     try {
-        // sql.js uses object-based params usually, but it can handle arrays if we prepare.
-        // For simplicity, we use run() for non-query commands.
         dbInstance.run(sql, params);
         
-        // sql.js doesn't provide lastID easily from run() unless it's a statement.
-        // We can get last_insert_rowid()
         const lastIDRes = dbInstance.exec("SELECT last_insert_rowid() as id");
         const lastID = lastIDRes[0].values[0][0];
         
-        // Save to disk after every write to ensure persistence (Option A simplicity)
-        await saveDB();
+        // Отложенное сохранение вместо немедленного
+        saveDB();
         
         return { lastID, changes: 1 }; 
     } catch (err) {
@@ -45,6 +72,7 @@ const dbRun = async (sql, params = []) => {
         throw err;
     }
 };
+
 
 const dbGet = async (sql, params = []) => {
     if (!dbInstance) throw new Error('БД не инициализирована');
@@ -278,5 +306,6 @@ module.exports = {
     dbGet,
     dbAll,
     initDB,
-    saveDB
+    saveDB,
+    saveDBImmediate
 };

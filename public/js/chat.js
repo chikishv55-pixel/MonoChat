@@ -11,7 +11,7 @@
                 return loadRecentChats();
             }
             document.querySelector('.chats-column').classList.add('is-searching');
-                        socket.emit('search users', query, (users) => renderChatsList(users.filter(u => u.username !== currentUser.username), 'Пользователь не найден'));
+            socket.emit('search users', query, (users) => renderChatsList(users, 'Пользователь не найден'));
         }
 
         function renderChatsList(users, emptyText) {
@@ -203,11 +203,20 @@
          }
 
          function toggleMute() {
-             // Placeholder for mute logic - can be expanded with socket events
-             const btn = event.currentTarget;
-             const isMuted = btn.classList.toggle('muted');
-             btn.style.color = isMuted ? '#ef4444' : 'inherit';
-             showAlert(isMuted ? 'Уведомления выключены' : 'Уведомления включены');
+             if (!currentChatUser) return;
+             const key = `muted_${currentChatUser.username}`;
+             const isMuted = !localStorage.getItem(key);
+             if (isMuted) {
+                 localStorage.setItem(key, '1');
+             } else {
+                 localStorage.removeItem(key);
+             }
+             const btn = document.getElementById('mute-btn');
+             if (btn) {
+                 btn.style.color = isMuted ? '#ef4444' : '';
+                 btn.title = isMuted ? 'Уведомления выключены' : 'Выключить уведомления';
+             }
+             showAlert(isMuted ? 'Уведомления выключены' : 'Уведомления включены', 'Настройки', isMuted ? '🔕' : '🔔');
          }
 
          function toggleNotifications() {

@@ -367,16 +367,39 @@ function openNewChatChoiceModal() {
 
         // --- Музыкальный статус ---
         function updateMyMusicUI(status) {
-            // pm-music-widget — в модалке просмотра чужого профиля
-            const widget = document.getElementById('pm-music-widget');
-            const text = document.getElementById('pm-music-text');
-            if (widget && text) {
+            // 1. Обновление в модалке чужого профиля
+            const pmWidget = document.getElementById('pm-music-widget');
+            const pmText = document.getElementById('pm-music-text');
+            if (pmWidget && pmText) {
                 if (status) {
-                    widget.style.display = 'block';
-                    text.textContent = status;
+                    pmWidget.style.display = 'flex';
+                    pmText.textContent = status;
                 } else {
-                    widget.style.display = 'none';
-                    text.textContent = 'Музыка';
+                    pmWidget.style.display = 'none';
+                }
+            }
+
+            // 2. Обновление виджета в боковой панели (над футером)
+            const sideContainer = document.getElementById('music-widget-container');
+            if (sideContainer) {
+                if (status) {
+                    sideContainer.classList.remove('hidden');
+                    sideContainer.innerHTML = `
+                        <div class="music-widget" onclick="promptMusicStatus()">
+                            <div class="music-icon ${status ? 'playing' : ''}">
+                                <div class="eq-bar"></div>
+                                <div class="eq-bar"></div>
+                                <div class="eq-bar"></div>
+                            </div>
+                            <div class="music-info">
+                                <div class="music-title">Listening to</div>
+                                <div class="music-text">${escapeHTML(status)}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    sideContainer.classList.add('hidden');
+                    sideContainer.innerHTML = '';
                 }
             }
         }
@@ -429,34 +452,50 @@ function openNewChatChoiceModal() {
         }
 
         function updateAllMyAvatars(avatarUrl, displayName) {
-            // Мой профиль (просмотр и редактирование)
-            setAvatarUI('my-profile-avatar-img', 'my-profile-avatar-text', avatarUrl, displayName);
-            setAvatarUI('edit-profile-avatar-img', 'edit-profile-avatar-text', avatarUrl, displayName);
-            // Виджет футера
-            setAvatarUI('my-avatar-footer', 'my-avatar-footer-text', avatarUrl, displayName);
+            const footerAvatar = document.getElementById('my-avatar-footer');
+            if (footerAvatar) {
+                footerAvatar.innerHTML = renderAvatarHTML(avatarUrl, displayName, 'avatar');
+            }
+            
+            // Также обновляем аватарки в настройках, если они открыты
+            const settingsAvatar = document.getElementById('my-avatar-display');
+            if (settingsAvatar) {
+                settingsAvatar.innerHTML = renderAvatarHTML(avatarUrl, displayName, 'avatar-large');
+            }
+            
+            const editAvatar = document.getElementById('edit-profile-avatar-display');
+            if (editAvatar) {
+                editAvatar.innerHTML = renderAvatarHTML(avatarUrl, displayName, 'avatar-large');
+            }
         }
 
         function setAvatarUI(imgId, textId, data, name) {
             const imgEl = document.getElementById(imgId);
-            if (!imgEl) return; // Safety check
+            if (!imgEl) return;
             const container = imgEl.parentElement;
-            if (container) {
-                container.innerHTML = `<img id="${imgId}" src="" style="display:none" class="avatar-img-actual">
-                                      <div id="${textId}" style="display:none" class="avatar-text-actual"></div>`;
-                const img = document.getElementById(imgId); 
-                const txt = document.getElementById(textId);
-                const finalData = data && data.startsWith('/uploads/') ? `${getFullUrl(data)}?t=${new Date().getTime()}` : data;
-                
-                if (finalData) {
-                    if (isVideoPath(data)) {
-                        container.innerHTML = `<video id="${imgId}" src="${finalData}" autoplay loop muted playsinline class="avatar-img-actual" style="display:flex; object-fit:cover; width:100%; height:100%"></video>
-                                              <div id="${textId}" style="display:none" class="avatar-text-actual"></div>`;
-                    } else {
-                        img.src = finalData; img.style.display = 'flex'; txt.style.display = 'none';
-                    }
+            if (!container) return;
+
+            const finalData = data && data.startsWith('/uploads/')
+                ? `${getFullUrl(data)}?t=${Date.now()}`
+                : data;
+
+            if (finalData) {
+                if (isVideoPath(data)) {
+                    // Видео-аватарка: display:block — обязательно!
+                    container.innerHTML = `<video id="${imgId}" src="${finalData}" autoplay loop muted playsinline
+                        class="avatar-img-actual"
+                        style="display:block; object-fit:cover; width:100%; height:100%; border-radius:50%;"></video>
+                        <div id="${textId}" style="display:none" class="avatar-text-actual"></div>`;
                 } else {
-                    img.style.display = 'none'; txt.style.display = 'flex'; txt.textContent = name ? name.substring(0,2).toUpperCase() : '??';
+                    container.innerHTML = `<img id="${imgId}" src="${finalData}"
+                        class="avatar-img-actual"
+                        style="display:block; object-fit:cover; border-radius:50%; width:100%; height:100%;">
+                        <div id="${textId}" style="display:none" class="avatar-text-actual"></div>`;
                 }
+            } else {
+                // Заглушка с инициалами
+                container.innerHTML = `<img id="${imgId}" style="display:none" class="avatar-img-actual">
+                    <div id="${textId}" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%;" class="avatar-text-actual">${name ? name.substring(0,2).toUpperCase() : '??'}</div>`;
             }
         }
 

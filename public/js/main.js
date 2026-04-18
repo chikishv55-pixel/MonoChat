@@ -39,3 +39,7 @@ function initEmojiPicker() {
     });
 }
 
+
+document.addEventListener('DOMContentLoaded', () => {
+    initEmojiPicker();
+});

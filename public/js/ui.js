@@ -10,8 +10,10 @@ function postStory(input) {
 
         function loadStories() {
             socket.emit('get stories', stories => {
-                const area = document.getElementById('stories-area');
-                const addBtn = area.querySelector('.story-add').outerHTML;
+                const area = document.getElementById('stories-bar');
+                if (!area) return;
+                const addBtnEl = area.querySelector('.story-add');
+                const addBtn = addBtnEl ? addBtnEl.outerHTML : '';
                 area.innerHTML = addBtn;
                 stories.forEach(s => {
                     const div = document.createElement('div');
@@ -221,7 +223,7 @@ function postStory(input) {
             forwardMessageId = messageId;
             socket.emit('get recent chats', (chats) => {
                 const list = document.getElementById('forward-chats-list');
-                list.innerHTML = '';
+                list.innerHTML = ''; // Всегда очищаем перед заполнением
                 chats.forEach(chat => {
                     const displayName = myContacts[chat.username] || chat.display_name;
                     const avatarHTML = renderAvatarHTML(chat.avatar, displayName, 'chat-avatar');
@@ -241,7 +243,7 @@ function postStory(input) {
             
             const targets = Array.from(selected).map(el => el.value);
             socket.emit('forward_message', { messageId: forwardMessageId, targets }, (res) => {
-                if (res.success) { showAlert('Сообщение переслано.'); } else { showAlert('Ошибка: ' + (res.message || 'Не удалось переслать сообщение.')); }
+                if (res.success) { showAlert('Сообщение переслано!'); } else { showAlert('Ошибка: ' + (res.message || 'Не удалось переслать сообщение.')); }
                 closeAllModals();
             });
         }
@@ -605,29 +607,40 @@ function postStory(input) {
 
         function applyBackgroundToCard(card, bg) {
             if (!card) return;
-            const cover = card.querySelector('#ph-cover');
-            
-            // Standardize bg: if it's an image/url, wrap in url()
-            let finalBg = bg || '';
-            if (finalBg.startsWith('/uploads/') || finalBg.startsWith('http') || finalBg.startsWith('data:')) {
-                finalBg = `url(${getFullUrl(finalBg)}) center/cover no-repeat`;
-            } else if (!finalBg) {
-                finalBg = 'linear-gradient(45deg, var(--accent), #0056b3)';
+
+            // 1) Находим обложку по ID или классу (поддерживаем оба варианта)
+            const cover = card.querySelector('#ph-cover') || card.querySelector('.ph-cover');
+
+            if (!bg || bg.trim() === '') {
+                // Нет фона — сбрасываем к дефолтному градиенту
+                const defaultBg = 'linear-gradient(135deg, var(--accent), rgba(0, 80, 179, 0.6))';
+                if (cover) {
+                    cover.style.background = defaultBg;
+                    cover.style.backgroundSize = '';
+                    cover.style.backgroundPosition = '';
+                }
+                // Сбрасываем цвет карточки — CSS переменная управляет
+                card.style.background = '';
+                return;
+            }
+
+            // Строим финальный CSS для обложки
+            let coverBg = bg;
+            if (bg.startsWith('/uploads/') || bg.startsWith('http') || bg.startsWith('data:')) {
+                coverBg = `url(${getFullUrl(bg)}) center / cover no-repeat`;
             }
 
             if (cover) {
-                cover.style.background = finalBg;
+                cover.style.background = coverBg;
                 cover.style.backgroundSize = 'cover';
                 cover.style.backgroundPosition = 'center';
             }
-            
-            // Apply background to the entire card as well for better look
-            if (bg && (bg.includes('gradient') || bg.startsWith('#') || bg.startsWith('rgba') || bg.startsWith('rgb'))) {
-                // For the card body, we use a darker or more transparent version if possible, 
-                // but for now let's just apply it to the whole card as a base.
+
+            // Применяем фон к самой карточке только для градиентов/цветов
+            if (bg.includes('gradient') || bg.startsWith('#') || bg.startsWith('rgba') || bg.startsWith('rgb')) {
                 card.style.background = bg;
-                card.style.backgroundBlendMode = 'overlay';
             } else {
+                // Для изображений — стекло поверх картинки
                 card.style.background = 'var(--glass-bg)';
             }
         }
@@ -654,40 +667,78 @@ function postStory(input) {
 
         window.saveProfileCustomization = async function() {
             if (!currentUser) return;
-            
+
             const saveBtn = document.querySelector('.ph-save-btn');
+            if (!saveBtn) return;
             const originalText = saveBtn.textContent;
             saveBtn.textContent = 'Сохранение...';
             saveBtn.disabled = true;
 
+            // Таймаут 8 секунд — кнопка не зависнет вечно
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+
             try {
                 const token = localStorage.getItem('monochrome_token');
-                
-                // Update both background and effect
+
                 const response = await fetch(SERVER_URL + '/api/user/update-customization', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify({ 
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
                         effect: currentPreviewEffect,
-                        cardBg: currentPreviewBg
-                    })
+                        cardBg:  currentPreviewBg
+                    }),
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
+
                 if (response.ok) {
-                    currentUser.profile_effect = currentPreviewEffect;
+                    currentUser.profile_effect  = currentPreviewEffect;
                     currentUser.profile_card_bg = currentPreviewBg;
-                    toggleHoverCardSettings(); // Close
+                    localStorage.setItem('monochrome_user', JSON.stringify(currentUser));
+                    toggleHoverCardSettings(); // Закрыть панель
                 } else {
-                    alert('Ошибка при сохранении настроек');
+                    const err = await response.json().catch(() => ({}));
+                    showAlert('Ошибка при сохранении: ' + (err.message || response.status));
                 }
+
             } catch (err) {
-                console.error('Ошибка сохранения кастомизации:', err);
-                alert('Не удалось сохранить изменения');
+                clearTimeout(timeoutId);
+
+                if (err.name === 'AbortError') {
+                    // fetch завис — пробуем через socket как запасной вариант
+                    console.warn('[save] fetch завис, пробуем socket...');
+                    socket.emit('update_profile', {
+                        displayName:   currentUser.display_name,
+                        bio:           currentUser.bio,
+                        birthDate:     currentUser.birth_date,
+                        profileCardBg: currentPreviewBg,
+                        profileEffect: currentPreviewEffect
+                    }, (res) => {
+                        if (res && res.success) {
+                            currentUser.profile_effect  = currentPreviewEffect;
+                            currentUser.profile_card_bg = currentPreviewBg;
+                            localStorage.setItem('monochrome_user', JSON.stringify(currentUser));
+                            toggleHoverCardSettings();
+                        } else {
+                            showAlert('Не удалось сохранить. Проверьте соединение.');
+                        }
+                    });
+                    return; // finally сбросит кнопку
+                }
+
+                console.error('[save] Ошибка сохранения кастомизации:', err);
+                showAlert('Не удалось сохранить изменения. Проверьте соединение.');
             } finally {
                 saveBtn.textContent = originalText;
                 saveBtn.disabled = false;
             }
         };
+
 
         let effectInterval;
         function stopCurrentEffect() {
@@ -827,3 +878,22 @@ function postStory(input) {
             }
         }
 
+
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emoji-picker');
+            if (picker) picker.classList.toggle('active');
+        }
+
+        function switchEmojiTab(tabId) {
+            document.querySelectorAll('.emoji-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.emoji-content').forEach(c => c.classList.remove('active'));
+            const tab = document.querySelector(`.emoji-tab[onclick*="${tabId}"]`);
+            if (tab) tab.classList.add('active');
+            const content = document.getElementById(`tab-${tabId}`);
+            if (content) content.classList.add('active');
+        }
+
+        window.toggleEmojiPicker = toggleEmojiPicker;
+        window.switchEmojiTab = switchEmojiTab;
+        window.showCallChoice = showCallChoice;
+        window.closeCallChoice = closeCallChoice;

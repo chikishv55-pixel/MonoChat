@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, interactive-widget=resizes-content">
-    <title>Монохром</title>
+    <title>Монохром — Минималистичный мессенджер</title>
+    <meta name="description" content="Monochrome — современный, быстрый и приватный мессенджер с поддержкой голосовых и видеозвонков, историями и групповыми чатами.">
+    <meta name="theme-color" content="#007aff">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
     <link rel="stylesheet" href="style.css">
 </head>
@@ -223,9 +225,6 @@
 
 
     <!-- ALL MODALS CONSOLIDATED BELOW AFTER DRAWERS -->
-
-
-    </div>
 
     <!-- МОДАЛКА ПРОФИЛЯ ПАРТНЕРА (DRAWER) -->
     <div class="tg-settings-panel drawer-right" id="profile-modal">
@@ -788,6 +787,19 @@
                 <button id="cm-confirm-btn" class="cm-btn confirm">OK</button>
             </div>
         </div>
+    </div>
+
+
+    <!-- ============ BANNED OVERLAY ============ -->
+    <div id="banned-overlay" class="banned-overlay hidden">
+        <div style="font-size: 80px; margin-bottom: 24px; filter: grayscale(1);">🚫</div>
+        <h1>Доступ запрещён</h1>
+        <p style="font-size: 18px; margin-bottom: 12px; color: #ccc; max-width: 360px;">Ваш аккаунт заблокирован администратором.</p>
+        <p style="font-size: 14px; color: #888; margin-bottom: 36px;">Если вы считаете, что это ошибка — свяжитесь с поддержкой.</p>
+        <button onclick="localStorage.removeItem('monochrome_token'); localStorage.removeItem('monochrome_user'); window.location.reload();"
+            style="background:#ef4444; color:#fff; border:none; padding:14px 32px; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; letter-spacing:0.5px;">
+            Выйти из аккаунта
+        </button>
     </div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
