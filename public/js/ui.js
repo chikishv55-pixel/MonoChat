@@ -39,11 +39,6 @@ function postStory(input) {
             const file = input.files[0]; if (!file) return;
             
             const isVideo = file.type.startsWith('video/');
-            if (isVideo && !isPremium) {
-                showAlert('Видео-аватарки доступны только Premium пользователям');
-                input.value = '';
-                return;
-            }
 
             const reader = new FileReader();
             reader.onload = e => {

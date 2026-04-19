@@ -194,9 +194,22 @@ function openNewChatChoiceModal() {
                     // Обновляем данные без перезагрузки чатов
                     currentUser = res.user;
                     localStorage.setItem('monochrome_user', JSON.stringify(res.user));
-                    document.getElementById('profile-name').textContent = res.user.display_name;
+
+                    // Обновляем UI просмотра профиля
+                    const nameModal = document.getElementById('my-profile-name-modal');
+                    const bioModal = document.getElementById('my-profile-bio');
+                    const bdateEl = document.getElementById('my-profile-bdate');
+                    if (nameModal) nameModal.textContent = res.user.display_name;
+                    if (bioModal) bioModal.textContent = res.user.bio || 'Нет описания';
+                    if (bdateEl) bdateEl.textContent = res.user.birth_date
+                        ? `Дата рождения: ${new Date(res.user.birth_date).toLocaleDateString()}`
+                        : 'Дата рождения не указана';
+
                     updateAllMyAvatars(res.user.avatar, res.user.display_name);
-                    openMySettings(); // Переоткрываем модалку с обновленными данными
+                    if (typeof updateHoverCardUI === 'function') updateHoverCardUI();
+
+                    // Выходим из режима редактирования — возвращаемся к просмотру
+                    exitEditProfileMode();
                 } else { showAlert('Ошибка: ' + (res.message || 'Не удалось сохранить профиль.')); }
             });
         }
