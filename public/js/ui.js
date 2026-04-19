@@ -151,8 +151,13 @@ function postStory(input) {
                 const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
                 const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                 uploadAvatarFile(dataUrl);
+            } else {
+                showAlert('Выберите или обрежьте изображение.');
+                return;
             }
             closeCropModal();
+            // Возвращаемся в профиль
+            if (typeof openMySettings === 'function') openMySettings();
         }
 
         // --- Обрезка вставленных сообщений ---
