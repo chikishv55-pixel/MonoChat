@@ -2587,7 +2587,8 @@ body.dark-theme .message.mine .wave-bar { background: rgba(255,255,255,0.3); }
 
 @media (max-width: 480px) {
     .card { padding: 28px 20px; }
-    .profile-hover-card { width: calc(100vw - 24px); }
+    .profile-hover-card { display: none !important; }
+    .ph-effects-backdrop { display: none !important; }
 }
 
 

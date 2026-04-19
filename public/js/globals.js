@@ -8,10 +8,24 @@ const SERVER_URL = (window.location.hostname === 'localhost' || window.location.
 window.loadStories = window.loadStories || function() { console.log('Stories script not yet ready...'); };
 window.loadRecentChats = window.loadRecentChats || function() { console.log('Chat list script not yet ready...'); };
 
-const socket = io(SERVER_URL);
+// Socket инициализируется с токеном из localStorage (если есть)
+// autoConnect: false — не подключаемся до явного вызова socket.connect()
+const _savedToken = localStorage.getItem('monochrome_token');
+const socket = io(SERVER_URL, {
+    autoConnect: false,
+    auth: { token: _savedToken || '' }
+});
+
+// Подключаемся сразу только если токен есть
+if (_savedToken) {
+    socket.connect();
+}
 
 socket.on('connect_error', (error) => {
-    console.error('Ошибка подключения Socket.IO:', error);
+    // Тихо игнорируем ошибку если мы на экране авторизации
+    const authScreen = document.getElementById('auth-screen');
+    if (authScreen && authScreen.classList.contains('active')) return;
+    console.warn('Socket.IO connect error:', error.message);
 });
 
 // --- Глобальные переменные состояния ---
@@ -139,8 +153,13 @@ window.addEventListener('load', () => {
                 if (res.success) {
                     isPremium = !!res.user.is_premium;
                     try {
-                        socket.auth = { token: token };
-                        socket.disconnect().connect();
+                        // Если сокет не подключён или подключён без токена — переподключаем
+                        if (!socket.connected) {
+                            socket.auth = { token: token };
+                            socket.connect();
+                        } else {
+                            socket.auth = { token: token };
+                        }
                         authSuccess(res.user);
                     } catch (err) {
                         console.error('Ошибка при инициализации профиля:', err);

@@ -87,25 +87,50 @@ function postStory(input) {
             input.value = ''; 
         }
 
-        function uploadAvatarFile(dataUrl) {
-            const oldAvatar = currentUser.avatar;
-            updateAllMyAvatars(dataUrl, currentUser.display_name); // Оптимистичное обновление
+        async function uploadAvatarFile(dataUrl) {
+            const oldAvatar = currentUser ? currentUser.avatar : null;
             
-            fetch(SERVER_URL + '/api/upload/avatar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('monochrome_token') },
-                body: JSON.stringify({ avatar: dataUrl })
-            }).then(r => r.json()).then(res => {
+            // Проверяем размер (лимит 80MB для base64)
+            const approxSizeBytes = dataUrl.length * 0.75;
+            if (approxSizeBytes > 80 * 1024 * 1024) {
+                showAlert('Файл слишком большой. Максимальный размер — 80 МБ.');
+                return;
+            }
+
+            // Оптимистичное обновление UI
+            if (currentUser) updateAllMyAvatars(dataUrl, currentUser.display_name);
+
+            const token = localStorage.getItem('monochrome_token');
+            if (!token) {
+                showAlert('Ошибка: вы не авторизованы.');
+                return;
+            }
+
+            try {
+                const response = await fetch(SERVER_URL + '/api/upload/avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ avatar: dataUrl })
+                });
+
+                const res = await response.json();
+
                 if (res.success) {
                     currentUser.avatar = res.path;
                     localStorage.setItem('monochrome_user', JSON.stringify(currentUser));
                     updateAllMyAvatars(currentUser.avatar, currentUser.display_name);
                 } else {
-                    showAlert('Ошибка обновления аватара: ' + (res.message || ''));
-                    currentUser.avatar = oldAvatar;
-                    updateAllMyAvatars(oldAvatar, currentUser.display_name);
+                    showAlert('Ошибка загрузки аватарки: ' + (res.message || 'Неизвестная ошибка'));
+                    if (currentUser) updateAllMyAvatars(oldAvatar, currentUser.display_name);
                 }
-            });
+            } catch (err) {
+                console.error('[uploadAvatarFile] Network error:', err);
+                showAlert('Ошибка сети при загрузке аватарки. Проверьте соединение.');
+                if (currentUser) updateAllMyAvatars(oldAvatar, currentUser.display_name);
+            }
         }
 
         function closeCropModal() {

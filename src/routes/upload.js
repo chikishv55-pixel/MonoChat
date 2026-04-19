@@ -3,6 +3,7 @@ const router = express.Router();
 const fs = require('fs').promises;
 const path = require('path');
 const mime = require('mime-types');
+const { existsSync } = require('fs');
 const { dbRun, dbGet } = require('../db/database');
 const jwt = require('../utils/jwt');
 const { JWT_SECRET } = require('./auth');
@@ -36,7 +37,10 @@ async function saveMediaDataUrl(dataUrl, username, folder) {
     if (!extension || !allowedExts.includes(extension.toLowerCase())) throw new Error(`Неподдерживаемый тип файла: ${extension}`);
 
     const filename = `${username}-${Date.now()}.${extension}`;
-    const filePath = path.join(__dirname, '..', '..', 'public', 'uploads', folder, filename);
+    const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', folder);
+    // Ensure directory exists
+    await fs.mkdir(uploadDir, { recursive: true });
+    const filePath = path.join(uploadDir, filename);
     await fs.writeFile(filePath, fileBuffer);
     return `/uploads/${folder}/${filename}`;
 }
@@ -46,16 +50,7 @@ router.post('/avatar', async (req, res) => {
         const { avatar } = req.body;
         if (!avatar) return res.status(400).json({ success: false });
         
-        // Проверяем формат (видео или фото)
-        const isVideo = avatar.startsWith('data:video/');
-        
-        if (isVideo) {
-            // Проверяем премиум статус
-            const user = await dbGet(`SELECT is_premium FROM users WHERE username = ?`, [req.user.username]);
-            if (!user || !user.is_premium) {
-                return res.status(403).json({ success: false, message: 'Видео-аватарки доступны только Premium пользователям' });
-            }
-        }
+        // Проверяем что данные вообще пришли
 
         const publicPath = await saveMediaDataUrl(avatar, req.user.username, 'avatars');
         await dbRun(`UPDATE users SET avatar = ? WHERE username = ?`, [publicPath, req.user.username]);
