@@ -78,9 +78,19 @@ process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
 // --- Start Server ---
 initDB().then(() => {
-    server.listen(PORT, '0.0.0.0', () => {
+    server.listen(PORT, '0.0.0.0', async () => {
         console.log(`\n⚲ MONOCHROME SERVER START`);
         console.log(`URL: http://localhost:${PORT}`);
+        
+        try {
+            const { dbGet, dbAll } = require('./src/db/database');
+            const userCount = await dbGet('SELECT COUNT(*) as count FROM users');
+            const logCount = await dbGet('SELECT COUNT(*) as count FROM admin_logs');
+            console.log(`[DB INFO] Users in DB: ${userCount.count}`);
+            console.log(`[DB INFO] Admin logs in DB: ${logCount.count}`);
+        } catch (e) {
+            console.error('[DB INFO] Failed to get stats:', e.message);
+        }
     });
 }).catch(err => {
     console.error('Ошибка инициализации БД:', err);

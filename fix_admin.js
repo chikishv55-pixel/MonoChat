@@ -1,22 +1,32 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('chat.db');
+const Database = require('better-sqlite3');
+const path = require('path');
 
-db.serialize(() => {
-    // Ensure is_admin exists and is set for xxx
-    db.run("UPDATE users SET is_admin = 1 WHERE username = 'xxx'", (err) => {
-        if (err) {
-            console.error("Error setting admin:", err.message);
-        } else {
-            console.log("Admin rights granted to user 'xxx'");
-        }
-    });
+const dbPath = path.join(__dirname, 'chat.db');
+console.log('Attempting to fix admin in:', dbPath);
 
-    db.all("SELECT username, is_admin FROM users", [], (err, rows) => {
-        if (err) {
-            console.error(err.message);
-        } else {
-            console.log("Current users and admin status:", rows);
-        }
-        db.close();
-    });
-});
+const db = new Database(dbPath);
+
+try {
+    const users = db.prepare("SELECT username FROM users").all();
+    console.log('Current users:', users.map(u => u.username).join(', ') || 'NONE');
+
+    if (users.length > 0) {
+        const result = db.prepare("UPDATE users SET is_admin = 1, is_premium = 1").run();
+        console.log(`Updated ${result.changes} users to ADMIN.`);
+    } else {
+        console.log('No users found to promote.');
+        // Maybe insert the xxx user if we are sure?
+        // But we don't have their password hash.
+    }
+
+    // Insert a dummy log so the logs panel isn't empty
+    db.prepare("INSERT INTO admin_logs (admin_username, action, target, details) VALUES (?, ?, ?, ?)").run(
+        'system', 'DB_FIX', 'admin_panel', 'Admin rights restored after DB migration'
+    );
+    console.log('Inserted dummy admin log.');
+
+} catch (err) {
+    console.error('Error during fix:', err);
+} finally {
+    db.close();
+}

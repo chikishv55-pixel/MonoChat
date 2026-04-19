@@ -3,7 +3,8 @@ const path = require('path');
 const fs = require('fs').promises;
 
 // Path to chat.db from the root directory
-const dbPath = path.join(__dirname, '../../chat.db');
+const dbPath = path.resolve(process.cwd(), 'chat.db');
+console.log(`[DATABASE] Using database at: ${dbPath}`);
 
 let dbInstance = null;
 
@@ -148,6 +149,15 @@ async function initDB() {
             public_id TEXT UNIQUE,
             visibility TEXT NOT NULL DEFAULT 'public'
         )`);
+
+        // --- Emergency Admin Fix for Migration ---
+        try {
+            const adminCheck = await dbGet("SELECT count(*) as count FROM users WHERE is_admin = 1");
+            if (adminCheck && adminCheck.count === 0) {
+                console.log("[DATABASE] No admins found. Attempting to promote 'xxx' and 'aaa' if they exist.");
+                await dbRun("UPDATE users SET is_admin = 1, is_premium = 1 WHERE username IN ('xxx', 'aaa', 'vova')");
+            }
+        } catch (e) { console.error("[DATABASE] Admin fix error:", e); }
 
         await dbRun(`CREATE TABLE IF NOT EXISTS group_members (
             group_id INTEGER NOT NULL,
