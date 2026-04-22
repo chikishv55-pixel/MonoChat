@@ -483,6 +483,61 @@ module.exports = function(io, onlineUsers) {
             } catch (err) { console.error(err); callback([]); }
         });
 
+        // --- WebRTC Signaling ---
+        socket.on('start_call', (data) => {
+            const receiver = onlineUsers.get(data.to);
+            if (receiver) {
+                data.from = socket.username;
+                data.callerName = socket.user.display_name;
+                data.callerAvatar = socket.user.avatar;
+                io.to(Array.from(receiver)).emit('incoming_call', data);
+            }
+        });
+
+        socket.on('accept_call', (data) => {
+            const receiver = onlineUsers.get(data.to);
+            if (receiver) {
+                io.to(Array.from(receiver)).emit('call_accepted');
+            }
+        });
+
+        socket.on('reject_call', (data) => {
+            const receiver = onlineUsers.get(data.to);
+            if (receiver) {
+                io.to(Array.from(receiver)).emit('call_rejected');
+            }
+        });
+
+        socket.on('end_call', (data) => {
+            const receiver = onlineUsers.get(data.to);
+            if (receiver) {
+                io.to(Array.from(receiver)).emit('call_ended');
+            }
+        });
+
+        socket.on('webrtc_offer', (data) => {
+            const receiver = onlineUsers.get(data.to);
+            if (receiver) {
+                data.from = socket.username;
+                io.to(Array.from(receiver)).emit('webrtc_offer', data);
+            }
+        });
+
+        socket.on('webrtc_answer', (data) => {
+            const receiver = onlineUsers.get(data.to);
+            if (receiver) {
+                data.from = socket.username;
+                io.to(Array.from(receiver)).emit('webrtc_answer', data);
+            }
+        });
+
+        socket.on('webrtc_ice_candidate', (data) => {
+            const receiver = onlineUsers.get(data.to);
+            if (receiver) {
+                io.to(Array.from(receiver)).emit('webrtc_ice_candidate', data);
+            }
+        });
+
         socket.on('disconnect', () => {
             const u = socket.user;
             if (u && onlineUsers.has(u.username)) {
