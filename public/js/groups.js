@@ -515,6 +515,5 @@ function openNewChatChoiceModal() {
         function logout() { localStorage.removeItem('monochrome_user'); localStorage.removeItem('monochrome_token'); window.location.reload(); }
 
         // ==========================================
-        // WEBRTC ВИДЕОЗВОНКИ
+        // WEBRTC ВИДЕОЗВОНКИ (Перенесено в webrtc.js)
         // ==========================================
-        let peerConnection;
