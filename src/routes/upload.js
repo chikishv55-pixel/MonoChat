@@ -37,7 +37,8 @@ async function saveMediaDataUrl(dataUrl, username, folder) {
     if (!extension || !allowedExts.includes(extension.toLowerCase())) throw new Error(`Неподдерживаемый тип файла: ${extension}`);
 
     const filename = `${username}-${Date.now()}.${extension}`;
-    const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', folder);
+    const { uploadsDir } = require('../utils/paths');
+    const uploadDir = path.join(uploadsDir, folder);
     // Ensure directory exists
     await fs.mkdir(uploadDir, { recursive: true });
     const filePath = path.join(uploadDir, filename);

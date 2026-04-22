@@ -18,6 +18,7 @@
     "better-sqlite3": "^12.9.0",
     "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-device": "^3.0.0",
+    "dotenv": "^17.4.2",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "mime-types": "^2.1.35",
@@ -26,15 +27,19 @@
     "sql.js": "^1.14.1"
   },
   "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.0.0"
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3",
+    "electron-rebuild": "^3.2.9"
   },
   "build": {
     "appId": "com.monochat.app",
     "productName": "MonoChat",
+    "npmRebuild": true,
+    "nodeGypRebuild": false,
     "win": {
       "target": "nsis",
-      "icon": "public/favicon.ico"
+      "icon": "public/favicon.ico",
+      "requestedExecutionLevel": "asInvoker"
     },
     "directories": {
       "output": "dist"
@@ -44,6 +49,7 @@
       "src/**/*",
       "server.js",
       "electron-main.js",
+      "preload.js",
       "package.json"
     ],
     "extraResources": [

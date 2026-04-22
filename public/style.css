@@ -7,6 +7,77 @@
 /* --- 1. GOOGLE FONTS --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
+/* --- CUSTOM TITLE BAR (Electron Frameless) --- */
+.custom-title-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 34px;
+    background: var(--bg-panel);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 10000;
+    border-bottom: 1px solid var(--border-light);
+    user-select: none;
+    transition: background var(--t-med);
+}
+
+.title-bar-drag {
+    flex: 1;
+    height: 100%;
+    -webkit-app-region: drag;
+}
+
+.title-bar-logo {
+    padding: 0 12px;
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 800;
+    pointer-events: none;
+    font-family: 'Outfit', sans-serif;
+}
+
+.title-bar-controls {
+    display: flex;
+    height: 100%;
+}
+
+.title-bar-btn {
+    width: 48px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    transition: background 0.2s, color 0.2s;
+    border-radius: 0 !important;
+}
+
+.title-bar-btn:hover {
+    background: var(--hover-bg);
+    color: var(--text-main);
+}
+
+.title-bar-btn.close:hover {
+    background: #ef4444 !important;
+    color: white !important;
+}
+
+/* Adjusting layout for the title bar */
+#splash-screen, .screen {
+    padding-top: 34px;
+}
+
+.chats-column, .messages-column {
+    padding-top: 0; /* Use offsets if needed, but usually screens handle it */
+}
+
 /* --- 2. DESIGN TOKENS (Светлая тема по умолчанию) --- */
 :root {
     /* Основные цвета */

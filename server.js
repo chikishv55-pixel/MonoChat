@@ -42,7 +42,9 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json({ limit: '100mb' }));
+const { uploadsDir } = require('./src/utils/paths');
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(uploadsDir));
 
 // Logging
 app.use((req, res, next) => {

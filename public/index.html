@@ -13,6 +13,21 @@
 </head>
 
 <body>
+    <div class="custom-title-bar">
+        <div class="title-bar-logo">⚲</div>
+        <div class="title-bar-drag"></div>
+        <div class="title-bar-controls">
+            <button class="title-bar-btn minimize" onclick="window.electronAPI.minimize()">
+                <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M19 13H5v-2h14v2z"/></svg>
+            </button>
+            <button class="title-bar-btn maximize" onclick="window.electronAPI.maximize()">
+                <svg viewBox="0 0 24 24" width="12" height="12"><path fill="currentColor" d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>
+            </button>
+            <button class="title-bar-btn close" onclick="window.electronAPI.close()">
+                <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+            </button>
+        </div>
+    </div>
     <div id="splash-screen">
         <div class="splash-logo">⚲ MONOCHROME</div>
     </div>

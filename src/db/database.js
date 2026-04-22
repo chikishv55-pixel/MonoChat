@@ -2,8 +2,9 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs').promises;
 
-// Path to chat.db from the root directory
-const dbPath = path.resolve(process.cwd(), 'chat.db');
+
+const { dbPath, uploadsDir } = require('../utils/paths');
+
 console.log(`[DATABASE] Using database at: ${dbPath}`);
 
 let dbInstance = null;
@@ -65,6 +66,25 @@ const dbAll = async (sql, params = []) => {
  */
 async function initDB() {
     try {
+        // --- Copy initial DB if it doesn't exist ---
+        if (!require('fs').existsSync(dbPath)) {
+            console.log('[DATABASE] DB not found in userData. Checking for initial DB...');
+            let initialDbPath = path.join(__dirname, '../../chat.db'); // Local dev path
+            
+            // In packed app, extraResources go to process.resourcesPath
+            if (process.resourcesPath) {
+                const packedDbPath = path.join(process.resourcesPath, 'chat.db');
+                if (require('fs').existsSync(packedDbPath)) {
+                    initialDbPath = packedDbPath;
+                }
+            }
+
+            if (require('fs').existsSync(initialDbPath)) {
+                console.log(`[DATABASE] Copying initial DB from ${initialDbPath} to ${dbPath}`);
+                require('fs').copyFileSync(initialDbPath, dbPath);
+            }
+        }
+
         // Initialize better-sqlite3
         dbInstance = new Database(dbPath);
         
@@ -185,7 +205,6 @@ async function initDB() {
         await dbRun("UPDATE users SET is_admin = 1 WHERE username = 'xxx'");
 
         // Создаем папки для загрузок, если их нет
-        const uploadsDir = path.join(__dirname, '../../public/uploads');
         await fs.mkdir(path.join(uploadsDir, 'avatars'), { recursive: true });
         await fs.mkdir(path.join(uploadsDir, 'stories'), { recursive: true });
         await fs.mkdir(path.join(uploadsDir, 'media'), { recursive: true });
