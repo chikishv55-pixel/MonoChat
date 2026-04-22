@@ -10,7 +10,9 @@ window.loadRecentChats = window.loadRecentChats || function() { console.log('Cha
 
 // Socket инициализируется с токеном из localStorage (если есть)
 // autoConnect: false — не подключаемся до явного вызова socket.connect()
-const _savedToken = localStorage.getItem('monochrome_token');
+let _savedToken = localStorage.getItem('monochrome_token');
+if (_savedToken === 'null' || _savedToken === 'undefined') _savedToken = null;
+
 const socket = io(SERVER_URL, {
     autoConnect: false,
     auth: { token: _savedToken || '' }
