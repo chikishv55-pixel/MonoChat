@@ -3,23 +3,25 @@
 // Исправлено: state machine, обработка ошибок ICE, более надёжный сигнал.
 // =====================================================================
 
-// --- Состояние звонка ---
-const CallState = {
-    IDLE:        'idle',
-    DIALING:     'dialing',
-    RINGING:     'ringing',
-    CONNECTING:  'connecting',
-    ACTIVE:      'active',
-};
+// --- Состояние звонка (используем var) ---
+if (typeof CallState === 'undefined') {
+    var CallState = {
+        IDLE:        'idle',
+        DIALING:     'dialing',
+        RINGING:     'ringing',
+        CONNECTING:  'connecting',
+        ACTIVE:      'active',
+    };
+}
 
-let callState        = CallState.IDLE;
-let localStream      = null;
-let remoteStream     = null;
-let peerConnection   = null;
-let callPeerUsername = null;
-let isCurrentCallVideo = false;
-let isSpeakerOn      = true;
-let pendingIceCandidates = [];
+var callState        = CallState.IDLE;
+var localStream      = null;
+var remoteStream     = null;
+var peerConnection   = null;
+var callPeerUsername = null;
+var isCurrentCallVideo = false;
+var isSpeakerOn      = true;
+var pendingIceCandidates = [];
 
 // =====================================================================
 // РИНГТОН через Web Audio API
