@@ -1,5 +1,8 @@
-const { app, BrowserWindow, Menu, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, dialog, ipcMain, session } = require('electron');
 const path = require('path');
+
+// Allow media access for the HTTP VPS IP
+app.commandLine.appendSwitch('unsafely-treat-insecure-origin-as-secure', 'http://5.35.95.248:3000');
 
 // Start the server (DISABLED for remote VPS mode)
 /*
@@ -20,7 +23,7 @@ function createWindow() {
         minWidth: 400,
         minHeight: 600,
         backgroundColor: '#000000',
-        frame: false,
+        frame: true, // Returning the standard Windows frame and buttons
         autoHideMenuBar: true,
         icon: require('fs').existsSync(path.join(__dirname, 'public/favicon.ico')) 
             ? path.join(__dirname, 'public/favicon.ico') 
@@ -46,7 +49,16 @@ function createWindow() {
     });
     ipcMain.on('window-close', () => win.close());
 
-    // Load the remote VPS server
+    // Auto-approve permissions for microphone and camera
+    win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
+        const allowed = ['media', 'audioCapture', 'videoCapture', 'notifications'];
+        if (allowed.includes(permission)) {
+            return callback(true);
+        }
+        callback(false);
+    });
+
+    // Remove the default menu completely VPS server
     const loadURL = () => {
         win.loadURL('http://5.35.95.248:3000').catch(() => {
             console.log('VPS Server not reachable, retrying in 2000ms...');
