@@ -17,7 +17,7 @@ if (typeof CallState === 'undefined') {
 var callState        = CallState.IDLE;
 var localStream      = null;
 var remoteStream     = null;
-var peerConnection   = null;
+var pcrtc           = null;
 var callPeerUsername = null;
 var isCurrentCallVideo = false;
 var isSpeakerOn      = true;
@@ -306,11 +306,11 @@ socket.on('call_accepted', async () => {
     setupPeerConnection();
 
     try {
-        const offer = await peerConnection.createOffer({
+        const offer = await pcrtc.createOffer({
             offerToReceiveAudio: true,
             offerToReceiveVideo: isCurrentCallVideo,
         });
-        await peerConnection.setLocalDescription(offer);
+        await pcrtc.setLocalDescription(offer);
         socket.emit('webrtc_offer', { to: callPeerUsername, offer });
     } catch (err) {
         console.error('[WebRTC] createOffer error:', err);
@@ -332,17 +332,17 @@ socket.on('call_ended', () => {
 });
 
 socket.on('webrtc_offer', async (data) => {
-    if (!peerConnection) setupPeerConnection();
+    if (!pcrtc) setupPeerConnection();
 
     try {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        await pcrtc.setRemoteDescription(new RTCSessionDescription(data.offer));
         // Добавляем буферизованные кандидаты
         while (pendingIceCandidates.length) {
             const c = pendingIceCandidates.shift();
-            await peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(e => console.warn('[WebRTC] pending ICE error:', e));
+            await pcrtc.addIceCandidate(new RTCIceCandidate(c)).catch(e => console.warn('[WebRTC] pending ICE error:', e));
         }
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
+        const answer = await pcrtc.createAnswer();
+        await pcrtc.setLocalDescription(answer);
         socket.emit('webrtc_answer', { to: callPeerUsername, answer });
     } catch (err) {
         console.error('[WebRTC] webrtc_offer error:', err);
@@ -351,9 +351,9 @@ socket.on('webrtc_offer', async (data) => {
 });
 
 socket.on('webrtc_answer', async (data) => {
-    if (!peerConnection) return;
+    if (!pcrtc) return;
     try {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        await pcrtc.setRemoteDescription(new RTCSessionDescription(data.answer));
         callState = CallState.ACTIVE;
     } catch (e) {
         console.error('[WebRTC] setRemoteDescription (answer) error:', e);
@@ -363,9 +363,9 @@ socket.on('webrtc_answer', async (data) => {
 socket.on('webrtc_ice_candidate', async (data) => {
     if (!data.candidate) return;
 
-    if (peerConnection && peerConnection.remoteDescription) {
+    if (pcrtc && pcrtc.remoteDescription) {
         try {
-            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            await pcrtc.addIceCandidate(new RTCIceCandidate(data.candidate));
         } catch(e) {
             console.warn('[WebRTC] addIceCandidate error:', e);
         }
@@ -381,13 +381,13 @@ socket.on('webrtc_ice_candidate', async (data) => {
 
 function setupPeerConnection() {
     // Закрываем старое соединение если есть
-    if (peerConnection) {
-        peerConnection.close();
-        peerConnection = null;
+    if (pcrtc) {
+        pcrtc.close();
+        pcrtc = null;
     }
 
     pendingIceCandidates = [];
-    peerConnection = new RTCPeerConnection(rtcConfig);
+    pcrtc = new RTCPeerConnection(rtcConfig);
     remoteStream   = new MediaStream();
 
     const remoteVideo = document.getElementById('remote-video');
@@ -395,24 +395,24 @@ function setupPeerConnection() {
 
     // Добавляем локальные треки
     if (localStream) {
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+        localStream.getTracks().forEach(track => pcrtc.addTrack(track, localStream));
     }
 
     // Получаем удалённые треки
-    peerConnection.ontrack = (event) => {
+    pcrtc.ontrack = (event) => {
         event.streams[0]?.getTracks().forEach(track => remoteStream.addTrack(track));
     };
 
     // ICE кандидаты
-    peerConnection.onicecandidate = (event) => {
+    pcrtc.onicecandidate = (event) => {
         if (event.candidate && callPeerUsername) {
             socket.emit('webrtc_ice_candidate', { to: callPeerUsername, candidate: event.candidate });
         }
     };
 
     // Мониторинг состояния ICE соединения
-    peerConnection.oniceconnectionstatechange = () => {
-        const state = peerConnection?.iceConnectionState;
+    pcrtc.oniceconnectionstatechange = () => {
+        const state = pcrtc?.iceConnectionState;
         console.log('[WebRTC] ICE state:', state);
 
         if (state === 'connected' || state === 'completed') {
@@ -420,8 +420,8 @@ function setupPeerConnection() {
         } else if (state === 'failed') {
             console.error('[WebRTC] ICE connection failed — trying to restart ICE');
             // Попытка перезапуска ICE (работает в Chrome/Firefox)
-            if (peerConnection && peerConnection.restartIce) {
-                peerConnection.restartIce();
+            if (pcrtc && pcrtc.restartIce) {
+                pcrtc.restartIce();
             } else {
                 _handleCallError('Соединение потеряно. Проверьте интернет-подключение.');
             }
@@ -429,15 +429,15 @@ function setupPeerConnection() {
             // Даём 5 секунд на восстановление
             console.warn('[WebRTC] ICE disconnected — waiting for recovery...');
             setTimeout(() => {
-                if (peerConnection?.iceConnectionState === 'disconnected') {
+                if (pcrtc?.iceConnectionState === 'disconnected') {
                     _handleCallError('Соединение разорвано.');
                 }
             }, 5000);
         }
     };
 
-    peerConnection.onconnectionstatechange = () => {
-        const state = peerConnection?.connectionState;
+    pcrtc.onconnectionstatechange = () => {
+        const state = pcrtc?.connectionState;
         console.log('[WebRTC] Connection state:', state);
         if (state === 'failed') {
             _handleCallError('WebRTC соединение не установлено.');
@@ -462,7 +462,7 @@ function cleanupCall() {
 }
 
 function _resetState() {
-    if (peerConnection) { peerConnection.close(); peerConnection = null; }
+    if (pcrtc) { pcrtc.close(); pcrtc = null; }
     if (localStream)    { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
 
     const localVideo  = document.getElementById('local-video');
