@@ -168,9 +168,22 @@ function _showCallScreen(show) {
 // =====================================================================
 
 async function startCall(videoEnabled) {
-    if (!currentChatUser || currentChatUser.isGroup) return;
+    console.log('[WebRTC] Attempting to start call. Video:', videoEnabled);
+    
+    if (!currentChatUser) {
+        console.error('[WebRTC] Cannot start call: currentChatUser is null');
+        showAlert('Ошибка: чат не выбран.');
+        return;
+    }
+    
+    if (currentChatUser.isGroup) {
+        console.error('[WebRTC] Cannot start call: Groups are not supported');
+        showAlert('Звонки в группах пока не поддерживаются.');
+        return;
+    }
+
     if (callState !== CallState.IDLE) {
-        showAlert('Вы уже в звонке.');
+        showAlert('Вы уже находитесь в звонке.');
         return;
     }
 
@@ -181,7 +194,8 @@ async function startCall(videoEnabled) {
 
     try {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            showAlert('Ваш браузер или соединение не поддерживает звонки (требуется HTTPS).', 'Ошибка', '⚠️');
+            console.error('[WebRTC] getUserMedia not supported (check HTTPS/Origin flags)');
+            showAlert('Ваш браузер или соединение не поддерживает звонки. Требуется безопасное соединение (HTTPS) или настроенный Electron.', 'Ошибка');
             callState = CallState.IDLE;
             return;
         }

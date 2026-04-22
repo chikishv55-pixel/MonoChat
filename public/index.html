@@ -513,8 +513,8 @@
 
     <div id="call-choice-modal" class="custom-modal">
         <h3>Выберите тип звонка</h3>
-        <button class="modal-btn" onclick="startCall(false); closeCallChoice();">Аудиозвонок</button>
-        <button class="modal-btn" onclick="startCall(true); closeCallChoice();">Видеозвонок</button>
+        <button class="modal-btn" onclick="startCall(false).finally(() => closeCallChoice())">Аудиозвонок</button>
+        <button class="modal-btn" onclick="startCall(true).finally(() => closeCallChoice())">Видеозвонок</button>
         <button class="modal-btn transparent" onclick="closeCallChoice()">Отмена</button>
     </div>
 
