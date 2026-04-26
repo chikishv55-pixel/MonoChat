@@ -27,13 +27,15 @@ module.exports = function(io, onlineUsers) {
         return !!membership;
     };
 
+    const { uploadsDir } = require('../utils/paths');
+
     const saveMediaDataUrl = async (dataUrl, username, folder = 'media') => {
         const matches = dataUrl.match(/^data:([A-Za-z0-9.+\-/]+);base64,(.+)$/);
         if (!matches || matches.length !== 3) throw new Error('Invalid data URL');
         const buffer = Buffer.from(matches[2], 'base64');
         const ext = mime.extension(matches[1]) || 'bin';
         const filename = `${username}_${Date.now()}_${Math.floor(Math.random() * 1000)}.${ext}`;
-        const uploadDir = path.join(__dirname, '../../public/uploads', folder);
+        const uploadDir = path.join(uploadsDir, folder);
         await fs.mkdir(uploadDir, { recursive: true });
         const filePath = path.join(uploadDir, filename);
         await fs.writeFile(filePath, buffer);
