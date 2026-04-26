@@ -1,22 +1,13 @@
 const path = require('path');
-const { app } = require('electron');
 
 let dataPath;
 
 try {
+    const { app } = require('electron');
     if (app) {
-        // We are in the Electron main process
         dataPath = app.getPath('userData');
     } else {
-        // We might be in a standalone node process or a child process
-        // Try to get it from Electron if possible (renderer or secondary main)
-        const electron = require('electron');
-        const remoteApp = electron.app || (electron.remote && electron.remote.app);
-        if (remoteApp) {
-            dataPath = remoteApp.getPath('userData');
-        } else {
-            dataPath = process.cwd();
-        }
+        dataPath = process.cwd();
     }
 } catch (e) {
     dataPath = process.cwd();
